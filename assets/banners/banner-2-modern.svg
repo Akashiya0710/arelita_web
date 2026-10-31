@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 640" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="citySky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#070b19"/>
+      <stop offset="45%" stop-color="#131c38"/>
+      <stop offset="78%" stop-color="#2a1f4a"/>
+      <stop offset="100%" stop-color="#0b1021"/>
+    </linearGradient>
+    <radialGradient id="citySunset" cx="72%" cy="62%" r="50%">
+      <stop offset="0%" stop-color="#f472b6" stop-opacity="0.42"/>
+      <stop offset="45%" stop-color="#6366f1" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#070b19" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#1e293b" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="neonGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#1e293b" stop-opacity="0.2"/>
+    </linearGradient>
+    <pattern id="winGrid" width="18" height="24" patternUnits="userSpaceOnUse">
+      <rect x="3" y="4" width="5" height="8" fill="#38bdf8" opacity="0.45"/>
+      <rect x="11" y="4" width="5" height="8" fill="#fde047" opacity="0.35"/>
+      <rect x="3" y="15" width="5" height="6" fill="#e2e8f0" opacity="0.25"/>
+      <rect x="11" y="15" width="5" height="6" fill="#f472b6" opacity="0.35"/>
+    </pattern>
+  </defs>
+
+  <!-- Night Metropolis Sky -->
+  <rect width="1600" height="640" fill="url(#citySky)"/>
+  <rect width="1600" height="640" fill="url(#citySunset)"/>
+
+  <!-- Crescent Moon & High Altitude Aircraft Lights -->
+  <circle cx="1220" cy="120" r="46" fill="#fef9c3" opacity="0.9"/>
+  <circle cx="1238" cy="108" r="42" fill="#101730"/>
+
+  <!-- Background Distant Skyline Layer -->
+  <g fill="#11182d" opacity="0.85">
+    <rect x="40" y="290" width="75" height="240"/>
+    <rect x="130" y="240" width="90" height="290"/>
+    <rect x="240" y="310" width="65" height="220"/>
+    <rect x="390" y="210" width="85" height="320"/>
+    <rect x="590" y="260" width="95" height="270"/>
+    <rect x="820" y="220" width="110" height="310"/>
+    <rect x="1050" y="270" width="80" height="260"/>
+    <rect x="1280" y="250" width="95" height="280"/>
+    <rect x="1420" y="290" width="85" height="240"/>
+  </g>
+
+  <!-- Midground Modern High-Rise Skyscrapers with Illuminated Windows -->
+  <g>
+    <!-- Tower 1 -->
+    <rect x="85" y="220" width="78" height="310" fill="#0d1326" stroke="#38bdf8" stroke-width="1"/>
+    <rect x="91" y="230" width="66" height="280" fill="url(#winGrid)"/>
+    <!-- Tower 2 (Iconic Spire) -->
+    <polygon points="280,530 280,150 325,95 370,150 370,530" fill="#0f172a" stroke="#60a5fa" stroke-width="1.2"/>
+    <line x1="325" y1="35" x2="325" y2="95" stroke="#38bdf8" stroke-width="2.5"/>
+    <circle cx="325" cy="35" r="4" fill="#f43f5e"/>
+    <rect x="292" y="160" width="66" height="340" fill="url(#winGrid)"/>
+    <!-- Tower 3 -->
+    <rect x="460" y="185" width="96" height="345" fill="#0c1222" stroke="#f472b6" stroke-width="1"/>
+    <rect x="470" y="198" width="76" height="310" fill="url(#winGrid)"/>
+    <!-- Central Mega-Tower (Arelita Modern Financial Center) -->
+    <polygon points="670,530 688,110 735,68 782,110 800,530" fill="#0b1120" stroke="#fbbf24" stroke-width="1.5"/>
+    <line x1="735" y1="18" x2="735" y2="68" stroke="#fde047" stroke-width="3"/>
+    <rect x="696" y="120" width="78" height="390" fill="url(#winGrid)"/>
+    <!-- Tower 5 -->
+    <rect x="910" y="170" width="104" height="360" fill="#0e1528" stroke="#38bdf8" stroke-width="1.2"/>
+    <rect x="920" y="182" width="84" height="330" fill="url(#winGrid)"/>
+    <!-- Tower 6 -->
+    <polygon points="1130,530 1130,200 1215,155 1215,530" fill="#0d1426" stroke="#a855f7" stroke-width="1.2"/>
+    <rect x="1140" y="210" width="65" height="300" fill="url(#winGrid)"/>
+    <!-- Tower 7 -->
+    <rect x="1340" y="215" width="92" height="315" fill="#0b1222" stroke="#38bdf8" stroke-width="1"/>
+    <rect x="1350" y="228" width="72" height="285" fill="url(#winGrid)"/>
+  </g>
+
+  <!-- Modern Suspension Bridge & Neon Highway Light Trails -->
+  <path d="M0,510 Q400,485 800,505 T1600,495" fill="none" stroke="#38bdf8" stroke-width="3" opacity="0.85"/>
+  <path d="M0,516 Q400,491 800,511 T1600,501" fill="none" stroke="#f43f5e" stroke-width="2.5" opacity="0.85"/>
+  <path d="M0,521 Q400,496 800,516 T1600,506" fill="none" stroke="#fde047" stroke-width="1.8" opacity="0.8"/>
+
+  <!-- Harbor Bay Water & Neon Reflections -->
+  <rect x="0" y="525" width="1600" height="115" fill="#060914"/>
+  <g opacity="0.38">
+    <rect x="295" y="530" width="55" height="95" fill="url(#neonCyan)"/>
+    <rect x="700" y="530" width="70" height="105" fill="url(#neonGold)"/>
+    <rect x="925" y="530" width="75" height="95" fill="url(#neonCyan)"/>
+    <rect x="1145" y="530" width="55" height="90" fill="url(#neonGold)"/>
+  </g>
+</svg>

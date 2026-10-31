@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 640" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#051811"/>
+      <stop offset="45%" stop-color="#0d3324"/>
+      <stop offset="80%" stop-color="#184a34"/>
+      <stop offset="100%" stop-color="#071a12"/>
+    </linearGradient>
+    <radialGradient id="crownGlow" cx="50%" cy="28%" r="55%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.75"/>
+      <stop offset="35%" stop-color="#f5d061" stop-opacity="0.38"/>
+      <stop offset="70%" stop-color="#10b981" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#051811" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e3a2f"/>
+      <stop offset="50%" stop-color="#fde047" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#132a21"/>
+    </linearGradient>
+    <linearGradient id="goldRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky & Sacred Canopy Glow -->
+  <rect width="1600" height="640" fill="url(#sky1)"/>
+  <rect width="1600" height="640" fill="url(#crownGlow)"/>
+
+  <!-- Celestial Sacred Geometry Halo Rings -->
+  <g transform="translate(800, 210)" opacity="0.42">
+    <circle r="310" fill="none" stroke="url(#goldRim)" stroke-width="1.5" stroke-dasharray="10 8"/>
+    <circle r="245" fill="none" stroke="#fde047" stroke-width="1.2"/>
+    <circle r="185" fill="none" stroke="#34d399" stroke-width="1" stroke-dasharray="4 6"/>
+    <polygon points="0,-245 212,122 -212,122" fill="none" stroke="#fde047" stroke-width="0.9" opacity="0.7"/>
+    <polygon points="0,245 212,-122 -212,-122" fill="none" stroke="#fde047" stroke-width="0.9" opacity="0.7"/>
+  </g>
+
+  <!-- God Rays from Canopy -->
+  <g opacity="0.24">
+    <polygon points="800,-40 320,640 480,640" fill="url(#crownGlow)"/>
+    <polygon points="800,-40 680,640 920,640" fill="url(#crownGlow)"/>
+    <polygon points="800,-40 1120,640 1280,640" fill="url(#crownGlow)"/>
+  </g>
+
+  <!-- Distant Mountain Ranges -->
+  <path d="M0,520 L180,410 L340,480 L540,370 L720,470 L920,390 L1140,465 L1350,360 L1520,450 L1600,415 L1600,640 L0,640 Z" fill="#082218" opacity="0.85"/>
+  <path d="M0,555 L240,465 L450,525 L660,440 L900,515 L1180,435 L1420,510 L1600,475 L1600,640 L0,640 Z" fill="#05160f"/>
+
+  <!-- World Tree Giant Silhouette & Luminous Veins -->
+  <g>
+    <path d="M735,600 Q775,450 778,260 Q750,150 560,70 Q420,20 260,10 L1340,10 Q1180,20 1040,70 Q850,150 822,260 Q825,450 865,600 Z" fill="url(#trunkGrad)" opacity="0.82"/>
+    <!-- Luminous Golden Branches -->
+    <path d="M800,590 C800,430 800,280 800,80" stroke="#fef08a" stroke-width="5" fill="none" opacity="0.75"/>
+    <path d="M792,340 C740,220 620,140 450,85" stroke="#fde047" stroke-width="3.2" fill="none" opacity="0.7"/>
+    <path d="M808,340 C860,220 980,140 1150,85" stroke="#fde047" stroke-width="3.2" fill="none" opacity="0.7"/>
+    <path d="M795,250 C710,150 560,95 360,50" stroke="#6ee7b7" stroke-width="2.4" fill="none" opacity="0.65"/>
+    <path d="M805,250 C890,150 1040,95 1240,50" stroke="#6ee7b7" stroke-width="2.4" fill="none" opacity="0.65"/>
+  </g>
+
+  <!-- Floating Sanctuary Islands & Fantasy Spires -->
+  <g transform="translate(230, 220)">
+    <polygon points="0,60 150,60 120,105 90,145 60,110 30,130" fill="#0d2e20" stroke="#34d399" stroke-width="1"/>
+    <polygon points="55,60 55,15 75,-20 95,15 95,60" fill="#164e37" stroke="#fde047" stroke-width="1.2"/>
+    <circle cx="75" cy="-32" r="5" fill="#fef08a"/>
+  </g>
+
+  <g transform="translate(1220, 195)">
+    <polygon points="0,70 170,70 140,125 95,165 65,120 25,140" fill="#0d2e20" stroke="#34d399" stroke-width="1"/>
+    <polygon points="65,70 65,10 85,-30 105,10 105,70" fill="#164e37" stroke="#fde047" stroke-width="1.2"/>
+    <polygon points="35,70 35,32 47,8 59,32 59,70" fill="#113d2b" stroke="#6ee7b7" stroke-width="1"/>
+    <circle cx="85" cy="-42" r="6" fill="#fef08a"/>
+  </g>
+
+  <!-- Foreground Sanctuary Bridge & Lake Reflection -->
+  <rect x="0" y="560" width="1600" height="80" fill="#030f0a" opacity="0.9"/>
+  <ellipse cx="800" cy="590" rx="420" ry="18" fill="#fde047" opacity="0.22"/>
+  <ellipse cx="800" cy="590" rx="220" ry="8" fill="#6ee7b7" opacity="0.35"/>
+
+  <!-- Floating Golden & Emerald Mana Particles -->
+  <g fill="#fef08a" opacity="0.85">
+    <circle cx="420" cy="180" r="3.5"/><circle cx="510" cy="290" r="2.5"/><circle cx="640" cy="140" r="4"/>
+    <circle cx="720" cy="210" r="3"/><circle cx="890" cy="165" r="4.5"/><circle cx="980" cy="275" r="2.8"/>
+    <circle cx="1120" cy="190" r="3.5"/><circle cx="670" cy="390" r="3"/><circle cx="940" cy="410" r="3.5"/>
+  </g>
+  <g fill="#6ee7b7" opacity="0.8">
+    <circle cx="350" cy="320" r="3"/><circle cx="580" cy="240" r="3.5"/><circle cx="760" cy="120" r="3"/>
+    <circle cx="840" cy="310" r="4"/><circle cx="1050" cy="230" r="3"/><circle cx="1290" cy="340" r="3.5"/>
+  </g>
+</svg>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="worldtree">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>亞雷利塔 ARELITA｜官方世界觀與角色檔案庫</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="shortcut icon" href="assets/favicon.svg" />
+  <script>
+    (function () {
+      try {
+        if (!localStorage.getItem("arelita_worldtree_init")) {
+          localStorage.setItem("arelita_theme", "worldtree");
+          localStorage.setItem("arelita_worldtree_init", "1");
+        }
+        var saved = localStorage.getItem("arelita_theme");
+        if (saved === "light" || saved === "dark" || saved === "starry" || saved === "worldtree") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body class="is-loading">
+  <!-- Game-Portal Opening Intro Animation Overlay -->
+  <div id="introSplash" class="intro-splash" role="status" aria-label="亞雷利塔檔案庫載入動畫">
+    <div class="intro-shutter intro-shutter-top"></div>
+    <div class="intro-shutter intro-shutter-bottom"></div>
+
+    <div class="intro-center-stage">
+      <div class="intro-corner intro-corner-tl"></div>
+      <div class="intro-corner intro-corner-tr"></div>
+      <div class="intro-corner intro-corner-bl"></div>
+      <div class="intro-corner intro-corner-br"></div>
+
+      <!-- Animated Geometric Astrolabe Emblem -->
+      <div class="intro-emblem-wrap">
+        <svg class="intro-ring-svg intro-ring-outer" viewBox="0 0 200 200" fill="none">
+          <circle cx="100" cy="100" r="90" stroke="currentColor" stroke-width="1" stroke-dasharray="5 6" />
+          <circle cx="100" cy="100" r="76" stroke="currentColor" stroke-width="1.2" />
+          <polygon points="100,16 173,142 27,142" stroke="currentColor" stroke-width="0.9" fill="none" />
+          <polygon points="100,184 173,58 27,58" stroke="currentColor" stroke-width="0.9" fill="none" />
+        </svg>
+        <div class="intro-core-diamond">
+          <span>❖</span>
+        </div>
+      </div>
+
+      <div class="intro-kicker">WORLD TREE SYSTEM // INITIALIZING ARCHIVE</div>
+      <h1 class="intro-title">亞 雷 利 塔</h1>
+      <div class="intro-subtitle-en">ARELITA OFFICIAL WORLD &amp; CHARACTER ARCHIVE</div>
+
+      <div class="intro-progress-box">
+        <div class="intro-progress-track">
+          <div class="intro-progress-bar" id="introProgressBar"></div>
+        </div>
+        <div class="intro-progress-meta">
+          <span id="introStatusText">SYNCING WORLD RECORDS...</span>
+          <span id="introPercentText">0%</span>
+        </div>
+      </div>
+
+      <div class="intro-skip-hint">CLICK ANYWHERE TO SKIP // 點擊任意處略過</div>
+    </div>
+  </div>
+
+  <!-- Decorative Game-Portal Background Grid, Floating Orbs & Graphic Design Layer -->
+  <div class="bg-grid-overlay" aria-hidden="true"></div>
+  <div class="bg-graphic-layer" aria-hidden="true">
+    <div class="bg-orb bg-orb-gold"></div>
+    <div class="bg-orb bg-orb-blue"></div>
+
+    <!-- Starry Sky & Shooting Meteors Layer (Active in Starry Theme) -->
+    <div class="starry-sky-layer">
+      <div class="starfield-dots starfield-sm"></div>
+      <div class="starfield-dots starfield-md"></div>
+      <span class="meteor m-1"></span>
+      <span class="meteor m-2"></span>
+      <span class="meteor m-3"></span>
+      <span class="meteor m-4"></span>
+      <span class="meteor m-5"></span>
+      <span class="meteor m-6"></span>
+      <span class="meteor m-7"></span>
+      <span class="meteor m-8"></span>
+    </div>
+
+    <!-- Sacred World Tree Layer (Active in World Tree Theme) -->
+    <div class="worldtree-layer">
+      <div class="sacred-canopy-rays"></div>
+      <svg class="worldtree-silhouette" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wtGoldGreen" x1="400" y1="60" x2="400" y2="760" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#fde047" stop-opacity="0.55" />
+            <stop offset="45%" stop-color="#34d399" stop-opacity="0.4" />
+            <stop offset="100%" stop-color="#eab308" stop-opacity="0.28" />
+          </linearGradient>
+        </defs>
+        <!-- Sacred Halo Rings -->
+        <circle cx="400" cy="340" r="260" stroke="url(#wtGoldGreen)" stroke-width="1.2" stroke-dasharray="6 8" />
+        <circle cx="400" cy="340" r="190" stroke="url(#wtGoldGreen)" stroke-width="1" />
+        <circle cx="400" cy="340" r="115" stroke="url(#wtGoldGreen)" stroke-width="0.9" stroke-dasharray="3 6" />
+        <!-- World Tree Trunk & Sweeping Canopy Branches -->
+        <path d="M400 720 C400 580 400 440 400 280" stroke="url(#wtGoldGreen)" stroke-width="6" stroke-linecap="round" />
+        <path d="M388 720 C395 570 396 450 382 320 C350 230 260 175 180 150" stroke="url(#wtGoldGreen)" stroke-width="3.2" stroke-linecap="round" />
+        <path d="M412 720 C405 570 404 450 418 320 C450 230 540 175 620 150" stroke="url(#wtGoldGreen)" stroke-width="3.2" stroke-linecap="round" />
+        <path d="M394 400 C340 310 250 265 150 260" stroke="url(#wtGoldGreen)" stroke-width="2.4" stroke-linecap="round" />
+        <path d="M406 400 C460 310 550 265 650 260" stroke="url(#wtGoldGreen)" stroke-width="2.4" stroke-linecap="round" />
+        <path d="M396 310 C360 210 310 135 250 95" stroke="url(#wtGoldGreen)" stroke-width="2.2" stroke-linecap="round" />
+        <path d="M404 310 C440 210 490 135 550 95" stroke="url(#wtGoldGreen)" stroke-width="2.2" stroke-linecap="round" />
+        <path d="M400 280 C400 190 400 120 400 65" stroke="url(#wtGoldGreen)" stroke-width="2.6" stroke-linecap="round" />
+        <!-- Sacred Roots -->
+        <path d="M388 700 C355 735 290 760 220 770" stroke="url(#wtGoldGreen)" stroke-width="2.4" stroke-linecap="round" />
+        <path d="M412 700 C445 735 510 760 580 770" stroke="url(#wtGoldGreen)" stroke-width="2.4" stroke-linecap="round" />
+        <path d="M396 710 C375 745 340 770 300 782" stroke="url(#wtGoldGreen)" stroke-width="1.8" stroke-linecap="round" />
+        <path d="M404 710 C425 745 460 770 500 782" stroke="url(#wtGoldGreen)" stroke-width="1.8" stroke-linecap="round" />
+        <!-- Crown Diamond Star -->
+        <polygon points="400,42 414,72 444,86 414,100 400,130 386,100 356,86 386,72" fill="rgba(253, 224, 71, 0.25)" stroke="#fde047" stroke-width="1.2" />
+      </svg>
+      <!-- Rising Golden & Emerald Life Motes -->
+      <span class="tree-mote tm-1"></span>
+      <span class="tree-mote tm-2"></span>
+      <span class="tree-mote tm-3"></span>
+      <span class="tree-mote tm-4"></span>
+      <span class="tree-mote tm-5"></span>
+      <span class="tree-mote tm-6"></span>
+      <span class="tree-mote tm-7"></span>
+      <span class="tree-mote tm-8"></span>
+      <span class="tree-mote tm-9"></span>
+      <span class="tree-mote tm-10"></span>
+    </div>
+
+    <div class="bg-watermark-text">ARELITA // CHRONICLES</div>
+    <svg class="bg-astrolabe" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="300" cy="300" r="260" stroke="currentColor" stroke-width="1" stroke-dasharray="6 8" />
+      <circle cx="300" cy="300" r="210" stroke="currentColor" stroke-width="1" />
+      <circle cx="300" cy="300" r="145" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" />
+      <polygon points="300,55 512,422 88,422" stroke="currentColor" stroke-width="0.8" fill="none" />
+      <polygon points="300,545 512,178 88,178" stroke="currentColor" stroke-width="0.8" fill="none" />
+      <line x1="20" y1="300" x2="580" y2="300" stroke="currentColor" stroke-width="0.7" stroke-dasharray="4 8" />
+      <line x1="300" y1="20" x2="300" y2="580" stroke="currentColor" stroke-width="0.7" stroke-dasharray="4 8" />
+    </svg>
+  </div>
+
+  <!-- Fixed Floating Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+      <div class="brand" id="brandHome" role="button" tabindex="0">
+        <div class="brand-emblem">
+          <span class="emblem-diamond">❖</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
+            <span>亞雷利塔</span>
+            <span class="brand-sub-en">ARELITA // OFFICIAL ARCHIVE</span>
+          </div>
+          <div class="brand-subtitle">五界世界觀・陣營角色圖鑑・傳記文庫</div>
+        </div>
+      </div>
+
+      <nav class="main-nav" aria-label="主要導覽">
+        <button class="nav-tab active" data-tab="home">
+          <span class="nav-label-en">HOME</span>
+          <span class="nav-label-zh">首頁導覽</span>
+        </button>
+        <button class="nav-tab" data-tab="characters">
+          <span class="nav-label-en">ROSTER</span>
+          <span class="nav-label-zh">角色陣營圖鑑</span>
+          <span class="nav-badge" id="navCharCount">175</span>
+        </button>
+        <button class="nav-tab" data-tab="world">
+          <span class="nav-label-en">WORLD</span>
+          <span class="nav-label-zh">世界觀與設定</span>
+          <span class="nav-badge" id="navWorldCount">9</span>
+        </button>
+        <button class="nav-tab" data-tab="attributes">
+          <span class="nav-label-en">ELEMENTS</span>
+          <span class="nav-label-zh">全屬性圖鑑</span>
+          <span class="nav-badge" id="navAttrCount">155</span>
+        </button>
+        <button class="nav-tab" data-tab="stories">
+          <span class="nav-label-en">CHRONICLES</span>
+          <span class="nav-label-zh">劇情文庫</span>
+          <span class="nav-badge" id="navStoryCount">17</span>
+        </button>
+        <button class="nav-tab" data-tab="gallery">
+          <span class="nav-label-en">GALLERY</span>
+          <span class="nav-label-zh">角色立繪畫廊</span>
+          <span class="nav-badge" id="navGalleryCount">36</span>
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="header-search">
+          <div class="search-input-wrap">
+            <span class="search-icon">⌕</span>
+            <input
+              type="search"
+              id="globalSearchInput"
+              placeholder="搜尋角色、稱號、陣營、神權或術式..."
+              autocomplete="off"
+            />
+            <button id="clearSearchBtn" class="clear-search-btn hidden" title="清除搜尋">✕</button>
+          </div>
+        </div>
+
+        <!-- Game-Portal BGM Player & Toggle -->
+        <div class="bgm-control-wrap" id="bgmControlWrap">
+          <button id="bgmToggleBtn" class="bgm-toggle-btn" title="點擊開啟／關閉背景音樂 (BGM)" aria-label="切換背景音樂">
+            <span class="bgm-eq" id="bgmEqIcon" aria-hidden="true">
+              <i class="eq-bar"></i>
+              <i class="eq-bar"></i>
+              <i class="eq-bar"></i>
+              <i class="eq-bar"></i>
+            </span>
+            <span class="bgm-label" id="bgmStatusText">BGM OFF</span>
+          </button>
+          <button id="bgmMenuBtn" class="bgm-menu-btn" title="音量與曲目設定" aria-label="背景音樂設定">▾</button>
+
+          <div id="bgmPopover" class="bgm-popover hidden">
+            <div class="bgm-pop-header">
+              <span>SOUNDTRACK // 背景音樂控制</span>
+              <span id="bgmVolValue">45%</span>
+            </div>
+            <div class="bgm-vol-row">
+              <span>🔉</span>
+              <input type="range" id="bgmVolumeSlider" min="0" max="100" value="45" aria-label="BGM 音量" />
+              <span>🔊</span>
+            </div>
+            <div class="bgm-track-list">
+              <button class="bgm-track-btn active" data-bgm-track="harp">🎵 曲目一：《世界樹之息》奇幻豎琴</button>
+              <button class="bgm-track-btn" data-bgm-track="astral">🌌 曲目二：《星界檔案庫》空靈星音</button>
+              <button class="bgm-track-btn hidden" id="bgmCustomTrackBtn" data-bgm-track="custom">💿 自訂曲目：外部音樂檔</button>
+            </div>
+            <div class="bgm-custom-upload">
+              <label class="bgm-upload-label" for="bgmFileInput">
+                📂 載入自訂音樂 (.mp3 / .wav)
+              </label>
+              <input type="file" id="bgmFileInput" accept="audio/*" class="hidden" />
+            </div>
+          </div>
+          <audio id="bgmCustomAudio" loop preload="auto"></audio>
+        </div>
+
+        <!-- World Tree / Starry / Dark / Light Theme Switcher -->
+        <button id="themeToggleBtn" class="theme-toggle-btn" title="點擊切換：世界樹版／星空版本／黑色版本／白色版本" aria-label="切換網頁主題版本">
+          <span class="theme-icon" id="themeToggleIcon">🌳</span>
+          <span class="theme-text" id="themeToggleText">世界樹版</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace Container -->
+  <main class="main-container">
+    <!-- Graphic Design Portal Banner -->
+    <section class="portal-hero-strip" aria-label="亞雷利塔世界觀導覽橫幅">
+      <div class="hero-corner hero-corner-tl"></div>
+      <div class="hero-corner hero-corner-tr"></div>
+      <div class="hero-corner hero-corner-bl"></div>
+      <div class="hero-corner hero-corner-br"></div>
+      <div class="hero-bg-watermark">WORLD TREE // ARCHIVE</div>
+
+      <div class="hero-strip-left">
+        <div class="hero-tag-row">
+          <span class="hero-sys-pill">❖ SYSTEM // ARELITA VER 3.0</span>
+          <span class="hero-sys-code">ARCHIVE-ID: ARL-00175</span>
+        </div>
+        <h1 class="hero-main-heading">
+          <span>亞雷利塔・五界檔案與傳記資料庫</span>
+          <span class="hero-heading-en">OFFICIAL WORLD &amp; CHARACTER ENCYCLOPEDIA</span>
+        </h1>
+      </div>
+
+      <div class="hero-strip-stats">
+        <div class="hero-stat-card" data-quick-tab="characters" title="前往角色陣營圖鑑">
+          <div class="hero-stat-kicker">ROSTER // 角色陣營圖鑑</div>
+          <div class="hero-stat-val"><span id="heroStatChars">175</span><small>名</small></div>
+        </div>
+        <div class="hero-stat-card" data-quick-tab="world" title="前往世界觀與設定">
+          <div class="hero-stat-kicker">WORLD // 世界觀與設定</div>
+          <div class="hero-stat-val"><span id="heroStatLore">9</span><small>卷</small></div>
+        </div>
+        <div class="hero-stat-card" data-quick-tab="attributes" title="前往全屬性圖鑑">
+          <div class="hero-stat-kicker">ELEMENTS // 全屬性圖鑑</div>
+          <div class="hero-stat-val"><span id="heroStatAttrs">155</span><small>種</small></div>
+        </div>
+        <div class="hero-stat-card" data-quick-tab="stories" title="前往劇情文庫">
+          <div class="hero-stat-kicker">CHRONICLES // 劇情文庫</div>
+          <div class="hero-stat-val"><span id="heroStatStories">17</span><small>章</small></div>
+        </div>
+        <div class="hero-stat-card" data-quick-tab="gallery" title="前往角色立繪畫廊">
+          <div class="hero-stat-kicker">GALLERY // 角色立繪畫廊</div>
+          <div class="hero-stat-val"><span id="heroStatImgs">36</span><small>幅</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 0: HOME PORTAL (CAROUSEL & ARCHIVE GUIDE) ==================== -->
+    <section id="tab-home" class="tab-panel active">
+      <!-- 5-Slide Interactive Worldview Carousel -->
+      <div class="home-carousel-wrap" id="homeCarousel">
+        <div class="carousel-viewport">
+          <!-- Slide 1: Fantasy Sanctuary -->
+          <div class="carousel-slide active" data-slide-index="0">
+            <img src="assets/banners/banner-1-fantasy.svg" alt="奇幻聖域・世界樹與五界樞紐" class="carousel-bg-img" />
+            <div class="carousel-overlay">
+              <div class="carousel-content">
+                <div class="carousel-badge">SLIDE 01 // FANTASY SANCTUARY ・ 奇幻聖域風格</div>
+                <h2 class="carousel-title">世界樹與五界創生樞紐</h2>
+                <p class="carousel-desc">自世界樹孕育自然萬象與九大力源流，串聯現界、魔界、天界、冥界與幻想界五界文明的宏偉史詩。</p>
+                <div class="carousel-actions">
+                  <button class="carousel-cta-btn" data-goto-tab="world">🏛️ 探索五界世界觀</button>
+                  <button class="carousel-cta-btn secondary" data-goto-tab="attributes">✨ 檢視 155 種全屬性圖鑑</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 2: Modern Metropolis -->
+          <div class="carousel-slide" data-slide-index="1">
+            <img src="assets/banners/banner-2-modern.svg" alt="現代都市・魔風聯邦繁華夜色" class="carousel-bg-img" />
+            <div class="carousel-overlay">
+              <div class="carousel-content">
+                <div class="carousel-badge">SLIDE 02 // MODERN METROPOLIS ・ 現代都市風格</div>
+                <h2 class="carousel-title">現代霓虹都市與強國勢力交鋒</h2>
+                <p class="carousel-desc">高聳摩天大樓與跨海大橋交織的現代繁華都會，見證魔風聯邦八大直轄市、世界級組織與異能者的暗流湧動。</p>
+                <div class="carousel-actions">
+                  <button class="carousel-cta-btn" data-goto-tab="characters">⚔️ 檢索 175 名角色圖鑑</button>
+                  <button class="carousel-cta-btn secondary" data-goto-tab="stories">📖 閱讀魔風傳記與外傳</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 3: Sci-Fi Quantum Fortress -->
+          <div class="carousel-slide" data-slide-index="2">
+            <img src="assets/banners/banner-3-scifi.svg" alt="科幻星艦・量子軌道與機械要塞" class="carousel-bg-img" />
+            <div class="carousel-overlay">
+              <div class="carousel-content">
+                <div class="carousel-badge">SLIDE 03 // SCI-FI CYBERNETICS ・ 科幻未來風格</div>
+                <h2 class="carousel-title">量子軌道環與高維機械科技</h2>
+                <p class="carousel-desc">融合微觀量子疊加、改造武裝、機械生命體與星際維度折疊技術，展現超越常規物理法則的未來戰線。</p>
+                <div class="carousel-actions">
+                  <button class="carousel-cta-btn" data-goto-tab="attributes">⚛️ 查閱時空與量子法則屬性</button>
+                  <button class="carousel-cta-btn secondary" data-goto-tab="characters">🔍 依種族與強度階級篩選</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 4: Demon Realm & Abyss -->
+          <div class="carousel-slide" data-slide-index="3">
+            <img src="assets/banners/banner-4-abyss.svg" alt="魔界深淵・煉獄古堡與血月" class="carousel-bg-img" />
+            <div class="carousel-overlay">
+              <div class="carousel-content">
+                <div class="carousel-badge">SLIDE 04 // DARK ABYSS &amp; DEMON REALM ・ 暗黑深淵風格</div>
+                <h2 class="carousel-title">猩紅血月與始源深淵禁區</h2>
+                <p class="carousel-desc">古老魔界八族、吞噬萬物魔力的淵蝕五系，以及歷經無數次世界重置仍屹立於巔峰的古神與神座強者。</p>
+                <div class="carousel-actions">
+                  <button class="carousel-cta-btn" data-goto-tab="characters">👑 查看頂尖強者檔案</button>
+                  <button class="carousel-cta-btn secondary" data-goto-tab="gallery">🖼️ 瀏覽高解析角色立繪</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 5: Celestial Astral Sanctum -->
+          <div class="carousel-slide" data-slide-index="4">
+            <img src="assets/banners/banner-5-celestial.svg" alt="天界星穹・神座聖殿與銀河長廊" class="carousel-bg-img" />
+            <div class="carousel-overlay">
+              <div class="carousel-content">
+                <div class="carousel-badge">SLIDE 05 // CELESTIAL PANTHEON ・ 天界神域風格</div>
+                <h2 class="carousel-title">星穹萬神殿與神權法則迴廊</h2>
+                <p class="carousel-desc">匯聚天體星宿、神聖庇護與至高神權，銘刻自古神紀至新神紀 #12026 年的萬象傳奇。</p>
+                <div class="carousel-actions">
+                  <button class="carousel-cta-btn" data-goto-tab="world">📜 閱覽編年史與組織設定</button>
+                  <button class="carousel-cta-btn secondary" data-goto-tab="gallery">🎨 開啟立繪細節檢視器</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carousel Prev / Next Controls -->
+        <button class="carousel-nav-btn prev" id="carouselPrevBtn" title="上一張" aria-label="上一張輪播圖">❮</button>
+        <button class="carousel-nav-btn next" id="carouselNextBtn" title="下一張" aria-label="下一張輪播圖">❯</button>
+
+        <!-- Carousel 5 Slide Indicators -->
+        <div class="carousel-indicators" id="carouselIndicators" role="tablist" aria-label="輪播圖切換">
+          <button class="carousel-dot active" data-slide-to="0" aria-label="第 1 張：奇幻聖域"></button>
+          <button class="carousel-dot" data-slide-to="1" aria-label="第 2 張：現代都市"></button>
+          <button class="carousel-dot" data-slide-to="2" aria-label="第 3 張：科幻未來"></button>
+          <button class="carousel-dot" data-slide-to="3" aria-label="第 4 張：暗黑深淵"></button>
+          <button class="carousel-dot" data-slide-to="4" aria-label="第 5 張：天界星穹"></button>
+        </div>
+      </div>
+
+      <!-- Website Purpose & Archive Modules Introduction -->
+      <div class="home-purpose-section">
+        <div class="home-purpose-header">
+          <div class="toolbar-kicker">ABOUT THIS ARCHIVE // 網站用途與系統導覽</div>
+          <h2 class="home-purpose-title">《亞雷利塔 ARELITA》官方世界觀與角色統合檔案庫</h2>
+          <p class="home-purpose-lead">
+            本網站為<strong>《亞雷利塔 ARELITA》原創世界觀的官方數位百科與設定檢索系統</strong>，旨在將龐大的五界世界設定、25 國與 11 大世界級組織、175 名登場角色的詳細人設（含種族、強度分級、專屬屬性、武器、加護、神器、神權與術式）、16 大類共 155 種全屬性介紹手冊，以及主線／外傳小說篇章與高清角色立繪整合於同一平台，提供創作者與讀者快速查閱、跨分類交叉檢索與沉浸式閱讀體驗。
+          </p>
+        </div>
+
+        <!-- 5 Feature Cards in Exact Header Navigation Order -->
+        <div class="home-feature-grid">
+          <article class="home-feature-card" data-goto-tab="characters">
+            <div class="hf-top">
+              <span class="hf-icon">⚔️</span>
+              <span class="hf-code">01 // ROSTER ARCHIVE</span>
+            </div>
+            <h3 class="hf-title">角色陣營圖鑑（175 名）</h3>
+            <p class="hf-desc">依現界、魔界、天界與各大組織／部隊階層完整歸檔。支援依「現象級～F」強度階級、世界觀標準種族（支援雙種族以上多重檢索）篩選，並可點擊角色身上的彩色屬性標籤直達屬性手冊。</p>
+            <div class="hf-link">進入角色陣營圖鑑 ➔</div>
+          </article>
+
+          <article class="home-feature-card" data-goto-tab="world">
+            <div class="hf-top">
+              <span class="hf-icon">🏛️</span>
+              <span class="hf-code">02 // WORLD &amp; NATIONS</span>
+            </div>
+            <h3 class="hf-title">世界觀與設定（9 卷）</h3>
+            <p class="hf-desc">收錄五界架構、重置編年史、現存 12 族與已消失 9 族、九大力剋制關係、11 大世界級組織，以及魔風聯邦、哈維德恩龍族帝國、極真圃等國家專題檔案與成員名冊。</p>
+            <div class="hf-link">進入世界觀與設定 ➔</div>
+          </article>
+
+          <article class="home-feature-card" data-goto-tab="attributes">
+            <div class="hf-top">
+              <span class="hf-icon">✨</span>
+              <span class="hf-code">03 // ELEMENTS HANDBOOK</span>
+            </div>
+            <h3 class="hf-title">全屬性分類圖鑑（16 大類 / 155 種）</h3>
+            <p class="hf-desc">完整收錄《亞雷利塔全屬性分類與個別介紹手冊》，涵蓋火、水冰、風、雷、土石金屬、草木花卉、光聖、天體日月、暗影幽冥、深淵淵蝕、血肉武魄、時空、精神幻象、粉碎破壞、毒腐瘟疫與特殊始源法則。</p>
+            <div class="hf-link">進入全屬性圖鑑 ➔</div>
+          </article>
+
+          <article class="home-feature-card" data-goto-tab="stories">
+            <div class="hf-top">
+              <span class="hf-icon">📖</span>
+              <span class="hf-code">04 // STORY CHRONICLES</span>
+            </div>
+            <h3 class="hf-title">劇情文庫（17 章）</h3>
+            <p class="hf-desc">收錄《魔風傳記—銀狼復仇篇》與外傳《入秋初盛綻，秋去罈留香》等完整章節文本，提供舒適的長文排版與小／中／大字級切換功能。</p>
+            <div class="hf-link">進入劇情文庫 ➔</div>
+          </article>
+
+          <article class="home-feature-card" data-goto-tab="gallery">
+            <div class="hf-top">
+              <span class="hf-icon">🖼️</span>
+              <span class="hf-code">05 // PORTRAIT GALLERY</span>
+            </div>
+            <h3 class="hf-title">角色立繪畫廊（36 幅）</h3>
+            <p class="hf-desc">按所屬勢力展示角色全身立繪，點擊立繪可開啟獨立分頁的「高解析度立繪細節檢視器」，自由滾輪無段縮放（15%～600%）與拖曳檢視原圖細節。</p>
+            <div class="hf-link">進入角色立繪畫廊 ➔</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 1: CHARACTER DIRECTORY BY FACTION ==================== -->
+    <section id="tab-characters" class="tab-panel">
+      <div class="workspace-layout">
+        <!-- Left Sidebar: Faction Directory Tree -->
+        <aside class="sidebar" id="factionSidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-kicker">FACTION DIRECTORY</div>
+            <h2>陣營與勢力目錄</h2>
+          </div>
+
+          <div class="filter-controls">
+            <label class="toggle-filter">
+              <input type="checkbox" id="filterHasImage" />
+              <span class="toggle-box"></span>
+              <span>僅顯示有形象圖角色</span>
+              <span class="pill-count" id="hasImageCountBadge">36</span>
+            </label>
+
+            <div class="select-row">
+              <div class="select-field">
+                <span class="select-field-label">TIER // 強度</span>
+                <div class="select-box-wrap">
+                  <select id="filterPowerTier" aria-label="依強度篩選">
+                    <option value="">全部強度階級</option>
+                  </select>
+                </div>
+              </div>
+              <div class="select-field">
+                <span class="select-field-label">RACE // 種族</span>
+                <div class="select-box-wrap">
+                  <select id="filterRace" aria-label="依種族篩選">
+                    <option value="">全部種族</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="faction-tree" id="factionTreeContainer">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </aside>
+
+        <!-- Right Content: Character Catalog & Split Detail View -->
+        <div class="content-area">
+          <div class="content-toolbar">
+            <div class="toolbar-left">
+              <div class="toolbar-kicker">CHARACTER ARCHIVE // 角色檔案檢索</div>
+              <div class="breadcrumb" id="factionBreadcrumb">全部陣營角色</div>
+              <div class="toolbar-subtitle" id="factionDescription">收錄現界、魔界、天界與諸神傳奇共 174 名角色設定檔案</div>
+            </div>
+            <div class="toolbar-right">
+              <div class="view-mode-group" role="group" aria-label="排版檢視模式">
+                <button class="view-mode-btn active" data-view="showcase" title="圖文並列檔案模式（立繪形象圖在旁，完整排版）">
+                  <span>📑 圖文並列</span>
+                </button>
+                <button class="view-mode-btn" data-view="grid" title="精簡目錄卡片模式">
+                  <span>🗂️ 目錄卡片</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="characterListContainer" class="character-list-container view-showcase">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: WORLD-BUILDING & LORE SETTINGS ==================== -->
+    <section id="tab-world" class="tab-panel">
+      <div class="workspace-layout">
+        <!-- Left Sidebar: World Lore Categories & Organization Folders -->
+        <aside class="sidebar" id="worldSidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-kicker">WORLD LORE & NATIONS</div>
+            <h2>世界觀與國家設定</h2>
+          </div>
+          <div class="lore-nav-tree" id="loreNavContainer">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </aside>
+
+        <!-- Right Content: Lore Document Reader / Organization Hub -->
+        <div class="content-area lore-reader-area">
+          <div id="loreContentContainer" class="lore-document-card">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: ATTRIBUTE HANDBOOK & ELEMENTAL ENCYCLOPEDIA ==================== -->
+    <section id="tab-attributes" class="tab-panel">
+      <div class="workspace-layout">
+        <!-- Left Sidebar: 16 Attribute Categories -->
+        <aside class="sidebar" id="attributeSidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-kicker">ELEMENTS &amp; LAWS // 16 CATEGORIES</div>
+            <h2>全屬性分類目錄</h2>
+          </div>
+          <div class="filter-controls">
+            <div class="search-input-wrap">
+              <span class="search-icon">⌕</span>
+              <input
+                type="search"
+                id="attrSearchInput"
+                placeholder="搜尋屬性名稱、構成或介紹..."
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="lore-nav-tree" id="attrCategoryNavContainer">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </aside>
+
+        <!-- Right Content: Selected Attribute Spotlight & Categorized Attribute Grid -->
+        <div class="content-area">
+          <div class="content-toolbar">
+            <div class="toolbar-left">
+              <div class="toolbar-kicker">ATTRIBUTE ENCYCLOPEDIA // 亞雷利塔全屬性分類與個別介紹手冊</div>
+              <div class="breadcrumb" id="attrBreadcrumb">全部 16 大屬性分類（共 155 種）</div>
+              <div class="toolbar-subtitle" id="attrDescription">點擊下方任意屬性卡片，即可檢視該屬性的形態類型、構成要素、作者設定介紹與持有角色名單</div>
+            </div>
+          </div>
+
+          <!-- Selected Attribute Detail Spotlight Panel -->
+          <div id="attrSpotlightContainer" class="attr-spotlight-container hidden">
+            <!-- Populated dynamically when an attribute is clicked -->
+          </div>
+
+          <!-- Categorized Attribute Cards Grid -->
+          <div id="attrCatalogContainer" class="attr-catalog-container">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: STORY ARCHIVE ==================== -->
+    <section id="tab-stories" class="tab-panel">
+      <div class="workspace-layout">
+        <!-- Left Sidebar: Story Series & Chapters -->
+        <aside class="sidebar" id="storySidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-kicker">STORY CHRONICLES</div>
+            <h2>劇情文本目錄</h2>
+          </div>
+          <div class="story-nav-tree" id="storyNavContainer">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </aside>
+
+        <!-- Right Content: Story Reader -->
+        <div class="content-area story-reader-area">
+          <div class="reader-controls">
+            <div>
+              <div class="toolbar-kicker">ARCHIVE READER // 故事閱覽</div>
+              <div id="storyCurrentMeta" class="story-meta-title"></div>
+            </div>
+            <div class="reader-font-btns">
+              <span>字級：</span>
+              <button class="font-size-btn" data-size="sm">小</button>
+              <button class="font-size-btn active" data-size="md">中</button>
+              <button class="font-size-btn" data-size="lg">大</button>
+            </div>
+          </div>
+          <article id="storyContentContainer" class="story-reader-card font-md">
+            <!-- Populated dynamically by app.js -->
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: CHARACTER PORTRAIT GALLERY ==================== -->
+    <section id="tab-gallery" class="tab-panel">
+      <div class="workspace-layout">
+        <!-- Left Sidebar: Gallery Faction Categories -->
+        <aside class="sidebar" id="gallerySidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-kicker">PORTRAIT ARCHIVE</div>
+            <h2>立繪陣營分類</h2>
+          </div>
+          <div class="faction-tree" id="galleryNavContainer">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </aside>
+
+        <!-- Right Content: Categorized Portrait Gallery -->
+        <div class="content-area">
+          <div class="content-toolbar">
+            <div class="toolbar-left">
+              <div class="toolbar-kicker">VISUAL GALLERY // 角色形象立繪</div>
+              <div class="breadcrumb" id="galleryBreadcrumb">全部角色立繪</div>
+              <div class="toolbar-subtitle" id="galleryDescription">依陣營分類展示已收錄之角色形象立繪（點擊卡片可檢視角色完整設定，點擊右上角可放大原圖）</div>
+            </div>
+          </div>
+          <div id="galleryGridContainer" class="gallery-sections-container">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Floating Back-to-Top Button -->
+  <button id="backToTopBtn" class="back-to-top-btn" title="回到網頁最頂部" aria-label="回到網頁最頂部">
+    <span class="btt-arrow">▲</span>
+    <span class="btt-label">TOP</span>
+  </button>
+
+  <!-- Character Full Detail Modal -->
+  <div id="characterModal" class="modal-backdrop hidden" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalCharTitle">
+      <button class="modal-close-btn" id="closeModalBtn" title="關閉 (Esc)">✕</button>
+      <div id="modalBodyContent" class="modal-body-content">
+        <!-- Populated dynamically by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div id="imageLightbox" class="lightbox-backdrop hidden" aria-hidden="true">
+    <button class="lightbox-close-btn" id="closeLightboxBtn" title="關閉預覽">✕</button>
+    <div class="lightbox-inner">
+      <img id="lightboxImg" src="" alt="角色形象放大圖" />
+      <div id="lightboxCaption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

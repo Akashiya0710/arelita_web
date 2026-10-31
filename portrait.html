@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>角色立繪高解析度檢視器｜亞雷利塔 ARELITA</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="shortcut icon" href="assets/favicon.svg" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("arelita_theme");
+        if (saved === "light" || saved === "dark" || saved === "starry") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    :root,
+    body.bg-dark,
+    body.bg-checker {
+      --bg-canvas: #080b11;
+      --bg-toolbar: rgba(13, 18, 28, 0.92);
+      --border-color: rgba(228, 184, 88, 0.42);
+      --border-subtle: rgba(255, 255, 255, 0.14);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-gold: #e4b858;
+      --accent-gold-soft: rgba(228, 184, 88, 0.16);
+      --btn-bg: #161e2e;
+    }
+
+    body.bg-light {
+      --bg-canvas: #eef2f7;
+      --bg-toolbar: rgba(255, 255, 255, 0.94);
+      --border-color: rgba(176, 125, 26, 0.45);
+      --border-subtle: rgba(15, 23, 42, 0.15);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --accent-gold: #b07d1a;
+      --accent-gold-soft: rgba(176, 125, 26, 0.12);
+      --btn-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", -apple-system, sans-serif;
+      user-select: none;
+    }
+
+    /* Canvas Background Modes */
+    body.bg-dark {
+      background: radial-gradient(circle at 50% 45%, #161d2b 0%, #070a10 85%);
+    }
+    body.bg-light {
+      background: radial-gradient(circle at 50% 45%, #ffffff 0%, #dde4ee 85%);
+    }
+    body.bg-checker {
+      background-color: #12161f;
+      background-image:
+        linear-gradient(45deg, #1b2230 25%, transparent 25%),
+        linear-gradient(-45deg, #1b2230 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1b2230 75%),
+        linear-gradient(-45deg, transparent 75%, #1b2230 75%);
+      background-size: 28px 28px;
+      background-position: 0 0, 0 14px, 14px -14px, -14px 0;
+    }
+
+    /* Top Floating Control Bar */
+    .viewer-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: var(--bg-toolbar);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      z-index: 100;
+      gap: 1rem;
+      flex-wrap: nowrap;
+    }
+
+    .viewer-title-box {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .viewer-badge {
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--accent-gold);
+      background: var(--accent-gold-soft);
+      border: 1px solid var(--border-color);
+      padding: 0.18rem 0.52rem;
+      border-radius: 4px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .viewer-title {
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .viewer-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .ctrl-btn {
+      background: var(--btn-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      padding: 0.36rem 0.68rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.28rem;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ctrl-btn:hover,
+    .ctrl-btn.active {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      background: var(--accent-gold-soft);
+    }
+
+    .zoom-readout {
+      min-width: 60px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+      background: var(--accent-gold-soft);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 0.32rem 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .ctrl-divider {
+      width: 1px;
+      height: 22px;
+      background: var(--border-subtle);
+      margin: 0 0.25rem;
+    }
+
+    /* Interactive Viewport */
+    .viewport {
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    .viewport.dragging {
+      cursor: grabbing;
+    }
+
+    .stage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    #portraitImage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      max-width: none;
+      max-height: none;
+      transform-origin: 0 0;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Bottom Floating Help Pill */
+    .viewer-footer-hint {
+      position: fixed;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-toolbar);
+      border: 1px solid var(--border-color);
+      border-radius: 99px;
+      padding: 0.42rem 1.2rem;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 90;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    .viewer-footer-hint strong {
+      color: var(--accent-gold);
+    }
+  </style>
+</head>
+<body class="bg-dark">
+  <header class="viewer-header">
+    <div class="viewer-title-box">
+      <span class="viewer-badge">PORTRAIT INSPECTOR // 立繪細節檢視</span>
+      <h1 class="viewer-title" id="charTitle">角色立繪檢視</h1>
+    </div>
+
+    <div class="viewer-controls">
+      <button class="ctrl-btn" id="btnZoomOut" title="縮小 (滾輪向下)">➖ 縮小</button>
+      <div class="zoom-readout" id="zoomLevelText">100%</div>
+      <button class="ctrl-btn" id="btnZoomIn" title="放大 (滾輪向上)">➕ 放大</button>
+      <button class="ctrl-btn" id="btnZoomFit" title="自動適應視窗高度">🗖 適應視窗</button>
+      <button class="ctrl-btn" id="btnZoomChar" title="聚焦角色全身最佳比例">🎯 聚焦角色</button>
+      <button class="ctrl-btn" id="btnZoomActual" title="100% 原始 4K 解析度像素">1:1 原圖像素</button>
+
+      <div class="ctrl-divider"></div>
+
+      <button class="ctrl-btn active" data-bg="bg-dark" title="曜黑背景">🌑 深色底</button>
+      <button class="ctrl-btn" data-bg="bg-checker" title="透明棋盤格背景">🏁 網格底</button>
+      <button class="ctrl-btn" data-bg="bg-light" title="純白背景">☀️ 淺色底</button>
+
+      <div class="ctrl-divider"></div>
+
+      <a class="ctrl-btn" id="rawImgLink" href="#" target="_blank" title="直接開啟原始 PNG 圖檔">🖼️ 原始圖檔</a>
+    </div>
+  </header>
+
+  <main class="viewport" id="viewport">
+    <div class="stage" id="stage">
+      <img id="portraitImage" src="" alt="角色高解析度立繪" />
+    </div>
+  </main>
+
+  <div class="viewer-footer-hint">
+    <span>🖱️ <strong>滾輪上下</strong>：自由無段縮放細節（20% ～ 600%）</span>
+    <span>✋ <strong>左鍵按住拖曳</strong>：自由移動畫面位置</span>
+    <span>🖱️ <strong>雙擊畫面</strong>：快速放大／還原</span>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const params = new URLSearchParams(window.location.search);
+      const src = params.get("src") || "";
+      const caption = params.get("caption") || "角色立繪檢視";
+
+      const titleEl = document.getElementById("charTitle");
+      const imgEl = document.getElementById("portraitImage");
+      const rawLink = document.getElementById("rawImgLink");
+      const viewport = document.getElementById("viewport");
+      const zoomText = document.getElementById("zoomLevelText");
+
+      titleEl.textContent = caption;
+      titleEl.title = caption;
+      document.title = caption + "｜立繪細節檢視器 - 亞雷利塔 ARELITA";
+
+      if (!src) {
+        titleEl.textContent = "未指定立繪路徑";
+        return;
+      }
+
+      imgEl.addEventListener("load", () => {
+        focusCharacter();
+      });
+
+      imgEl.src = src;
+      rawLink.href = src;
+      if (imgEl.complete && imgEl.naturalWidth > 0) {
+        focusCharacter();
+      }
+
+      let scale = 1;
+      let posX = 0;
+      let posY = 0;
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+
+      const MIN_SCALE = 0.15;
+      const MAX_SCALE = 6.0;
+
+      function updateTransform() {
+        imgEl.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale})`;
+        imgEl.style.transformOrigin = "0 0";
+        zoomText.textContent = `${Math.round(scale * 100)}%`;
+      }
+
+      // Fit full image inside viewport
+      function fitToViewport() {
+        const vw = viewport.clientWidth;
+        const vh = viewport.clientHeight;
+        const iw = imgEl.naturalWidth || 1920;
+        const ih = imgEl.naturalHeight || 1080;
+
+        scale = Math.min((vw * 0.92) / iw, (vh * 0.92) / ih);
+        posX = (vw - iw * scale) / 2;
+        posY = (vh - ih * scale) / 2;
+        updateTransform();
+      }
+
+      // Focus nicely on the character height (fills ~92% of viewport height)
+      function focusCharacter() {
+        const vw = viewport.clientWidth;
+        const vh = viewport.clientHeight;
+        const iw = imgEl.naturalWidth || 3840;
+        const ih = imgEl.naturalHeight || 2160;
+
+        // If 16:9 4K canvas, character occupies ~82% of height in center
+        scale = (vh * 0.94) / ih;
+        posX = (vw - iw * scale) / 2;
+        posY = (vh - ih * scale) / 2;
+        updateTransform();
+      }
+
+      // 1:1 100% original pixel zoom centered on character
+      function zoomActual1to1() {
+        const vw = viewport.clientWidth;
+        const vh = viewport.clientHeight;
+        const iw = imgEl.naturalWidth || 3840;
+        const ih = imgEl.naturalHeight || 2160;
+
+        scale = 1;
+        posX = (vw - iw) / 2;
+        posY = Math.min(20, (vh - ih) / 3);
+        updateTransform();
+      }
+
+      function zoomAtPoint(newScale, clientX, clientY) {
+        const rect = viewport.getBoundingClientRect();
+        const mx = clientX - rect.left;
+        const my = clientY - rect.top;
+
+        const clamped = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+        const ratio = clamped / scale;
+
+        posX = mx - (mx - posX) * ratio;
+        posY = my - (my - posY) * ratio;
+        scale = clamped;
+        updateTransform();
+      }
+
+      // Mouse wheel zoom around cursor position
+      viewport.addEventListener(
+        "wheel",
+        (e) => {
+          e.preventDefault();
+          const factor = e.deltaY < 0 ? 1.16 : 1 / 1.16;
+          zoomAtPoint(scale * factor, e.clientX, e.clientY);
+        },
+        { passive: false }
+      );
+
+      // Drag to pan
+      viewport.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return;
+        isDragging = true;
+        startX = e.clientX - posX;
+        startY = e.clientY - posY;
+        viewport.classList.add("dragging");
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        posX = e.clientX - startX;
+        posY = e.clientY - startY;
+        updateTransform();
+      });
+
+      window.addEventListener("mouseup", () => {
+        isDragging = false;
+        viewport.classList.remove("dragging");
+      });
+
+      // Double click to toggle zoom in / reset
+      viewport.addEventListener("dblclick", (e) => {
+        const ih = imgEl.naturalHeight || 2160;
+        const baseScale = (viewport.clientHeight * 0.94) / ih;
+        if (scale < baseScale * 1.6) {
+          zoomAtPoint(baseScale * 2.2, e.clientX, e.clientY);
+        } else {
+          focusCharacter();
+        }
+      });
+
+      // Toolbar Buttons
+      document.getElementById("btnZoomIn").addEventListener("click", () => {
+        const rect = viewport.getBoundingClientRect();
+        zoomAtPoint(scale * 1.25, rect.left + rect.width / 2, rect.top + rect.height / 2);
+      });
+
+      document.getElementById("btnZoomOut").addEventListener("click", () => {
+        const rect = viewport.getBoundingClientRect();
+        zoomAtPoint(scale / 1.25, rect.left + rect.width / 2, rect.top + rect.height / 2);
+      });
+
+      document.getElementById("btnZoomFit").addEventListener("click", fitToViewport);
+      document.getElementById("btnZoomChar").addEventListener("click", focusCharacter);
+      document.getElementById("btnZoomActual").addEventListener("click", zoomActual1to1);
+
+      document.querySelectorAll("[data-bg]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("[data-bg]").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          document.body.className = btn.getAttribute("data-bg");
+        });
+      });
+
+      window.addEventListener("resize", () => {
+        updateTransform();
+      });
+    })();
+  </script>
+</body>
+</html>
