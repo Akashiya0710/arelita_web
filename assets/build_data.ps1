@@ -54,10 +54,30 @@ function Get-DocxBlocks($path) {
             foreach ($node in $body.ChildNodes) {
                 if ($node.LocalName -eq "p") {
                     $hasDrawing = $node.SelectSingleNode(".//w:drawing", $ns)
-                    $parts = $node.SelectNodes(".//w:t | .//w:br", $ns) | ForEach-Object {
-                        if ($_.LocalName -eq "br") { "`n" } else { $_.InnerText }
+                    $childRuns = $node.SelectNodes(".//w:r", $ns)
+                    $txt = ""
+                    if ($childRuns -and $childRuns.Count -gt 0) {
+                        $pSb = New-Object System.Text.StringBuilder
+                        foreach ($cr in $childRuns) {
+                            $isStrike = ($cr.SelectSingleNode(".//w:strike", $ns) -ne $null) -or ($cr.SelectSingleNode(".//w:dstrike", $ns) -ne $null)
+                            $rTextNodes = $cr.SelectNodes(".//w:t | .//w:br", $ns)
+                            $rText = ""
+                            foreach ($tn in $rTextNodes) {
+                                if ($tn.LocalName -eq "br") { $rText += "`n" } else { $rText += $tn.InnerText }
+                            }
+                            if ($isStrike -and $rText.Trim() -ne "") {
+                                [void]$pSb.Append("~~" + $rText + "~~")
+                            } else {
+                                [void]$pSb.Append($rText)
+                            }
+                        }
+                        $txt = (($pSb.ToString()) -replace '[\uFEFF\u200B]', '').Trim()
+                    } else {
+                        $parts = $node.SelectNodes(".//w:t | .//w:br", $ns) | ForEach-Object {
+                            if ($_.LocalName -eq "br") { "`n" } else { $_.InnerText }
+                        }
+                        $txt = (($parts -join "") -replace '[\uFEFF\u200B]', '').Trim()
                     }
-                    $txt = (($parts -join "") -replace '[\uFEFF\u200B]', '').Trim()
                     if ($txt -ne "") {
                         $blocks.Add(@{ type = "p"; text = $txt })
                     }
@@ -308,12 +328,12 @@ $loreOrder = @(
     @{ path = "亞雷利塔設定文本\組織 國家設定\魔風聯邦\魔風聯邦建國歷史.docx"; category = "組織與國家設定"; orgName = "魔風聯邦"; title = "魔風聯邦建國歷史"; subtitle = "#12010～#12026 赤夜風竹創立魔風至建國與冥府神傑成立編年史"; icon = "📜" },
     @{ path = "亞雷利塔設定文本\組織 國家設定\哈維德恩龍族帝國\哈維德恩龍族帝國 軍隊編制.docx"; category = "組織與國家設定"; orgName = "哈維德恩龍族帝國"; title = "哈維德恩龍族帝國 軍隊編制"; subtitle = "龍皇島軍隊編制・寂滅龍皇・龍皇四柱・親衛隊・四大軍團・龍神"; icon = "🐉" },
     @{ path = "亞雷利塔設定文本\組織 國家設定\極真圃\極真圃時間線.docx"; category = "組織與國家設定"; orgName = "極真圃"; title = "極真圃時間線"; subtitle = "#11595～#12026 伊森塔爾與「識真六花」尋求世界重置真相之軌跡"; icon = "🏵️" },
-    @{ path = "亞雷利塔設定文本\其他設定\「亞雷利塔最強者」.docx"; category = "其他設定"; orgName = ""; title = "「亞雷利塔最強者」名錄"; subtitle = "終世級（18名）・降臨級・神座級 頂尖強者榜單"; icon = "👑" },
     @{ path = "亞雷利塔設定文本\其他設定\虛斬相關.docx"; category = "其他設定"; orgName = ""; title = "虛斬相關設定"; subtitle = "由武神寺山夜明所開發之超越時空獨立劍術「虛斬」與「斷術」機制"; icon = "⚔️" }
 )
 
 $loreIdx = 0
 $processedLore = @{}
+$processedLore[(Join-Path $rootPath "亞雷利塔設定文本\其他設定\「亞雷利塔最強者」.docx")] = $true
 foreach ($item in $loreOrder) {
     $full = Join-Path $rootPath $item.path
     if (Test-Path $full) {
@@ -464,9 +484,21 @@ if (Test-Path $attrDocPath) {
                 if ($row.Count -ge 2) {
                     $num = $row[0].Trim()
                     $aName = $row[1].Trim()
-                    $aForm = if ($row.Count -ge 3) { $row[2].Trim() } else { "" }
-                    $aComp = if ($row.Count -ge 4) { $row[3].Trim() } else { "" }
-                    $aDesc = if ($row.Count -ge 5) { $row[4].Trim() } else { "" }
+                    $aForm = ""
+                    $aComp = ""
+                    $aDesc = ""
+                    if ($row.Count -eq 3) {
+                        $aForm = $row[2].Trim()
+                    } elseif ($row.Count -eq 4) {
+                        # 4 columns: 序號, 屬性名稱, 形態類型, 個別介紹 (已刪除構成要素/關聯母體)
+                        $aForm = $row[2].Trim()
+                        $aDesc = $row[3].Trim()
+                    } elseif ($row.Count -ge 5) {
+                        # Legacy 5 columns fallback
+                        $aForm = $row[2].Trim()
+                        $aComp = $row[3].Trim()
+                        $aDesc = $row[4].Trim()
+                    }
                     if ($aName -ne "") {
                         $items.Add(@{
                             num = $num

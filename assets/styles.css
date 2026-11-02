@@ -2161,6 +2161,17 @@ body.is-loaded .workspace-layout {
   flex-wrap: wrap;
 }
 
+.char-name del,
+.grid-card-title del,
+.gallery-char-name del,
+.ability-content del,
+del.strikethrough-text {
+  text-decoration: line-through;
+  text-decoration-color: rgba(239, 68, 68, 0.85);
+  text-decoration-thickness: 2px;
+  opacity: 0.75;
+}
+
 .char-name {
   font-size: 1.42rem;
   font-weight: 800;

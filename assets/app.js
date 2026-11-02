@@ -189,11 +189,11 @@
     "沙": { style: "background:linear-gradient(135deg,#78350f,#a16207);border-color:#fcd34d;color:#fef9c3;" },
     "鋼": { style: "background:#334155;border-color:#94a3b8;color:#f8fafc;" },
     "金屬": { style: "background:linear-gradient(135deg,#1e293b,#475569);border-color:#cbd5e1;color:#f8fafc;" },
+    "水銀": { style: "background:linear-gradient(135deg,#475569,#94a3b8 50%,#e2e8f0);border-color:#ffffff;color:#0f172a;box-shadow:0 0 8px rgba(255,255,255,0.4);", icon: "⚗️" },
     "世界金屬": { style: "background:linear-gradient(135deg,#064e3b 0%,#334155 50%,#78350f 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 10px rgba(253,224,71,0.36);", icon: "🛡️", isSupreme: true },
     "水晶": { style: "background:linear-gradient(135deg,#0e7490,#6d28d9 55%,#be185d);border-color:#f0abfc;color:#fdf4ff;", icon: "💎" },
     "黃金": { style: "background:linear-gradient(135deg,#713f12,#ca8a04 55%,#eab308);border-color:#fef08a;color:#fefce8;box-shadow:0 0 8px rgba(250,204,21,0.3);", icon: "✦", isSupreme: true },
     "白銀": { style: "background:linear-gradient(135deg,#334155,#64748b);border-color:#f8fafc;color:#ffffff;", icon: "✦" },
-    "建築": { style: "background:linear-gradient(135deg,#44403c,#78350f);border-color:#fbbf24;color:#fef3c7;" },
     "銳利": { style: "background:linear-gradient(135deg,#1e293b,#991b1b);border-color:#f8fafc;color:#ffe4e6;", icon: "⚔️" },
 
     // 六、草木、植物與自然花卉屬性（10 種）
@@ -215,7 +215,7 @@
     "白": { style: "background:#475569;border-color:#e2e8f0;color:#f8fafc;" },
     "黎明": { style: "background:linear-gradient(135deg,#1e1b4b,#9a3412 55%,#ca8a04);border-color:#fde047;color:#fef9c3;", icon: "🌅", isSupreme: true },
     "晨光": { style: "background:linear-gradient(135deg,#0369a1,#ca8a04);border-color:#fef08a;color:#fefce8;" },
-    "母": { style: "background:linear-gradient(135deg,#065f46,#b45309 55%,#be185d);border-color:#fde047;color:#fef08a;box-shadow:0 0 10px rgba(253,224,71,0.35);", icon: "👑", isSupreme: true },
+    "極光": { style: "background:linear-gradient(135deg,#047857 0%,#0284c7 45%,#7c3aed 100%);border-color:#a7f3d0;color:#ecfdf5;box-shadow:0 0 9px rgba(167,243,208,0.38);", icon: "✨", isSupreme: true },
     "境界": { style: "background:linear-gradient(135deg,#312e81,#854d0e);border-color:#fde047;color:#fef9c3;", icon: "❖", isSupreme: true },
 
     // 八、天體星空與日月屬性（9 種）
@@ -225,7 +225,7 @@
     "月": { style: "background:linear-gradient(135deg,#1e1b4b,#312e81);border-color:#fef08a;color:#fef9c3;", icon: "🌙" },
     "星": { style: "background:linear-gradient(135deg,#1e1b4b,#1d4ed8);border-color:#93c5fd;color:#eff6ff;", icon: "⭐" },
     "星穹": { style: "background:linear-gradient(135deg,#0f172a,#312e81 55%,#581c87);border-color:#a5b4fc;color:#e0e7ff;", icon: "🌌", isSupreme: true },
-    "行星": { style: "background:linear-gradient(135deg,#1e1b4b,#78350f);border-color:#f59e0b;color:#fef3c7;" },
+    "重力": { style: "background:linear-gradient(135deg,#0f172a 0%,#312e81 48%,#7e22ce 100%);border-color:#c084fc;color:#f3e8ff;box-shadow:0 0 9px rgba(192,132,252,0.38);", icon: "🪐", isSupreme: true },
     "銀河": { style: "background:linear-gradient(135deg,#090d16 0%,#312e81 35%,#7e22ce 70%,#0284c7 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 11px rgba(253,224,71,0.4);", icon: "🌌", isSupreme: true },
     "陰": { style: "background:linear-gradient(135deg,#0f172a,#334155);border-color:#94a3b8;color:#e2e8f0;" },
 
@@ -255,7 +255,7 @@
     "猩紅": { style: "background:linear-gradient(135deg,#450a0a,#991b1b 55%,#be123c);border-color:#fb7185;color:#ffe4e6;", icon: "🩸", isSupreme: true },
     "原初之血": { style: "background:linear-gradient(135deg,#2a040d 0%,#881337 52%,#450a0a 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 11px rgba(253,224,71,0.4);", icon: "👑", isSupreme: true },
     "肉體": { style: "background:#7c2d12;border-color:#fb923c;color:#ffedd5;" },
-    "重力": { style: "background:linear-gradient(135deg,#18181b,#4c1d95 60%,#78350f);border-color:#c084fc;color:#f3e8ff;" },
+    "髮": { style: "background:linear-gradient(135deg,#18181b 0%,#27272a 50%,#3f3f46 100%);border-color:#d4d4d8;color:#f4f4f5;box-shadow:0 0 8px rgba(212,212,216,0.35);", icon: "✦" },
     "力量": { style: "background:linear-gradient(135deg,#7c2d12,#b45309);border-color:#facc15;color:#fef9c3;" },
     "武": { style: "background:linear-gradient(135deg,#451a03,#9a3412 55%,#991b1b);border-color:#fbbf24;color:#fef3c7;", icon: "🥋" },
     "守護": { style: "background:linear-gradient(135deg,#1e3a8a,#065f46);border-color:#fde047;color:#fef9c3;", icon: "🛡️" },
@@ -277,10 +277,10 @@
     "色彩": { style: "background:linear-gradient(135deg,#991b1b 0%,#854d0e 35%,#065f46 68%,#1e3a8a 100%);border-color:#fde047;color:#fefce8;", icon: "🎨" },
     "言靈": { style: "background:linear-gradient(135deg,#311042,#78350f);border-color:#fde047;color:#fef08a;box-shadow:0 0 8px rgba(253,224,71,0.3);", icon: "📜", isSupreme: true },
     "咒": { style: "background:linear-gradient(135deg,#18181b,#4c0519 60%,#3b0764);border-color:#f43f5e;color:#fecdd3;" },
-    "髮": { style: "background:#27272a;border-color:#a1a1aa;color:#f4f4f5;" },
     "慾望": { style: "background:linear-gradient(135deg,#4c0519,#831843 55%,#581c87);border-color:#f472b6;color:#fce7f3;" },
     "幻": { style: "background:linear-gradient(135deg,#1e1b4b,#581c87 50%,#0f766e);border-color:#e879f9;color:#fae8ff;box-shadow:0 0 8px rgba(232,121,249,0.3);", icon: "🦋", isSupreme: true },
     "恐懼": { style: "background:linear-gradient(135deg,#09090b,#3b0764 60%,#450a0a);border-color:#ef4444;color:#fecaca;" },
+    "夢": { style: "background:linear-gradient(135deg,#1e1b4b,#3b0764 55%,#0f766e);border-color:#c084fc;color:#f3e8ff;", icon: "🌙" },
 
     // 十四、粉碎、破壞毀滅與戰爭（4 種）
     "粉碎": { style: "background:linear-gradient(135deg,#3b0714,#7f1d1d);border-color:#fb7185;color:#ffe4e6;" },
@@ -300,9 +300,10 @@
     "自然": { style: "background:linear-gradient(135deg,#064e3b 0%,#047857 50%,#a16207 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 10px rgba(253,224,71,0.38);", icon: "🌿", isSupreme: true },
     "生命": { style: "background:linear-gradient(135deg,#065f46,#10b981 50%,#ca8a04);border-color:#fef08a;color:#fefce8;", icon: "🌱", isSupreme: true },
     "死": { style: "background:linear-gradient(135deg,#09090b 0%,#18181b 55%,#3b0764 100%);border-color:#e11d48;color:#fda4af;box-shadow:0 0 9px rgba(225,29,72,0.35);", icon: "💀", isSupreme: true },
-    "真實": { style: "background:linear-gradient(135deg,#1e293b 0%,#0f766e 50%,#a16207 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 9px rgba(253,224,71,0.34);", icon: "✦", isSupreme: true },
+    "真實": { style: "background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 38%,#38bdf8 72%,#ffffff 100%);border-color:#e0f2fe;color:#ffffff;box-shadow:0 0 12px rgba(186,230,253,0.55);", icon: "✦", isSupreme: true },
     "理": { style: "background:linear-gradient(135deg,#1e1b4b 0%,#1d4ed8 50%,#78350f 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 9px rgba(253,224,71,0.34);", icon: "❖", isSupreme: true },
-    "真實/理": { style: "background:linear-gradient(135deg,#1e1b4b 0%,#0f766e 50%,#a16207 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 9px rgba(253,224,71,0.34);", icon: "✦", isSupreme: true },
+    "真實/理": { style: "background:linear-gradient(135deg,#0f172a 0%,#1e40af 40%,#38bdf8 75%,#ffffff 100%);border-color:#bae6fd;color:#ffffff;box-shadow:0 0 12px rgba(186,230,253,0.55);", icon: "✦", isSupreme: true },
+    "母": { style: "background:linear-gradient(135deg,#065f46,#b45309 55%,#be185d);border-color:#fde047;color:#fef08a;box-shadow:0 0 10px rgba(253,224,71,0.35);", icon: "👑", isSupreme: true },
     "王": { style: "background:linear-gradient(135deg,#2e1065 0%,#78350f 52%,#991b1b 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 11px rgba(253,224,71,0.45);", icon: "👑", isSupreme: true },
     "創生": { style: "background:linear-gradient(135deg,#064e3b 0%,#0284c7 48%,#ca8a04 100%);border-color:#fef08a;color:#fefce8;box-shadow:0 0 10px rgba(254,240,138,0.38);", icon: "✨", isSupreme: true },
     "掠奪": { style: "background:linear-gradient(135deg,#18181b 0%,#881337 55%,#4c1d95 100%);border-color:#fbbf24;color:#fef08a;box-shadow:0 0 9px rgba(251,191,36,0.34);", icon: "⛓️", isSupreme: true },
@@ -408,6 +409,8 @@
 
   function formatAbilityText(text) {
     let safe = esc(text);
+    // Support markdown style ~~text~~ or word-extracted struck-through text
+    safe = safe.replace(/~~([^~]+)~~/g, '<del class="strikethrough-text">$1</del>');
     // Support inline or multi-line -技能或武器名- so each item starts on a clean line
     safe = safe.replace(/(^|\n|[。！？）)\s])\s*-([^-\n]{1,36})-/g, (match, prefix, name) => {
       const br = prefix === "" || prefix === "\n" ? prefix : `${prefix}\n`;
@@ -425,6 +428,16 @@
     return "";
   }
 
+  function formatCharacterDisplayName(name) {
+    if (!name) return "";
+    let safe = esc(name);
+    return safe.replace(/~~([^~]+)~~/g, '<del class="strikethrough-text">$1</del>');
+  }
+
+  function getCharacterPlainName(name) {
+    return String(name || "").replace(/~~([^~]+)~~/g, "$1").trim();
+  }
+
   function formatStoryHtml(storyText) {
     if (!storyText) return '<span style="color:var(--text-muted)">（尚無背景故事紀錄）</span>';
     const blocks = String(storyText).split(/—{4,}|-{3,}/);
@@ -432,7 +445,9 @@
       .map((part) => {
         const trimmed = part.trim();
         if (!trimmed) return "";
-        return `<div>${esc(trimmed)}</div>`;
+        let safe = esc(trimmed);
+        safe = safe.replace(/~~([^~]+)~~/g, '<del class="strikethrough-text">$1</del>');
+        return `<div>${safe}</div>`;
       })
       .filter(Boolean)
       .join('<hr class="story-divider" />');
@@ -943,8 +958,8 @@
             <div class="char-title-block">
               <div class="char-dossier-kicker">DOSSIER // ${esc(serialCode)} ・ ${esc(c.realm)} ARCHIVE</div>
               <div class="char-name-line">
-                <h4 class="char-name">${esc(c.name)}</h4>
-                ${epithet ? `<span class="char-epithet">${esc(epithet)}</span>` : ""}
+                <h4 class="char-name">${formatCharacterDisplayName(c.name)}</h4>
+                ${epithet ? `<span class="char-epithet">${formatCharacterDisplayName(epithet)}</span>` : ""}
               </div>
               <div class="char-faction-path">
                 <span class="badge-realm">${esc(c.realm)}</span>
@@ -1047,7 +1062,7 @@
                     <span class="portrait-zoom-hint">🔍 新分頁放大檢視細節 ↗</span>
                   </div>
                   <div class="portrait-caption-bar">
-                    <strong>${esc(c.name)}</strong>
+                    <strong>${formatCharacterDisplayName(c.name)}</strong>
                     <div>${esc(c.faction)}${c.subFaction ? `・${esc(c.subFaction)}` : ""}</div>
                   </div>
                 </div>
@@ -1077,10 +1092,10 @@
         }
         <div class="grid-card-info">
           <div class="grid-card-title">
-            <span>${esc(c.name)}</span>
+            <span>${formatCharacterDisplayName(c.name)}</span>
             ${c.power ? `<span class="badge-power" style="font-size:0.72rem;padding:0.12rem 0.45rem;">${esc(c.power)}</span>` : ""}
           </div>
-          ${epithet ? `<div class="grid-card-sub">${esc(epithet)}</div>` : ""}
+          ${epithet ? `<div class="grid-card-sub">${formatCharacterDisplayName(epithet)}</div>` : ""}
           <div class="grid-card-meta">
             <span>種族：${esc(race)}</span>
             <span>善惡：${esc(align)}</span>
@@ -1409,7 +1424,6 @@
     const holders = getCharactersWithAttribute(displayName);
 
     const formType = rec && rec.formType ? rec.formType : "角色特殊／衍生屬性";
-    const components = rec && rec.components ? rec.components : "依角色自身本源或複合屬性構成";
     const description =
       rec && rec.description
         ? rec.description
@@ -1431,13 +1445,9 @@
         </div>
 
         <div class="attr-spot-grid">
-          <div class="attr-spot-box">
+          <div class="attr-spot-box wide">
             <span class="meta-label">形態類型</span>
             <div class="attr-spot-val">${esc(formType)}</div>
-          </div>
-          <div class="attr-spot-box">
-            <span class="meta-label">構成要素 ／ 關聯母體</span>
-            <div class="attr-spot-val">${esc(components)}</div>
           </div>
           <div class="attr-spot-box wide">
             <span class="meta-label">個別介紹（設定手冊內容）</span>
@@ -1454,7 +1464,7 @@
                     .map(
                       (ch) => `
                     <button type="button" class="attr-holder-chip" data-modal-char="${esc(ch.id)}">
-                      <span class="holder-name">${esc(ch.name)}</span>
+                      <span class="holder-name">${formatCharacterDisplayName(ch.name)}</span>
                       <span class="holder-fac">${esc(ch.faction)}</span>
                     </button>
                   `
@@ -1496,7 +1506,7 @@
       .map((cat) => {
         const items = cat.items.filter((item) => {
           if (!q) return true;
-          const hay = `${item.name} ${item.formType} ${item.components} ${item.description} ${cat.title}`.toLowerCase();
+          const hay = `${item.name} ${item.formType} ${item.description} ${cat.title}`.toLowerCase();
           return hay.includes(q);
         });
         return { ...cat, filteredItems: items };
@@ -1512,7 +1522,7 @@
         crumbEl.textContent = `全部 16 大屬性分類（共 ${totalAttributeItemsCount} 種）`;
         if (descEl) {
           descEl.textContent =
-            "點擊下方任意屬性卡片，即可檢視該屬性的形態類型、構成要素、作者設定介紹與持有角色名單";
+            "點擊下方任意屬性卡片，即可檢視該屬性的形態類型、作者設定介紹與持有角色名單";
         }
       }
     }
@@ -1544,11 +1554,6 @@
                 <span class="attr-color-badge ${vCard.isSupreme ? "is-supreme" : ""}" style="${style}">${renderAttributeBadgeInner(item.name)}</span>
                 ${item.formType ? `<span class="attr-form-tag">${esc(item.formType)}</span>` : ""}
               </div>
-              ${
-                item.components
-                  ? `<div class="attr-card-comp"><strong>構成：</strong>${esc(item.components)}</div>`
-                  : ""
-              }
               <div class="attr-card-desc">
                 ${item.description ? esc(item.description) : `<span style="color:var(--text-muted)">（基礎／延伸屬性條目）</span>`}
               </div>
@@ -2649,7 +2654,7 @@
               </div>
               <div class="gallery-card-meta">
                 <div class="gallery-char-header">
-                  <span class="gallery-char-name">${esc(c.name)}</span>
+                  <span class="gallery-char-name">${formatCharacterDisplayName(c.name)}</span>
                   ${c.power ? `<span class="badge-power" style="font-size:0.68rem;padding:0.08rem 0.42rem;">${esc(c.power)}</span>` : ""}
                 </div>
                 ${epithet ? `<div class="gallery-char-epithet">${esc(epithet)}</div>` : ""}
