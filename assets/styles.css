@@ -3734,8 +3734,8 @@ del.strikethrough-text {
 
 .attr-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 0.65rem 0.85rem;
   padding: 1rem;
 }
 
@@ -3743,66 +3743,68 @@ del.strikethrough-text {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 0.95rem 1.05rem;
+  padding: 0.6rem 0.95rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.48rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
   cursor: pointer;
+  min-height: 46px;
   transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .attr-item-card:hover,
 .attr-item-card.selected {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--border-gold);
   background: var(--bg-card-hover);
   box-shadow: var(--shadow-card);
 }
 
-.attr-card-top {
+.attr-card-main {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.attr-form-tag {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
-  padding: 0.1rem 0.45rem;
-  border-radius: var(--radius-xs);
-}
-
-.attr-card-comp {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .attr-card-desc {
   font-size: 0.86rem;
   color: var(--text-body);
-  line-height: 1.58;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   flex: 1;
+  min-width: 0;
 }
 
-.attr-card-footer {
+.attr-card-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 0.45rem;
-  border-top: 1px dashed var(--border-subtle);
+  gap: 0.45rem;
+  flex-shrink: 0;
   font-size: 0.74rem;
 }
 
 .attr-holder-count {
-  color: var(--text-secondary);
+  color: var(--accent-gold);
   font-weight: 700;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
 }
 
-.attr-view-more {
+.attr-view-arrow {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.attr-item-card:hover .attr-view-arrow {
   color: var(--accent-gold);
-  font-weight: 800;
+  transform: translateX(2px);
 }

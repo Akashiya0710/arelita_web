@@ -488,16 +488,11 @@ if (Test-Path $attrDocPath) {
                     $aComp = ""
                     $aDesc = ""
                     if ($row.Count -eq 3) {
-                        $aForm = $row[2].Trim()
-                    } elseif ($row.Count -eq 4) {
-                        # 4 columns: 序號, 屬性名稱, 形態類型, 個別介紹 (已刪除構成要素/關聯母體)
-                        $aForm = $row[2].Trim()
-                        $aDesc = $row[3].Trim()
-                    } elseif ($row.Count -ge 5) {
-                        # Legacy 5 columns fallback
-                        $aForm = $row[2].Trim()
-                        $aComp = $row[3].Trim()
-                        $aDesc = $row[4].Trim()
+                        # 3 columns: 序號, 屬性名稱, 個別介紹 (手冊已無形態類型、構成要素)
+                        $aDesc = $row[2].Trim()
+                    } elseif ($row.Count -ge 4) {
+                        # Fallback for legacy tables: 最後一欄為個別介紹
+                        $aDesc = $row[$row.Count - 1].Trim()
                     }
                     if ($aName -ne "") {
                         $items.Add(@{
