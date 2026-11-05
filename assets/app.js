@@ -972,7 +972,10 @@
                 ${c.subFaction ? `<span>› ${esc(c.subFaction)}</span>` : ""}
               </div>
             </div>
-            ${c.power ? `<div class="badge-power" title="世界樹強度分級">⚡ 強度：${esc(c.power)}</div>` : ""}
+            <div class="char-header-right-badges">
+              ${c.power ? `<div class="badge-power" title="世界樹強度分級">⚡ 強度：${esc(c.power)}</div>` : ""}
+              <a href="compare.html?left=${encodeURIComponent(c.id)}" target="_blank" rel="noopener" class="btn-compare-char" title="於新分頁將此角色加入能力對比">⚖️ 能力對比 ↗</a>
+            </div>
           </div>
 
           ${
@@ -3122,7 +3125,9 @@
           dark: "light",
           light: "ocean",
         };
-        applyTheme(nextMap[state.theme] || "ocean");
+        const nextTheme = nextMap[state.theme] || "ocean";
+        applyTheme(nextTheme);
+        runIntroSplash({ theme: nextTheme, isThemeSwitch: true });
       });
     }
 
@@ -3149,10 +3154,10 @@
       });
     }
 
-    document.querySelectorAll(".nav-tab").forEach((tabBtn) => {
+    document.querySelectorAll(".nav-tab[data-tab]").forEach((tabBtn) => {
       tabBtn.addEventListener("click", () => {
         const target = tabBtn.getAttribute("data-tab");
-        switchTab(target);
+        if (target) switchTab(target);
       });
     });
 
@@ -3301,12 +3306,299 @@
     });
   }
 
-  // ==================== OPENING INTRO SPLASH ANIMATION ====================
-  function runIntroSplash() {
+  // ==================== OPENING INTRO SPLASH & 5-THEME SFX SYNTHESIZER ====================
+  const INTRO_THEME_CONFIGS = {
+    ocean: {
+      badge: "🌊 ABYSSAL OCEAN REALM // 夏日海洋領域",
+      kicker: "AQUA RESONANCE // SYNCHRONIZING CORAL SANCTUARY",
+      subtitle: "ABYSSAL TIDE & LUMINOUS ARCHIPELAGO ARCHIVE",
+      telemetryLeft: "DEPTH // 1,280M CORAL TRENCH",
+      telemetryRight: "🔊 SFX: SONAR & WATER HARP",
+      coreSvg: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3v26M16 3l-4 5M16 3l4 5M8 10c0 5 3.5 8 8 8s8-3 8-8M8 10l-2 3M24 10l2 3M11 25h10"/></svg>`,
+      stage1: (c) => `SONAR PINGING ${c} ARCHIVE NODES...`,
+      stage2: (s) => `SURFACING ${s} ABYSSAL CHRONICLES...`,
+      stage3: "OCEAN REALM ONLINE // 碧海領域展開完成",
+    },
+    worldtree: {
+      badge: "🌳 SACRED YGGDRASIL // 世界樹領域",
+      kicker: "ROOT CONVERGENCE // AWAKENING YGGDRASIL CANOPY",
+      subtitle: "SACRED WORLD TREE & ANCIENT BOUGH ARCHIVE",
+      telemetryLeft: "MANA // 99.8% LEYLINE RESONANCE",
+      telemetryRight: "🔊 SFX: WIND CHIME & CELTIC HARP",
+      coreSvg: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 28V12M16 12c-4-5-9-4-9-9 5 0 8 2 9 9zM16 12c4-5 9-4 9-9-5 0-8 2-9 9zM16 17c-3-3-7-2-7-6M16 17c3-3 7-2 7-6M11 28c2-2 3-3 5-3s3 1 5 3"/></svg>`,
+      stage1: (c) => `CHANNELLING ${c} SOUL LEAVES...`,
+      stage2: (s) => `WEAVING ${s} WORLD TREE CHRONICLES...`,
+      stage3: "YGGDRASIL ONLINE // 世界樹領域共鳴完成",
+    },
+    starry: {
+      badge: "🌌 ASTRAL FIRMAMENT // 璀璨星空領域",
+      kicker: "CELESTIAL ASTROLABE // ALIGNING STARLIGHT ORBITS",
+      subtitle: "ASTRAL NEBULA & CONSTELLATION CHRONICLE",
+      telemetryLeft: "ORBIT // EPOCH J2000.0 LOCKED",
+      telemetryRight: "🔊 SFX: METEOR SWEEP & CELESTE",
+      coreSvg: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2l3.2 9.6L29 15l-9.8 3.4L16 28l-3.2-9.6L3 15l9.8-3.4L16 2z"/><circle cx="16" cy="15" r="3"/></svg>`,
+      stage1: (c) => `MAPPING ${c} STELLAR CONSTELLATIONS...`,
+      stage2: (s) => `DECODING ${s} NEBULA CHRONICLES...`,
+      stage3: "ASTRAL REALM ONLINE // 星穹領域觀測完成",
+    },
+    dark: {
+      badge: "🌙 OBSIDIAN ECLIPSE // 永夜黑曜領域",
+      kicker: "SHADOW PROTOCOL // UNSEALING OBSIDIAN VAULT",
+      subtitle: "OBSIDIAN ECLIPSE & FORBIDDEN COVENANT ARCHIVE",
+      telemetryLeft: "UMBRA // ECLIPSE TOTALITY 100%",
+      telemetryRight: "🔊 SFX: ABYSSAL BASS & RUNE BELL",
+      coreSvg: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4a11 11 0 1 0 7 19.5A9.5 9.5 0 0 1 21 4z"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg>`,
+      stage1: (c) => `UNSEALING ${c} SHADOW DOSSIERS...`,
+      stage2: (s) => `DECRYPTING ${s} FORBIDDEN RECORDS...`,
+      stage3: "ECLIPSE REALM ONLINE // 永夜黑曜領域解封",
+    },
+    light: {
+      badge: "☀️ CELESTIAL DAWN // 聖潔白晝領域",
+      kicker: "SANCTUARY ILLUMINATION // OPENING GOLDEN CATHEDRAL",
+      subtitle: "CELESTIAL DAWN & RADIANT SANCTUARY ARCHIVE",
+      telemetryLeft: "LUMEN // RADIANCE HARMONIC IX",
+      telemetryRight: "🔊 SFX: CATHEDRAL BELL & GOLDEN HARP",
+      coreSvg: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="5"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8"/></svg>`,
+      stage1: (c) => `ILLUMINATING ${c} SANCTUARY RECORDS...`,
+      stage2: (s) => `INSCRIBING ${s} RADIANT CHRONICLES...`,
+      stage3: "SANCTUARY ONLINE // 聖潔白晝領域降臨",
+    },
+  };
+
+  let sfxAudioCtx = null;
+  let cachedNoiseBuffer = null;
+
+  function getSfxContext() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    if (!sfxAudioCtx) {
+      sfxAudioCtx = new AudioCtx();
+    }
+    return sfxAudioCtx;
+  }
+
+  function getCachedNoiseBuffer(ctx) {
+    if (cachedNoiseBuffer && cachedNoiseBuffer.sampleRate === ctx.sampleRate) {
+      return cachedNoiseBuffer;
+    }
+    const bufferSize = Math.floor(ctx.sampleRate * 1.4);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    cachedNoiseBuffer = buffer;
+    return cachedNoiseBuffer;
+  }
+
+  function playToneHelper(ctx, dest, freq, startTime, duration, opts = {}) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = opts.type || "sine";
+    osc.frequency.setValueAtTime(freq, startTime);
+    if (opts.endFreq) {
+      osc.frequency.exponentialRampToValueAtTime(opts.endFreq, startTime + duration);
+    }
+
+    const peak = opts.gain || 0.08;
+    const attack = opts.attack || 0.02;
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.linearRampToValueAtTime(peak, startTime + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    if (opts.filterFreq) {
+      const filter = ctx.createBiquadFilter();
+      filter.type = opts.filterType || "lowpass";
+      filter.frequency.setValueAtTime(opts.filterFreq, startTime);
+      if (opts.filterEndFreq) {
+        filter.frequency.exponentialRampToValueAtTime(opts.filterEndFreq, startTime + duration);
+      }
+      osc.connect(filter);
+      filter.connect(gain);
+    } else {
+      osc.connect(gain);
+    }
+
+    gain.connect(dest);
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.04);
+  }
+
+  function playNoiseBurstHelper(ctx, dest, startTime, duration, opts = {}) {
+    const noise = ctx.createBufferSource();
+    noise.buffer = getCachedNoiseBuffer(ctx);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = opts.filterType || "bandpass";
+    filter.frequency.setValueAtTime(opts.startFreq || 400, startTime);
+    if (opts.endFreq) {
+      filter.frequency.exponentialRampToValueAtTime(opts.endFreq, startTime + duration);
+    }
+    filter.Q.value = opts.Q || 2.5;
+
+    const gain = ctx.createGain();
+    const peak = opts.gain || 0.05;
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.linearRampToValueAtTime(peak, startTime + duration * 0.25);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(dest);
+    noise.start(startTime);
+    noise.stop(startTime + duration + 0.02);
+  }
+
+  function playThemeIntroSfx(themeName) {
+    try {
+      const ctx = getSfxContext();
+      if (!ctx) return false;
+      if (ctx.state === "suspended") {
+        ctx.resume().catch(() => {});
+      }
+      if (ctx.state !== "running") {
+        return false;
+      }
+
+      const now = ctx.currentTime + 0.02;
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.65, now);
+      master.connect(ctx.destination);
+
+      const theme = themeName || state.theme || "ocean";
+
+      if (theme === "ocean") {
+        // 🌊 Ocean: Deep submarine sonar ping + ocean wave wash + Lydian aqua-harp & bubble chimes
+        playNoiseBurstHelper(ctx, master, now, 1.15, {
+          filterType: "bandpass",
+          startFreq: 220,
+          endFreq: 950,
+          Q: 1.8,
+          gain: 0.06,
+        });
+        // Sonar ping
+        playToneHelper(ctx, master, 1046.5, now + 0.02, 0.95, { type: "sine", gain: 0.09, attack: 0.008 });
+        playToneHelper(ctx, master, 2093.0, now + 0.02, 0.55, { type: "sine", gain: 0.035, attack: 0.008 });
+        // Rising bubble blips
+        [392.0, 493.88, 587.33, 739.99, 783.99, 987.77, 1174.66, 1567.98].forEach((f, idx) => {
+          const t = now + 0.1 + idx * 0.075;
+          playToneHelper(ctx, master, f, t, 0.55, {
+            type: "triangle",
+            endFreq: f * 1.03,
+            gain: 0.055,
+            attack: 0.01,
+          });
+        });
+      } else if (theme === "worldtree") {
+        // 🌳 World Tree: Warm forest fifth drone + wooden wind-chimes + Celtic pentatonic harp cascade
+        playToneHelper(ctx, master, 146.83, now, 1.35, { type: "sine", gain: 0.09, attack: 0.12 }); // D3
+        playToneHelper(ctx, master, 220.0, now, 1.35, { type: "triangle", gain: 0.06, attack: 0.12, filterFreq: 800 }); // A3
+        // Pentatonic harp & wind-chime flourish (D4, F#4, A4, B4, D5, F#5, A5)
+        [293.66, 369.99, 440.0, 493.88, 587.33, 739.99, 880.0, 1174.66].forEach((f, idx) => {
+          const t = now + 0.06 + idx * 0.08;
+          playToneHelper(ctx, master, f, t, 0.85, {
+            type: "triangle",
+            gain: 0.065,
+            attack: 0.012,
+            filterFreq: 2400,
+          });
+          playToneHelper(ctx, master, f * 2, t + 0.015, 0.45, {
+            type: "sine",
+            gain: 0.025,
+            attack: 0.008,
+          });
+        });
+      } else if (theme === "starry") {
+        // 🌌 Starry: Shooting-star high-frequency shimmer sweep + cosmic glass celeste constellation chord
+        playToneHelper(ctx, master, 2400, now, 0.55, {
+          type: "sine",
+          endFreq: 580,
+          gain: 0.05,
+          attack: 0.01,
+        });
+        playNoiseBurstHelper(ctx, master, now, 0.75, {
+          filterType: "highpass",
+          startFreq: 1800,
+          endFreq: 4200,
+          Q: 3.0,
+          gain: 0.035,
+        });
+        // Sparkling astral celeste notes (Eb major 9 / Lydian shimmer)
+        [622.25, 783.99, 932.33, 1174.66, 1396.91, 1567.98, 2093.0].forEach((f, idx) => {
+          const t = now + 0.05 + idx * 0.085;
+          playToneHelper(ctx, master, f, t, 0.9, { type: "sine", gain: 0.06, attack: 0.006 });
+          playToneHelper(ctx, master, f * 1.5, t, 0.5, { type: "sine", gain: 0.022, attack: 0.006 });
+        });
+      } else if (theme === "dark") {
+        // 🌙 Dark: Abyssal sub-bass drop + Phrygian dark rune bell toll + obsidian lock resonance
+        playToneHelper(ctx, master, 130.81, now, 1.15, {
+          type: "sawtooth",
+          endFreq: 55.0,
+          gain: 0.11,
+          attack: 0.015,
+          filterFreq: 380,
+          filterEndFreq: 120,
+        });
+        playNoiseBurstHelper(ctx, master, now, 0.85, {
+          filterType: "lowpass",
+          startFreq: 360,
+          endFreq: 90,
+          Q: 2.0,
+          gain: 0.07,
+        });
+        // Dark metallic rune bells (C# Phrygian / Diminished mystic intervals)
+        [277.18, 293.66, 369.99, 440.0, 554.37, 587.33].forEach((f, idx) => {
+          const t = now + 0.08 + idx * 0.11;
+          playToneHelper(ctx, master, f, t, 0.95, {
+            type: "triangle",
+            gain: 0.065,
+            attack: 0.008,
+            filterFreq: 1600,
+          });
+          playToneHelper(ctx, master, f * 2.41, t, 0.45, {
+            type: "sine",
+            gain: 0.025,
+            attack: 0.005,
+          });
+        });
+      } else {
+        // ☀️ Light: Radiant cathedral organ swell + angelic golden tubular bell & harp glissando
+        [261.63, 329.63, 392.0, 523.25].forEach((f) => {
+          playToneHelper(ctx, master, f, now, 1.35, {
+            type: "triangle",
+            gain: 0.045,
+            attack: 0.14,
+            filterFreq: 1800,
+          });
+        });
+        // Golden glissando
+        [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1318.5, 1567.98, 2093.0].forEach((f, idx) => {
+          const t = now + 0.04 + idx * 0.065;
+          playToneHelper(ctx, master, f, t, 0.75, {
+            type: "sine",
+            gain: 0.055,
+            attack: 0.008,
+          });
+        });
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  let activeIntroCleanup = null;
+
+  function runIntroSplash(options = {}) {
     const splash = document.getElementById("introSplash");
     const bar = document.getElementById("introProgressBar");
     const pctEl = document.getElementById("introPercentText");
     const statusEl = document.getElementById("introStatusText");
+    const badgeEl = document.getElementById("introThemeBadge");
+    const kickerEl = document.getElementById("introKicker");
+    const subtitleEl = document.getElementById("introSubtitle");
+    const coreIconEl = document.getElementById("introCoreIcon");
+    const telemetryEl = document.getElementById("introTelemetry");
 
     if (!splash) {
       document.body.classList.remove("is-loading");
@@ -3314,73 +3606,129 @@
       return;
     }
 
+    // Cancel any previous running intro animation when switching themes rapidly
+    if (typeof activeIntroCleanup === "function") {
+      activeIntroCleanup();
+      activeIntroCleanup = null;
+    }
+
+    const currentTheme = options.theme || state.theme || "ocean";
+    const isThemeSwitch = Boolean(options.isThemeSwitch);
+    const cfg = INTRO_THEME_CONFIGS[currentTheme] || INTRO_THEME_CONFIGS.ocean;
+
+    // Apply theme-specific visual identity to the splash overlay
+    splash.setAttribute("data-intro-theme", currentTheme);
+    if (badgeEl) badgeEl.textContent = cfg.badge;
+    if (kickerEl) kickerEl.textContent = cfg.kicker;
+    if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
+    if (coreIconEl) coreIconEl.innerHTML = cfg.coreSvg;
+    if (telemetryEl) {
+      telemetryEl.innerHTML = `<span>${cfg.telemetryLeft}</span><span>${cfg.telemetryRight}</span>`;
+    }
+
+    // Reset splash state so it can play both on initial boot and on theme switch
+    document.body.classList.add("intro-active");
+    splash.classList.remove("is-removed", "is-exiting");
+    if (bar) bar.style.transform = "scaleX(0)";
+    if (pctEl) pctEl.textContent = "0%";
+    const stage1Text = cfg.stage1(characters.length);
+    const stage2Text = cfg.stage2(stories.length);
+    const stage3Text = cfg.stage3;
+    if (statusEl) statusEl.textContent = stage1Text;
+
+    // Attempt to play the theme's unique synthesized sound effect immediately
+    let sfxPlayed = playThemeIntroSfx(currentTheme);
+
     let finished = false;
     let rafId = null;
-    const duration = 950; // Crisp ceremonial intro
-    const startTime = Date.now();
+    let removeTimerId = null;
+    let failsafeTimerId = null;
+    let lastPct = 0;
+    let lastStage = 1;
+    const duration = isThemeSwitch ? 680 : 900;
+    const startTime = performance.now();
 
     function finishIntro() {
       if (finished) return;
       finished = true;
       if (rafId) cancelAnimationFrame(rafId);
+      if (failsafeTimerId) clearTimeout(failsafeTimerId);
 
-      if (bar) bar.style.width = "100%";
-      if (pctEl) pctEl.textContent = "100%";
-      if (statusEl) statusEl.textContent = "ARCHIVE ONLINE // 歡迎進入亞雷利塔";
+      // If browser blocked autoplay on initial page load, play the chime on the user's click/tap!
+      if (!sfxPlayed) {
+        sfxPlayed = playThemeIntroSfx(currentTheme);
+      }
+
+      if (bar) bar.style.transform = "scaleX(1)";
+      if (pctEl && lastPct !== 100) pctEl.textContent = "100%";
+      if (statusEl && lastStage !== 3) statusEl.textContent = stage3Text;
 
       splash.classList.add("is-exiting");
       document.body.classList.remove("is-loading");
       document.body.classList.add("is-loaded");
 
-      setTimeout(() => {
+      removeTimerId = setTimeout(() => {
         splash.classList.add("is-removed");
-      }, 750);
+        document.body.classList.remove("intro-active");
+      }, 680);
     }
 
-    function tick() {
+    function tick(nowTs) {
       if (finished) return;
-      const elapsed = Math.max(0, Date.now() - startTime);
+      const elapsed = Math.max(0, (nowTs || performance.now()) - startTime);
       const rawProgress = Math.min(1, elapsed / duration);
-      // Ease-out cubic curve for smooth progress bar
       const eased = 1 - Math.pow(1 - rawProgress, 3);
       const pct = Math.max(0, Math.min(100, Math.round(eased * 100)));
 
-      if (bar) bar.style.width = `${pct}%`;
-      if (pctEl) pctEl.textContent = `${pct}%`;
-      if (statusEl) {
-        if (pct < 40) {
-          statusEl.textContent = `SYNCING ${characters.length} CHARACTER DOSSIERS...`;
-        } else if (pct < 80) {
-          statusEl.textContent = `LOADING WORLD TREE & ${stories.length} CHRONICLES...`;
-        } else {
-          statusEl.textContent = "ARCHIVE ONLINE // 歡迎進入亞雷利塔";
+      if (bar) bar.style.transform = `scaleX(${eased.toFixed(4)})`;
+      if (pct !== lastPct) {
+        lastPct = pct;
+        if (pctEl) pctEl.textContent = `${pct}%`;
+      }
+      const currentStage = pct < 42 ? 1 : pct < 84 ? 2 : 3;
+      if (currentStage !== lastStage) {
+        lastStage = currentStage;
+        if (statusEl) {
+          statusEl.textContent = currentStage === 1 ? stage1Text : currentStage === 2 ? stage2Text : stage3Text;
         }
       }
 
       if (rawProgress < 1) {
         rafId = requestAnimationFrame(tick);
       } else {
-        setTimeout(finishIntro, 100);
+        setTimeout(finishIntro, 80);
       }
     }
 
-    splash.addEventListener("click", finishIntro, { once: true });
-    splash.addEventListener("touchstart", finishIntro, { once: true, passive: true });
-    // Hard failsafe timer for iOS Safari / Low Power Mode
-    setTimeout(finishIntro, duration + 350);
+    const onSplashInteract = () => {
+      if (!sfxPlayed) {
+        sfxPlayed = playThemeIntroSfx(currentTheme);
+      }
+      finishIntro();
+    };
+
+    splash.addEventListener("click", onSplashInteract, { once: true });
+    splash.addEventListener("touchstart", onSplashInteract, { once: true, passive: true });
+    failsafeTimerId = setTimeout(finishIntro, duration + 320);
     rafId = requestAnimationFrame(tick);
+
+    activeIntroCleanup = () => {
+      finished = true;
+      if (rafId) cancelAnimationFrame(rafId);
+      if (removeTimerId) clearTimeout(removeTimerId);
+      if (failsafeTimerId) clearTimeout(failsafeTimerId);
+      document.body.classList.remove("intro-active");
+      splash.removeEventListener("click", onSplashInteract);
+      splash.removeEventListener("touchstart", onSplashInteract);
+    };
   }
 
   // Boot
   applyTheme(state.theme);
   initHeaderAndFilters();
   initHomeCarousel();
-  // On desktop (> 1024px), pre-render tabs; on mobile/iOS (<= 1024px), lazy-render on tab switch to prevent WebKit freeze!
-  if (typeof window !== "undefined" && window.innerWidth > 1024) {
-    ["characters", "world", "attributes", "stories", "gallery"].forEach(ensureTabRendered);
-  } else {
-    ensureTabRendered(state.activeTab);
-  }
+  // Lazy-render tabs on demand so initial opening animation runs at a locked 60fps without background DOM/image decoding stalls
+  ensureTabRendered(state.activeTab);
   initEventListeners();
   initBgmControls();
   runIntroSplash();
