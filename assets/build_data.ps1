@@ -54,17 +54,21 @@ function Get-DocxBlocks($path) {
             foreach ($node in $body.ChildNodes) {
                 if ($node.LocalName -eq "p") {
                     $hasDrawing = $node.SelectSingleNode(".//w:drawing", $ns)
-                    $childRuns = $node.SelectNodes(".//w:r", $ns)
+                    $descendantRuns = $node.SelectNodes(".//w:r", $ns)
                     $txt = ""
-                    if ($childRuns -and $childRuns.Count -gt 0) {
+                    if ($descendantRuns -and $descendantRuns.Count -gt 0) {
                         $pSb = New-Object System.Text.StringBuilder
-                        foreach ($cr in $childRuns) {
+                        foreach ($cr in $descendantRuns) {
                             $isStrike = ($cr.SelectSingleNode(".//w:strike", $ns) -ne $null) -or ($cr.SelectSingleNode(".//w:dstrike", $ns) -ne $null)
-                            $rTextNodes = $cr.SelectNodes(".//w:t | .//w:br", $ns)
-                            $rText = ""
-                            foreach ($tn in $rTextNodes) {
-                                if ($tn.LocalName -eq "br") { $rText += "`n" } else { $rText += $tn.InnerText }
+                            $rSb = New-Object System.Text.StringBuilder
+                            foreach ($cn in $cr.ChildNodes) {
+                                if ($cn.LocalName -eq "br") {
+                                    [void]$rSb.Append("`n")
+                                } elseif ($cn.LocalName -eq "t") {
+                                    [void]$rSb.Append($cn.InnerText)
+                                }
                             }
+                            $rText = $rSb.ToString()
                             if ($isStrike -and $rText.Trim() -ne "") {
                                 [void]$pSb.Append("~~" + $rText + "~~")
                             } else {
