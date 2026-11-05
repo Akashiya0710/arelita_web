@@ -24,36 +24,112 @@
 </head>
 <body class="is-loading">
   <!-- Game-Portal Opening Intro Animation Overlay -->
-  <div id="introSplash" class="intro-splash" role="status" aria-label="亞雷利塔檔案庫載入動畫">
+  <div id="introSplash" class="intro-splash" data-intro-theme="ocean" role="status" aria-label="亞雷利塔檔案庫載入動畫">
     <div class="intro-shutter intro-shutter-top"></div>
     <div class="intro-shutter intro-shutter-bottom"></div>
+
+    <!-- Theme-Specific Ambient FX & Particle Backdrop inside Intro -->
+    <div class="intro-ambient-fx" aria-hidden="true">
+      <div class="intro-fx-ocean">
+        <span class="intro-sonar-wave s-1"></span>
+        <span class="intro-sonar-wave s-2"></span>
+        <span class="intro-sonar-wave s-3"></span>
+        <span class="intro-bubble b-1"></span>
+        <span class="intro-bubble b-2"></span>
+        <span class="intro-bubble b-3"></span>
+        <span class="intro-bubble b-4"></span>
+        <span class="intro-bubble b-5"></span>
+        <span class="intro-bubble b-6"></span>
+      </div>
+      <div class="intro-fx-worldtree">
+        <div class="intro-tree-halo"></div>
+        <span class="intro-mote m-1"></span>
+        <span class="intro-mote m-2"></span>
+        <span class="intro-mote m-3"></span>
+        <span class="intro-mote m-4"></span>
+        <span class="intro-mote m-5"></span>
+        <span class="intro-mote m-6"></span>
+      </div>
+      <div class="intro-fx-starry">
+        <div class="intro-nebula-glow"></div>
+        <span class="intro-shooting-star st-1"></span>
+        <span class="intro-shooting-star st-2"></span>
+        <span class="intro-shooting-star st-3"></span>
+      </div>
+      <div class="intro-fx-dark">
+        <div class="intro-eclipse-corona"></div>
+        <span class="intro-ember e-1"></span>
+        <span class="intro-ember e-2"></span>
+        <span class="intro-ember e-3"></span>
+        <span class="intro-ember e-4"></span>
+        <span class="intro-ember e-5"></span>
+      </div>
+      <div class="intro-fx-light">
+        <div class="intro-sunburst-rays"></div>
+        <span class="intro-prism p-1"></span>
+        <span class="intro-prism p-2"></span>
+        <span class="intro-prism p-3"></span>
+        <span class="intro-prism p-4"></span>
+      </div>
+    </div>
 
     <div class="intro-center-stage">
       <div class="intro-corner intro-corner-tl"></div>
       <div class="intro-corner intro-corner-tr"></div>
       <div class="intro-corner intro-corner-bl"></div>
       <div class="intro-corner intro-corner-br"></div>
+      <div class="intro-scanline-overlay" aria-hidden="true"></div>
 
-      <!-- Animated Geometric Astrolabe Emblem -->
+      <!-- Theme Mode Pill -->
+      <div class="intro-theme-pill" id="introThemePill">
+        <span class="intro-theme-pill-dot"></span>
+        <span id="introThemeBadge">🌊 ABYSSAL OCEAN REALM // 夏日海洋領域</span>
+      </div>
+
+      <!-- Multi-Layered Sacred Geometry & Theme Emblem -->
       <div class="intro-emblem-wrap">
-        <svg class="intro-ring-svg intro-ring-outer" viewBox="0 0 200 200" fill="none">
-          <circle cx="100" cy="100" r="90" stroke="currentColor" stroke-width="1" stroke-dasharray="5 6" />
-          <circle cx="100" cy="100" r="76" stroke="currentColor" stroke-width="1.2" />
-          <polygon points="100,16 173,142 27,142" stroke="currentColor" stroke-width="0.9" fill="none" />
-          <polygon points="100,184 173,58 27,58" stroke="currentColor" stroke-width="0.9" fill="none" />
+        <span class="intro-shockwave sw-1"></span>
+        <span class="intro-shockwave sw-2"></span>
+
+        <!-- Outer Astrolabe Ring (Clockwise) -->
+        <svg class="intro-ring-svg intro-ring-outer" viewBox="0 0 240 240" fill="none">
+          <circle cx="120" cy="120" r="112" stroke="currentColor" stroke-width="1" stroke-dasharray="3 7" opacity="0.65" />
+          <circle cx="120" cy="120" r="102" stroke="currentColor" stroke-width="1.3" stroke-dasharray="28 10 6 10" />
+          <path d="M120 4 L124 16 L116 16 Z M120 236 L124 224 L116 224 Z M4 120 L16 124 L16 116 Z M236 120 L224 124 L224 116 Z" fill="currentColor" />
         </svg>
-        <div class="intro-core-diamond">
-          <span>❖</span>
+
+        <!-- Middle Sacred Hexagram Ring (Counter-Clockwise) -->
+        <svg class="intro-ring-svg intro-ring-mid" viewBox="0 0 240 240" fill="none">
+          <circle cx="120" cy="120" r="86" stroke="currentColor" stroke-width="1.2" opacity="0.8" />
+          <polygon points="120,34 194,163 46,163" stroke="currentColor" stroke-width="1" fill="none" opacity="0.75" />
+          <polygon points="120,206 194,77 46,77" stroke="currentColor" stroke-width="1" fill="none" opacity="0.75" />
+          <rect x="60" y="60" width="120" height="120" stroke="currentColor" stroke-width="0.8" stroke-dasharray="6 6" transform="rotate(45 120 120)" opacity="0.55" />
+        </svg>
+
+        <!-- Inner High-Speed Chrono Ring -->
+        <svg class="intro-ring-svg intro-ring-inner" viewBox="0 0 240 240" fill="none">
+          <circle cx="120" cy="120" r="60" stroke="currentColor" stroke-width="1.6" stroke-dasharray="18 14" />
+          <circle cx="120" cy="120" r="50" stroke="currentColor" stroke-width="0.9" stroke-dasharray="2 5" />
+        </svg>
+
+        <!-- Theme-Specific Core Emblem (Dynamically swapped per theme) -->
+        <div class="intro-core-diamond" id="introCoreDiamond">
+          <div class="intro-core-icon" id="introCoreIcon">❖</div>
         </div>
       </div>
 
-      <div class="intro-kicker">WORLD TREE SYSTEM // INITIALIZING ARCHIVE</div>
-      <h1 class="intro-title">亞 雷 利 塔</h1>
-      <div class="intro-subtitle-en">ARELITA OFFICIAL WORLD &amp; CHARACTER ARCHIVE</div>
+      <div class="intro-kicker" id="introKicker">AQUA RESONANCE // SYNCHRONIZING CORAL ARCHIVE</div>
+      <h1 class="intro-title" id="introTitle">亞 雷 利 塔</h1>
+      <div class="intro-subtitle-en" id="introSubtitle">ARELITA OFFICIAL WORLD &amp; CHARACTER ARCHIVE</div>
 
       <div class="intro-progress-box">
+        <div class="intro-telemetry-row" id="introTelemetry">
+          <span>SYS.NODE // 05-REALMS</span>
+          <span id="introSfxIndicator">🔊 THEME AUDIO SYNCHRONIZED</span>
+        </div>
         <div class="intro-progress-track">
           <div class="intro-progress-bar" id="introProgressBar"></div>
+          <div class="intro-progress-segments" aria-hidden="true"></div>
         </div>
         <div class="intro-progress-meta">
           <span id="introStatusText">SYNCING WORLD RECORDS...</span>
@@ -61,7 +137,7 @@
         </div>
       </div>
 
-      <div class="intro-skip-hint">CLICK ANYWHERE TO SKIP // 點擊任意處略過</div>
+      <div class="intro-skip-hint">CLICK ANYWHERE TO ENTER &amp; CHIME // 點擊任意處展開領域（切換風格亦可觸發專屬動畫與音效）</div>
     </div>
   </div>
 
@@ -209,6 +285,10 @@
           <span class="nav-label-zh">角色立繪畫廊</span>
           <span class="nav-badge" id="navGalleryCount">36</span>
         </button>
+        <a href="compare.html" target="_blank" rel="noopener" class="nav-tab nav-tab-compare" title="於新分頁開啟雙視窗角色能力對比系統">
+          <span class="nav-label-en">VERSUS</span>
+          <span class="nav-label-zh">角色能力對比 ↗</span>
+        </a>
       </nav>
 
       <div class="header-actions">
@@ -478,6 +558,16 @@
             <p class="hf-desc">按所屬勢力展示角色全身立繪，點擊立繪可開啟獨立分頁的「高解析度立繪細節檢視器」，自由滾輪無段縮放（15%～600%）與拖曳檢視原圖細節。</p>
             <div class="hf-link">進入角色立繪畫廊 ➔</div>
           </article>
+
+          <a href="compare.html" target="_blank" rel="noopener" class="home-feature-card home-feature-compare">
+            <div class="hf-top">
+              <span class="hf-icon">⚖️</span>
+              <span class="hf-code">06 // ABILITY COMPARATOR</span>
+            </div>
+            <h3 class="hf-title">角色能力對比系統（獨立雙視窗分頁）</h3>
+            <p class="hf-desc">開啟獨立新分頁的左右雙視窗戰力對比工具。支援依界域、主陣營、子部隊、強度階級、種族、善惡、17 大屬性分類與能力體系細緻篩選，專注對比陣營、基礎身體數值與全能力術式。</p>
+            <div class="hf-link">開啟角色能力對比分頁 ↗</div>
+          </a>
         </div>
       </div>
     </section>
