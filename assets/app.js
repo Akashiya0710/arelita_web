@@ -193,7 +193,6 @@
     "黃金": { style: "background:linear-gradient(135deg,#713f12,#ca8a04 55%,#eab308);border-color:#fef08a;color:#fefce8;box-shadow:0 0 8px rgba(250,204,21,0.3);", icon: "✦", isSupreme: true },
     "白銀": { style: "background:linear-gradient(135deg,#334155,#64748b);border-color:#f8fafc;color:#ffffff;", icon: "✦" },
     "建築": { style: "background:linear-gradient(135deg,#334155,#57534e 55%,#78350f);border-color:#cbd5e1;color:#f8fafc;", icon: "🏛️" },
-    "銳利": { style: "background:linear-gradient(135deg,#1e293b,#991b1b);border-color:#f8fafc;color:#ffe4e6;", icon: "⚔️" },
     "鹽": { style: "background:linear-gradient(135deg,#334155 0%,#475569 50%,#64748b 100%);border-color:#f8fafc;color:#ffffff;box-shadow:0 0 7px rgba(248,250,252,0.32);", icon: "🧂" },
 
     // 六、草木、植物與自然花卉屬性（10 種）
@@ -258,11 +257,12 @@
     "肉體": { style: "background:#7c2d12;border-color:#fb923c;color:#ffedd5;" },
     "髮": { style: "background:linear-gradient(135deg,#18181b 0%,#27272a 50%,#3f3f46 100%);border-color:#d4d4d8;color:#f4f4f5;box-shadow:0 0 8px rgba(212,212,216,0.35);", icon: "✦" },
 
-    // 十二、戰鬥相關屬性（6 種）
+    // 十二、戰鬥相關屬性（7 種）
     "力量": { style: "background:linear-gradient(135deg,#7c2d12,#b45309);border-color:#facc15;color:#fef9c3;" },
     "武": { style: "background:linear-gradient(135deg,#451a03,#9a3412 55%,#991b1b);border-color:#fbbf24;color:#fef3c7;", icon: "🥋" },
     "守護": { style: "background:linear-gradient(135deg,#1e3a8a,#065f46);border-color:#fde047;color:#fef9c3;", icon: "🛡️" },
     "劍": { style: "background:linear-gradient(135deg,#1e293b,#0284c7 55%,#475569);border-color:#f8fafc;color:#f0f9ff;", icon: "⚔️" },
+    "銳利": { style: "background:linear-gradient(135deg,#1e293b,#991b1b);border-color:#f8fafc;color:#ffe4e6;", icon: "⚔️" },
     "狂": { style: "background:linear-gradient(135deg,#18181b,#991b1b 60%,#c2410c);border-color:#ef4444;color:#fecaca;", icon: "🔥" },
     "掠奪": { style: "background:linear-gradient(135deg,#18181b 0%,#881337 55%,#4c1d95 100%);border-color:#fbbf24;color:#fef08a;box-shadow:0 0 9px rgba(251,191,36,0.34);", icon: "⛓️", isSupreme: true },
 
@@ -416,8 +416,8 @@
     let safe = esc(text);
     // Support markdown style ~~text~~ or word-extracted struck-through text
     safe = safe.replace(/~~([^~]+)~~/g, '<del class="strikethrough-text">$1</del>');
-    // Support inline or multi-line -技能或武器名- so each item starts on a clean line
-    safe = safe.replace(/(^|\n|[。！？）)\s])\s*-([^-\n]{1,36})-/g, (match, prefix, name) => {
+    // Support inline or multi-line -技能或武器名- so each item starts on a clean line (支援較長之古言靈詠唱咒句)
+    safe = safe.replace(/(^|\n|[。！？）)\s])\s*-([^-\n]{1,120})-/g, (match, prefix, name) => {
       const br = prefix === "" || prefix === "\n" ? prefix : `${prefix}\n`;
       return `${br}<span class="skill-subname">❖ ${name.trim()}</span>`;
     });

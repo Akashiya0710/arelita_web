@@ -522,6 +522,34 @@ if (Test-Path $attrDocPath) {
             $currentCatDesc = ""
         }
     }
+
+    # 確保「銳利」歸類於「十二、戰鬥相關屬性」
+    $combatCat = $attributeCategories | Where-Object { $_.title -match '十二、戰鬥' }
+    if ($combatCat) {
+        # 移除可能存在於其他分類的「銳利」
+        foreach ($cat in $attributeCategories) {
+            if ($cat -ne $combatCat) {
+                $rem = @($cat.items | Where-Object { $_.name -eq "銳利" })
+                foreach ($it in $rem) {
+                    [void]$cat.items.Remove($it)
+                }
+            }
+        }
+        # 若戰鬥分類尚未收錄「銳利」，則追加
+        $hasSharp = ($combatCat.items | Where-Object { $_.name -eq "銳利" }) -ne $null
+        if (-not $hasSharp) {
+            $sharpNum = [string]($combatCat.items.Count + 1)
+            $combatCat.items.Add(@{
+                num = $sharpNum
+                name = "銳利"
+                formType = ""
+                components = ""
+                description = "強化任何物體使其變的銳利"
+                categoryId = $combatCat.id
+                categoryTitle = $combatCat.title
+            })
+        }
+    }
 }
 
 $payload = @{
