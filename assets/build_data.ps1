@@ -59,7 +59,23 @@ function Get-DocxBlocks($path) {
                     if ($descendantRuns -and $descendantRuns.Count -gt 0) {
                         $pSb = New-Object System.Text.StringBuilder
                         foreach ($cr in $descendantRuns) {
-                            $isStrike = ($cr.SelectSingleNode(".//w:strike", $ns) -ne $null) -or ($cr.SelectSingleNode(".//w:dstrike", $ns) -ne $null)
+                            $isStrike = $false
+                            $sNode = $cr.SelectSingleNode(".//w:strike", $ns)
+                            if ($sNode -ne $null) {
+                                $val = $sNode.GetAttribute("val", "http://schemas.openxmlformats.org/wordprocessingml/2006/main")
+                                if ($val -eq $null -or $val -eq "" -or ($val -ne "0" -and $val -ne "false" -and $val -ne "off")) {
+                                    $isStrike = $true
+                                }
+                            }
+                            if (-not $isStrike) {
+                                $dsNode = $cr.SelectSingleNode(".//w:dstrike", $ns)
+                                if ($dsNode -ne $null) {
+                                    $val = $dsNode.GetAttribute("val", "http://schemas.openxmlformats.org/wordprocessingml/2006/main")
+                                    if ($val -eq $null -or $val -eq "" -or ($val -ne "0" -and $val -ne "false" -and $val -ne "off")) {
+                                        $isStrike = $true
+                                    }
+                                }
+                            }
                             $rSb = New-Object System.Text.StringBuilder
                             foreach ($cn in $cr.ChildNodes) {
                                 if ($cn.LocalName -eq "br") {

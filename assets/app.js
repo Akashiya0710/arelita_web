@@ -2090,7 +2090,8 @@
           } else {
             const cleanTxt = txt.replace(/—{4,}/g, "");
             if (cleanTxt.trim()) {
-              bodyHtml += `<p class="lore-p">${esc(cleanTxt.trim())}</p>`;
+              const formattedPara = esc(cleanTxt.trim()).replace(/~~([^~]+)~~/g, '<del class="strikethrough-text">$1</del>');
+              bodyHtml += `<p class="lore-p">${formattedPara}</p>`;
             }
           }
         }
