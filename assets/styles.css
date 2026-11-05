@@ -118,12 +118,11 @@
   --scrollbar-thumb-hover: #523491;
 }
 
-[data-theme="starry"] body {
+[data-theme="starry"] .bg-graphic-layer {
   background-image:
     radial-gradient(ellipse at 20% 15%, rgba(109, 40, 217, 0.22) 0%, transparent 55%),
     radial-gradient(ellipse at 80% 75%, rgba(147, 51, 234, 0.18) 0%, transparent 55%),
     radial-gradient(ellipse at 50% 50%, #120929 0%, #090414 100%);
-  background-attachment: fixed;
 }
 
 /* Sacred World Tree Gold & Emerald Theme (世界樹版本：金色配綠色神聖風格) */
@@ -166,13 +165,60 @@
   --scrollbar-thumb-hover: #2d7a56;
 }
 
-[data-theme="worldtree"] body {
+[data-theme="worldtree"] .bg-graphic-layer {
   background-image:
     radial-gradient(ellipse at 50% -5%, rgba(250, 204, 21, 0.22) 0%, rgba(16, 185, 129, 0.12) 38%, transparent 68%),
     radial-gradient(ellipse at 15% 80%, rgba(16, 185, 129, 0.18) 0%, transparent 55%),
     radial-gradient(ellipse at 85% 75%, rgba(234, 179, 8, 0.14) 0%, transparent 55%),
     radial-gradient(ellipse at 50% 50%, #0b2419 0%, #04100b 100%);
-  background-attachment: fixed;
+}
+
+/* Summer Azure & Turquoise Ocean Theme (夏日海洋版本：晴空碧海、陽光水波與珍珠氣泡風格) */
+[data-theme="ocean"] {
+  --bg-base: #062238;
+  --bg-surface: rgba(9, 44, 72, 0.86);
+  --bg-elevated: #0e3d63;
+  --bg-card: rgba(11, 51, 82, 0.86);
+  --bg-card-hover: rgba(16, 67, 106, 0.94);
+  --bg-subtle: rgba(56, 189, 248, 0.065);
+  --bg-input: #072740;
+  --bg-glass: rgba(7, 36, 58, 0.86);
+  --bg-portrait: radial-gradient(circle at 50% 22%, rgba(34, 211, 238, 0.28), rgba(251, 191, 36, 0.14) 54%, #051d30 86%);
+
+  --grid-line: rgba(103, 232, 249, 0.042);
+  --border-subtle: rgba(103, 232, 249, 0.16);
+  --border-medium: rgba(34, 211, 238, 0.28);
+  --border-strong: rgba(165, 243, 252, 0.46);
+  --border-gold: rgba(56, 189, 248, 0.58);
+  --border-accent: rgba(251, 191, 36, 0.52);
+
+  --text-primary: #f0fdfa;
+  --text-secondary: #9de4f5;
+  --text-body: #e0f7fa;
+  --text-muted: #67b2cc;
+
+  --accent-gold: #38e8ff;
+  --accent-gold-soft: rgba(56, 232, 255, 0.15);
+  --accent-blue: #fbbf24;
+  --accent-blue-soft: rgba(251, 191, 36, 0.15);
+  --accent-purple: #67e8f9;
+  --accent-purple-soft: rgba(103, 232, 249, 0.15);
+  --accent-crimson: #fb7185;
+  --accent-crimson-soft: rgba(251, 113, 133, 0.16);
+
+  --shadow-card: 0 12px 34px -5px rgba(2, 14, 26, 0.58), 0 0 22px rgba(34, 211, 238, 0.08);
+  --shadow-header: 0 8px 32px rgba(2, 14, 26, 0.68);
+  --shadow-modal: 0 28px 70px rgba(2, 12, 24, 0.88);
+  --scrollbar-thumb: #155e8a;
+  --scrollbar-thumb-hover: #0284c7;
+}
+
+[data-theme="ocean"] .bg-graphic-layer {
+  background-image:
+    radial-gradient(ellipse at 50% -8%, rgba(253, 224, 71, 0.22) 0%, rgba(34, 211, 238, 0.24) 36%, transparent 68%),
+    radial-gradient(ellipse at 15% 78%, rgba(6, 182, 212, 0.22) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 70%, rgba(56, 189, 248, 0.18) 0%, transparent 55%),
+    linear-gradient(180deg, #0c3b5e 0%, #072842 52%, #041829 100%);
 }
 
 :root {
@@ -191,21 +237,31 @@
   padding: 0;
 }
 
-html, body {
+html {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.65;
+  font-size: 15px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
   background-color: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-sans);
   line-height: 1.65;
   font-size: 15px;
   min-height: 100vh;
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-  transition: background-color 0.22s ease, color 0.22s ease;
-}
-
-body {
+  min-height: 100dvh;
   padding-top: var(--header-height);
   position: relative;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
+  -webkit-overflow-scrolling: touch;
+  transition: background-color 0.22s ease, color 0.22s ease;
 }
 
 /* Subtle Game-Portal Architectural Grid Overlay */
@@ -233,7 +289,6 @@ body {
   position: absolute;
   border-radius: 50%;
   opacity: 0.45;
-  will-change: transform;
   animation: floatOrb 18s ease-in-out infinite alternate;
 }
 
@@ -246,6 +301,10 @@ body {
 }
 
 [data-theme="worldtree"] .bg-orb {
+  opacity: 0.68;
+}
+
+[data-theme="ocean"] .bg-orb {
   opacity: 0.68;
 }
 
@@ -265,6 +324,10 @@ body {
   background: radial-gradient(circle, rgba(250, 204, 21, 0.3) 0%, rgba(234, 179, 8, 0.12) 45%, transparent 72%);
 }
 
+[data-theme="ocean"] .bg-orb-gold {
+  background: radial-gradient(circle, rgba(253, 224, 71, 0.28) 0%, rgba(34, 211, 238, 0.14) 45%, transparent 72%);
+}
+
 .bg-orb-blue {
   width: 740px;
   height: 740px;
@@ -280,6 +343,10 @@ body {
 
 [data-theme="worldtree"] .bg-orb-blue {
   background: radial-gradient(circle, rgba(52, 211, 153, 0.28) 0%, rgba(16, 185, 129, 0.1) 45%, transparent 72%);
+}
+
+[data-theme="ocean"] .bg-orb-blue {
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, rgba(14, 165, 233, 0.12) 45%, transparent 72%);
 }
 
 /* Starry Sky & Shooting Stars Layer (星空版本專屬背景與流星) */
@@ -484,6 +551,112 @@ body {
 .tree-mote.tm-9  { left: 92%; width: 5px;  height: 5px;  animation-duration: 9.9s;  animation-delay: 1.7s; }
 .tree-mote.tm-10 { left: 26%; width: 7px;  height: 7px;  animation-duration: 11.8s; animation-delay: 6.1s; }
 
+/* Summer Ocean Layer (夏日海洋版本專屬背景：陽光海面折射光束、蔚藍波浪與珍珠氣泡) */
+.summer-ocean-layer {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+[data-theme="ocean"] .summer-ocean-layer {
+  display: block;
+}
+
+.ocean-sun-rays {
+  position: absolute;
+  top: -15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 135vw;
+  height: 80vh;
+  background:
+    conic-gradient(
+      from 135deg at 50% 0%,
+      transparent 0deg,
+      rgba(253, 224, 71, 0.1) 10deg,
+      rgba(56, 189, 248, 0.12) 22deg,
+      transparent 34deg,
+      rgba(103, 232, 249, 0.11) 46deg,
+      transparent 58deg,
+      rgba(253, 224, 71, 0.09) 70deg,
+      rgba(34, 211, 238, 0.1) 80deg,
+      transparent 92deg
+    );
+  opacity: 0.9;
+}
+
+.ocean-waves-svg {
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  width: 110%;
+  height: clamp(120px, 22vh, 240px);
+  opacity: 0.85;
+}
+
+.ocean-wave {
+  animation: oceanWaveSway 9s ease-in-out infinite alternate;
+}
+
+.ocean-wave.wave-mid {
+  animation-duration: 7s;
+  animation-direction: alternate-reverse;
+}
+
+.ocean-wave.wave-front {
+  animation-duration: 5.5s;
+}
+
+@keyframes oceanWaveSway {
+  0% { transform: translateX(-2%) scaleY(0.96); }
+  100% { transform: translateX(2%) scaleY(1.05); }
+}
+
+.ocean-bubble {
+  position: absolute;
+  bottom: -24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 32%, rgba(255, 255, 255, 0.95) 0%, rgba(165, 243, 252, 0.55) 45%, rgba(34, 211, 238, 0.18) 80%, transparent 100%);
+  border: 1px solid rgba(165, 243, 252, 0.65);
+  box-shadow: 0 0 10px rgba(56, 232, 255, 0.45), inset 0 0 4px rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  animation: oceanBubbleRise 10s ease-in infinite;
+}
+
+@keyframes oceanBubbleRise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.82;
+  }
+  55% {
+    transform: translateY(-48vh) translateX(18px) scale(1);
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateY(-95vh) translateX(-14px) scale(1.15);
+    opacity: 0;
+  }
+}
+
+.ocean-bubble.ob-1  { left: 7%;  width: 8px;  height: 8px;  animation-duration: 9.5s;  animation-delay: 0.2s; }
+.ocean-bubble.ob-2  { left: 18%; width: 12px; height: 12px; animation-duration: 11.8s; animation-delay: 1.8s; }
+.ocean-bubble.ob-3  { left: 29%; width: 6px;  height: 6px;  animation-duration: 8.6s;  animation-delay: 3.4s; }
+.ocean-bubble.ob-4  { left: 41%; width: 10px; height: 10px; animation-duration: 12.2s; animation-delay: 0.9s; }
+.ocean-bubble.ob-5  { left: 53%; width: 7px;  height: 7px;  animation-duration: 10.4s; animation-delay: 2.7s; }
+.ocean-bubble.ob-6  { left: 65%; width: 11px; height: 11px; animation-duration: 11.1s; animation-delay: 0.5s; }
+.ocean-bubble.ob-7  { left: 76%; width: 7px;  height: 7px;  animation-duration: 9.2s;  animation-delay: 4.1s; }
+.ocean-bubble.ob-8  { left: 86%; width: 13px; height: 13px; animation-duration: 13.0s; animation-delay: 2.2s; }
+.ocean-bubble.ob-9  { left: 93%; width: 6px;  height: 6px;  animation-duration: 8.9s;  animation-delay: 1.4s; }
+.ocean-bubble.ob-10 { left: 35%; width: 9px;  height: 9px;  animation-duration: 10.8s; animation-delay: 5.0s; }
+
 .bg-watermark-text {
   position: absolute;
   bottom: 4%;
@@ -505,7 +678,6 @@ body {
   height: 560px;
   color: var(--accent-gold);
   opacity: 0.075;
-  will-change: transform;
   animation: spinAstrolabe 95s linear infinite;
 }
 
@@ -518,7 +690,9 @@ body.modal-open .bg-astrolabe,
 body.modal-open .back-to-top-btn,
 body.modal-open .meteor,
 body.modal-open .starfield-dots,
-body.modal-open .tree-mote {
+body.modal-open .tree-mote,
+body.modal-open .ocean-bubble,
+body.modal-open .ocean-wave {
   animation-play-state: paused !important;
 }
 
@@ -534,6 +708,11 @@ body.modal-open .tree-mote {
 [data-theme="worldtree"] .bg-astrolabe {
   opacity: 0.12;
   color: #f5d061;
+}
+
+[data-theme="ocean"] .bg-astrolabe {
+  opacity: 0.14;
+  color: #67e8f9;
 }
 
 @keyframes floatOrb {
@@ -800,36 +979,24 @@ body.modal-open .tree-mote {
 /* Main Page Staggered Reveal after Intro */
 body.is-loading .site-header {
   opacity: 0;
-  transform: translateY(-16px);
 }
 
 body.is-loading .portal-hero-strip,
 body.is-loading .workspace-layout {
   opacity: 0;
-  transform: translateY(18px);
 }
 
 .site-header,
 .portal-hero-strip,
 .workspace-layout {
-  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.45s ease;
 }
 
-body.is-loaded .site-header {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-body.is-loaded .portal-hero-strip {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.08s;
-}
-
+body.is-loaded .site-header,
+body.is-loaded .portal-hero-strip,
 body.is-loaded .workspace-layout {
   opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.16s;
+  transform: none;
 }
 
 /* Custom Scrollbar */
@@ -3797,6 +3964,28 @@ del.strikethrough-text {
    COMPREHENSIVE RESPONSIVE DESIGN SYSTEM (MOBILE, TABLET, DESKTOP)
    ========================================================================== */
 
+/* ===== STANDARD LAPTOPS & DESKTOPS (<= 1560px) ===== */
+@media (max-width: 1560px) {
+  .nav-label-en,
+  .brand-sub-en {
+    display: none;
+  }
+
+  .header-inner {
+    gap: 0.55rem;
+    padding: 0 1rem;
+  }
+
+  .nav-tab {
+    padding: 0.38rem 0.55rem;
+  }
+
+  .header-search {
+    width: clamp(140px, 13vw, 195px);
+    min-width: 120px;
+  }
+}
+
 /* ===== TABLETS & SMALL LAPTOPS (<= 1024px) ===== */
 @media (max-width: 1024px) {
   :root {
@@ -3809,7 +3998,10 @@ del.strikethrough-text {
 
   /* 2-Tier Header Layout */
   .site-header {
-    height: var(--header-height);
+    height: auto;
+    min-height: var(--header-height);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
 
   .header-inner {
@@ -3818,6 +4010,7 @@ del.strikethrough-text {
     gap: 0.35rem 0.6rem;
     align-content: center;
     justify-content: space-between;
+    height: auto;
   }
 
   .brand {
@@ -3887,14 +4080,20 @@ del.strikethrough-text {
 
   /* Workspace Layout & Collapsible Sidebar */
   .workspace-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.15rem;
+  }
+
+  .content-area {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .sidebar {
     position: static;
     max-height: none;
     width: 100%;
+    min-width: 0;
   }
 
   .sidebar-header {
@@ -3953,8 +4152,18 @@ del.strikethrough-text {
   }
 
   .hero-strip-stats {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     width: 100%;
+  }
+
+  .hero-stat-card {
+    min-width: 0;
+  }
+
+  .hero-stat-kicker {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .hero-main-heading {
@@ -3963,7 +4172,7 @@ del.strikethrough-text {
 
   /* Character Cards (Stack Portrait on top cleanly) */
   .char-showcase-card.has-portrait {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .char-portrait-aside {
@@ -4010,12 +4219,32 @@ del.strikethrough-text {
 
 /* ===== PHONES & SMALL TABLETS (<= 768px) ===== */
 @media (max-width: 768px) {
-  .brand-subtitle {
+  .main-container {
+    padding: 0.85rem 0.75rem 3rem;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .brand-subtitle,
+  .brand-sub-en,
+  .theme-text,
+  .bgm-label {
     display: none;
   }
 
+  .theme-toggle-btn,
+  .bgm-toggle-btn {
+    padding: 0.36rem 0.55rem;
+  }
+
+  .header-search {
+    width: clamp(120px, 34vw, 180px);
+    min-width: 105px;
+  }
+
   .portal-hero-strip {
-    padding: 0.85rem 1rem;
+    padding: 0.85rem 0.95rem;
   }
 
   .hero-bg-watermark {
@@ -4023,12 +4252,16 @@ del.strikethrough-text {
   }
 
   .hero-strip-stats {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem;
   }
 
+  .hero-strip-stats .hero-stat-card:last-child {
+    grid-column: span 2;
+  }
+
   .hero-stat-card {
-    padding: 0.4rem 0.55rem;
+    padding: 0.45rem 0.65rem;
   }
 
   .hero-stat-val {
@@ -4036,6 +4269,16 @@ del.strikethrough-text {
   }
 
   /* Carousel */
+  .carousel-overlay {
+    padding: 0.85rem 2.35rem 1.85rem;
+  }
+
+  .carousel-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.9rem 1rem;
+  }
+
   .carousel-desc {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -4043,6 +4286,12 @@ del.strikethrough-text {
     overflow: hidden;
     font-size: 0.82rem;
     line-height: 1.5;
+    margin-bottom: 0.85rem;
+  }
+
+  .carousel-cta-btn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8rem;
   }
 
   .carousel-tags {
@@ -4050,19 +4299,32 @@ del.strikethrough-text {
   }
 
   .carousel-nav-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 0.85rem;
+    width: 30px;
+    height: 30px;
+    font-size: 0.82rem;
   }
 
+  .carousel-nav-btn.prev { left: 0.35rem; }
+  .carousel-nav-btn.next { right: 0.35rem; }
+
   .carousel-indicators {
-    bottom: 0.5rem;
-    gap: 0.4rem;
+    bottom: 0.45rem;
+    gap: 0.35rem;
   }
 
   .carousel-dot {
-    width: 22px;
+    width: 20px;
     height: 5px;
+  }
+
+  /* Home Purpose Section */
+  .home-purpose-section {
+    padding: 1.1rem 1rem;
+  }
+
+  .home-feature-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
   }
 
   /* Character Dossier */
@@ -4073,13 +4335,13 @@ del.strikethrough-text {
   }
 
   .char-meta-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem;
     padding: 0.65rem 0.75rem;
   }
 
   .char-traits-box {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .char-badges-cluster {
@@ -4089,9 +4351,9 @@ del.strikethrough-text {
 
   /* Attribute Catalog */
   .attr-cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    padding: 0.65rem;
-    gap: 0.55rem;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0.55rem;
+    gap: 0.5rem;
   }
 
   .attr-spotlight-box {
@@ -4101,7 +4363,7 @@ del.strikethrough-text {
   /* Readers (Lore & Story) */
   .lore-document-card,
   .story-reader-card {
-    padding: 1rem 1.15rem;
+    padding: 1rem 1.05rem;
   }
 
   .reader-controls {
@@ -4136,12 +4398,14 @@ del.strikethrough-text {
   }
 
   .site-header {
-    height: var(--header-height);
+    height: auto;
+    min-height: var(--header-height);
   }
 
   .header-inner {
     padding: 0.28rem 0.5rem;
     gap: 0.25rem 0.35rem;
+    height: auto;
   }
 
   .brand-emblem {
@@ -4311,5 +4575,38 @@ del.strikethrough-text {
   .intro-center-stage {
     padding: 1.2rem;
     max-width: 92vw;
+  }
+}
+
+/* ===== iOS / iPadOS SAFARI WEBKIT SPECIFIC FIXES ===== */
+@supports (-webkit-touch-callout: none) {
+  html,
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent iOS Safari from auto-zooming page when tapping inputs/selects */
+  input[type="search"],
+  input[type="text"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Avoid WebKit GPU layer exhaustion on large lists */
+  .char-showcase-card,
+  .char-grid-card,
+  .gallery-card,
+  .attr-item-card {
+    animation: none !important;
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Pause heavy background particle animations on small iOS screens for 60fps scrolling */
+  @media (max-width: 768px) {
+    .bg-orb,
+    .bg-astrolabe {
+      animation: none !important;
+    }
   }
 }

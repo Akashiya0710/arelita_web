@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" data-theme="worldtree">
+<html lang="zh-Hant" data-theme="ocean">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>亞雷利塔 ARELITA｜官方世界觀與角色檔案庫</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="shortcut icon" href="assets/favicon.svg" />
   <script>
     (function () {
       try {
-        if (!localStorage.getItem("arelita_worldtree_init")) {
-          localStorage.setItem("arelita_theme", "worldtree");
-          localStorage.setItem("arelita_worldtree_init", "1");
+        if (!localStorage.getItem("arelita_ocean_init")) {
+          localStorage.setItem("arelita_theme", "ocean");
+          localStorage.setItem("arelita_ocean_init", "1");
         }
         var saved = localStorage.getItem("arelita_theme");
-        if (saved === "light" || saved === "dark" || saved === "starry" || saved === "worldtree") {
+        if (saved === "light" || saved === "dark" || saved === "starry" || saved === "worldtree" || saved === "ocean") {
           document.documentElement.setAttribute("data-theme", saved);
         }
       } catch (e) {}
@@ -130,6 +130,27 @@
       <span class="tree-mote tm-10"></span>
     </div>
 
+    <!-- Summer Ocean Layer (Active in Ocean Theme) -->
+    <div class="summer-ocean-layer">
+      <div class="ocean-sun-rays"></div>
+      <svg class="ocean-waves-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="ocean-wave wave-back" fill="rgba(34, 211, 238, 0.08)" d="M0,192L60,181.3C120,171,240,149,360,154.7C480,160,600,192,720,197.3C840,203,960,181,1080,165.3C1200,149,1320,139,1380,133.3L1440,128L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+        <path class="ocean-wave wave-mid" fill="rgba(56, 189, 248, 0.1)" d="M0,224L80,213.3C160,203,320,181,480,186.7C640,192,800,224,960,224C1120,224,1280,192,1360,176L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+        <path class="ocean-wave wave-front" fill="rgba(103, 232, 249, 0.09)" d="M0,256L60,250.7C120,245,240,235,360,240C480,245,600,267,720,266.7C840,267,960,245,1080,234.7C1200,224,1320,224,1380,224L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+      </svg>
+      <!-- Rising Sea Bubbles & Sunlit Foam -->
+      <span class="ocean-bubble ob-1"></span>
+      <span class="ocean-bubble ob-2"></span>
+      <span class="ocean-bubble ob-3"></span>
+      <span class="ocean-bubble ob-4"></span>
+      <span class="ocean-bubble ob-5"></span>
+      <span class="ocean-bubble ob-6"></span>
+      <span class="ocean-bubble ob-7"></span>
+      <span class="ocean-bubble ob-8"></span>
+      <span class="ocean-bubble ob-9"></span>
+      <span class="ocean-bubble ob-10"></span>
+    </div>
+
     <div class="bg-watermark-text">ARELITA // CHRONICLES</div>
     <svg class="bg-astrolabe" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="300" cy="300" r="260" stroke="currentColor" stroke-width="1" stroke-dasharray="6 8" />
@@ -242,10 +263,10 @@
           <audio id="bgmCustomAudio" loop preload="auto"></audio>
         </div>
 
-        <!-- World Tree / Starry / Dark / Light Theme Switcher -->
-        <button id="themeToggleBtn" class="theme-toggle-btn" title="點擊切換：世界樹版／星空版本／黑色版本／白色版本" aria-label="切換網頁主題版本">
-          <span class="theme-icon" id="themeToggleIcon">🌳</span>
-          <span class="theme-text" id="themeToggleText">世界樹版</span>
+        <!-- Summer Ocean / World Tree / Starry / Dark / Light Theme Switcher -->
+        <button id="themeToggleBtn" class="theme-toggle-btn" title="點擊切換：夏日海洋／世界樹版／星空版本／黑色版本／白色版本" aria-label="切換網頁主題版本">
+          <span class="theme-icon" id="themeToggleIcon">🌊</span>
+          <span class="theme-text" id="themeToggleText">夏日海洋</span>
         </button>
       </div>
     </div>

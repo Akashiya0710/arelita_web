@@ -174,7 +174,7 @@
     "神龍之風": { style: "background:linear-gradient(135deg,#064e3b 0%,#059669 52%,#0d9488 100%);border-color:#fde047;color:#fef08a;box-shadow:0 0 10px rgba(253,224,71,0.38);", icon: "🐉", isSupreme: true },
 
     // 四、雷電屬性（7 種）
-    "雷": { style: "background:#5b21b6;border-color:#c084fc;color:#f5f3ff;" },
+    "雷": { style: "background:linear-gradient(135deg,#072540 0%,#0369a1 42%,#0284c7 70%,#ca8a04 90%,#facc15 100%);border-color:#facc15;color:#fefce8;box-shadow:0 0 9px rgba(250,204,21,0.5),0 0 4px rgba(56,189,248,0.45);", icon: "⚡" },
     "紫電": { style: "background:linear-gradient(135deg,#4c1d95,#7e22ce 55%,#a21caf);border-color:#e879f9;color:#fae8ff;", icon: "⚡" },
     "白雷": { style: "background:linear-gradient(135deg,#475569,#ca8a04 55%,#eab308);border-color:#ffffff;color:#fefce8;box-shadow:0 0 8px rgba(254,240,138,0.32);", icon: "⚡", isSupreme: true },
     "銀雷": { style: "background:linear-gradient(135deg,#334155,#6d28d9);border-color:#e2e8f0;color:#f8fafc;" },
@@ -332,7 +332,7 @@
     if (/冰|雪|霜/.test(name)) return { style: "background:linear-gradient(135deg,#155e75,#0284c7);border-color:#38bdf8;color:#ecfeff;" };
     if (/水|海/.test(name)) return { style: "background:linear-gradient(135deg,#1e3a8a,#2563eb);border-color:#60a5fa;color:#eff6ff;" };
     if (/風|嵐|氣/.test(name)) return { style: "background:linear-gradient(135deg,#065f46,#059669);border-color:#34d399;color:#ecfdf5;" };
-    if (/雷|電/.test(name)) return { style: "background:linear-gradient(135deg,#4c1d95,#7e22ce);border-color:#c084fc;color:#f5f3ff;" };
+    if (/雷|電/.test(name)) return { style: "background:linear-gradient(135deg,#072540 0%,#0284c7 65%,#eab308 100%);border-color:#facc15;color:#fefce8;box-shadow:0 0 8px rgba(250,204,21,0.5),0 0 4px rgba(56,189,248,0.4);", icon: "⚡" };
     if (/光|聖/.test(name)) return { style: "background:linear-gradient(135deg,#854d0e,#ca8a04);border-color:#fde047;color:#fefce8;" };
     if (/暗|影|冥|夜/.test(name)) return { style: "background:linear-gradient(135deg,#18122b,#3b0764);border-color:#9333ea;color:#f3e8ff;" };
     if (/血/.test(name)) return { style: "background:linear-gradient(135deg,#450a0a,#991b1b);border-color:#ef4444;color:#fef2f2;" };
@@ -366,8 +366,10 @@
 
   // Application State
   const state = {
-    theme: localStorage.getItem("arelita_theme") || "worldtree", // 'worldtree' | 'starry' | 'dark' | 'light'
+    theme: localStorage.getItem("arelita_theme") || "ocean", // 'ocean' | 'worldtree' | 'starry' | 'dark' | 'light'
     activeTab: "home",
+    renderedTabs: new Set(["home"]),
+    mobileDefaultCollapsedApplied: false,
     selectedRealm: "",
     selectedFaction: "",
     selectedSubFaction: "",
@@ -1177,14 +1179,35 @@
       return sortSubFactions(a.subFaction, b.subFaction);
     });
 
+    const isFilteredView = Boolean(
+      state.selectedFaction || state.selectedSubFaction || state.searchQuery || state.filterHasImage || state.filterPowerTier || state.filterRace
+    );
+
+    if (
+      !state.mobileDefaultCollapsedApplied &&
+      !isFilteredView &&
+      typeof window !== "undefined" &&
+      window.innerWidth <= 1024 &&
+      sortedGroups.length > 2
+    ) {
+      state.mobileDefaultCollapsedApplied = true;
+      sortedGroups.forEach((grp, idx) => {
+        if (idx >= 2) {
+          state.collapsedMainGroups.add(grp.label);
+        }
+      });
+    }
+
     let html = "";
     sortedGroups.forEach((grp) => {
-      const isCollapsed = state.collapsedMainGroups.has(grp.label);
-      const itemsHtml = grp.items
-        .map((c) =>
-          state.viewMode === "showcase" ? renderCharacterShowcaseCard(c) : renderCharacterGridCard(c)
-        )
-        .join("");
+      const isCollapsed = !isFilteredView && state.collapsedMainGroups.has(grp.label);
+      const itemsHtml = isCollapsed
+        ? ""
+        : grp.items
+            .map((c) =>
+              state.viewMode === "showcase" ? renderCharacterShowcaseCard(c) : renderCharacterGridCard(c)
+            )
+            .join("");
 
       html += `
         <section class="faction-section-group">
@@ -2639,8 +2662,10 @@
     let html = "";
     sortedGroups.forEach((grp) => {
       const isCollapsed = state.collapsedGalleryGroups.has(grp.label);
-      const cardsHtml = grp.items
-        .map((c) => {
+      const cardsHtml = isCollapsed
+        ? ""
+        : grp.items
+            .map((c) => {
           const epithet = c.profile["稱號"] || "";
           const portraitSrc = getPortraitUrl(c.image);
           return `
@@ -3057,15 +3082,18 @@
 
   // ==================== THEME & SCROLL CONTROLS ====================
   function applyTheme(theme) {
-    const validThemes = ["worldtree", "starry", "dark", "light"];
-    state.theme = validThemes.includes(theme) ? theme : "worldtree";
+    const validThemes = ["ocean", "worldtree", "starry", "dark", "light"];
+    state.theme = validThemes.includes(theme) ? theme : "ocean";
     document.documentElement.setAttribute("data-theme", state.theme);
     localStorage.setItem("arelita_theme", state.theme);
 
     const iconEl = document.getElementById("themeToggleIcon");
     const textEl = document.getElementById("themeToggleText");
     if (iconEl && textEl) {
-      if (state.theme === "worldtree") {
+      if (state.theme === "ocean") {
+        iconEl.textContent = "🌊";
+        textEl.textContent = "夏日海洋";
+      } else if (state.theme === "worldtree") {
         iconEl.textContent = "🌳";
         textEl.textContent = "世界樹版";
       } else if (state.theme === "starry") {
@@ -3083,17 +3111,18 @@
 
   // ==================== EVENT LISTENERS ====================
   function initEventListeners() {
-    // Theme toggle button (World Tree / Starry / Dark / Light mode cycle)
+    // Theme toggle button (Summer Ocean / World Tree / Starry / Dark / Light mode cycle)
     const themeToggleBtn = document.getElementById("themeToggleBtn");
     if (themeToggleBtn) {
       themeToggleBtn.addEventListener("click", () => {
         const nextMap = {
+          ocean: "worldtree",
           worldtree: "starry",
           starry: "dark",
           dark: "light",
-          light: "worldtree",
+          light: "ocean",
         };
-        applyTheme(nextMap[state.theme] || "worldtree");
+        applyTheme(nextMap[state.theme] || "ocean");
       });
     }
 
@@ -3216,8 +3245,12 @@
       }
     });
 
-    // Mobile collapsible sidebars
+    // Mobile collapsible sidebars (collapse by default on <= 1024px so content is immediately visible)
+    const isMobileViewport = typeof window !== "undefined" && window.innerWidth <= 1024;
     document.querySelectorAll(".sidebar").forEach((sidebar) => {
+      if (isMobileViewport) {
+        sidebar.classList.add("is-mobile-collapsed");
+      }
       const header = sidebar.querySelector(".sidebar-header");
       if (header) {
         header.addEventListener("click", () => {
@@ -3229,13 +3262,38 @@
     });
   }
 
+  function ensureTabRendered(tabName) {
+    if (state.renderedTabs.has(tabName)) return;
+    state.renderedTabs.add(tabName);
+    if (tabName === "characters") {
+      renderFactionTree();
+      renderCharacters();
+    } else if (tabName === "world") {
+      renderLoreNav();
+      renderLoreDocument();
+    } else if (tabName === "attributes") {
+      renderAttributeNav();
+      renderAttributeSpotlight();
+      renderAttributeCatalog();
+    } else if (tabName === "stories") {
+      renderStoryNav();
+      renderStoryContent();
+    } else if (tabName === "gallery") {
+      renderGalleryNav();
+      renderGallery();
+    }
+  }
+
   function switchTab(tabName) {
     state.activeTab = tabName;
+    ensureTabRendered(tabName);
     document.querySelectorAll(".nav-tab").forEach((b) => {
       const isActive = b.getAttribute("data-tab") === tabName;
       b.classList.toggle("active", isActive);
       if (isActive && typeof b.scrollIntoView === "function") {
-        b.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        try {
+          b.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        } catch (e) {}
       }
     });
     document.querySelectorAll(".tab-panel").forEach((p) => {
@@ -3258,8 +3316,8 @@
 
     let finished = false;
     let rafId = null;
-    const duration = 1150; // 1.15s crisp ceremonial intro
-    const startTime = performance.now();
+    const duration = 950; // Crisp ceremonial intro
+    const startTime = Date.now();
 
     function finishIntro() {
       if (finished) return;
@@ -3276,16 +3334,16 @@
 
       setTimeout(() => {
         splash.classList.add("is-removed");
-      }, 850);
+      }, 750);
     }
 
-    function tick(now) {
+    function tick() {
       if (finished) return;
-      const elapsed = now - startTime;
+      const elapsed = Math.max(0, Date.now() - startTime);
       const rawProgress = Math.min(1, elapsed / duration);
       // Ease-out cubic curve for smooth progress bar
       const eased = 1 - Math.pow(1 - rawProgress, 3);
-      const pct = Math.round(eased * 100);
+      const pct = Math.max(0, Math.min(100, Math.round(eased * 100)));
 
       if (bar) bar.style.width = `${pct}%`;
       if (pctEl) pctEl.textContent = `${pct}%`;
@@ -3302,11 +3360,14 @@
       if (rawProgress < 1) {
         rafId = requestAnimationFrame(tick);
       } else {
-        setTimeout(finishIntro, 140);
+        setTimeout(finishIntro, 100);
       }
     }
 
     splash.addEventListener("click", finishIntro, { once: true });
+    splash.addEventListener("touchstart", finishIntro, { once: true, passive: true });
+    // Hard failsafe timer for iOS Safari / Low Power Mode
+    setTimeout(finishIntro, duration + 350);
     rafId = requestAnimationFrame(tick);
   }
 
@@ -3314,17 +3375,12 @@
   applyTheme(state.theme);
   initHeaderAndFilters();
   initHomeCarousel();
-  renderFactionTree();
-  renderCharacters();
-  renderLoreNav();
-  renderLoreDocument();
-  renderAttributeNav();
-  renderAttributeSpotlight();
-  renderAttributeCatalog();
-  renderStoryNav();
-  renderStoryContent();
-  renderGalleryNav();
-  renderGallery();
+  // On desktop (> 1024px), pre-render tabs; on mobile/iOS (<= 1024px), lazy-render on tab switch to prevent WebKit freeze!
+  if (typeof window !== "undefined" && window.innerWidth > 1024) {
+    ["characters", "world", "attributes", "stories", "gallery"].forEach(ensureTabRendered);
+  } else {
+    ensureTabRendered(state.activeTab);
+  }
   initEventListeners();
   initBgmControls();
   runIntroSplash();
