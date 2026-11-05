@@ -3215,12 +3215,28 @@
         closeCharacterModal();
       }
     });
+
+    // Mobile collapsible sidebars
+    document.querySelectorAll(".sidebar").forEach((sidebar) => {
+      const header = sidebar.querySelector(".sidebar-header");
+      if (header) {
+        header.addEventListener("click", () => {
+          if (window.innerWidth <= 1024) {
+            sidebar.classList.toggle("is-mobile-collapsed");
+          }
+        });
+      }
+    });
   }
 
   function switchTab(tabName) {
     state.activeTab = tabName;
     document.querySelectorAll(".nav-tab").forEach((b) => {
-      b.classList.toggle("active", b.getAttribute("data-tab") === tabName);
+      const isActive = b.getAttribute("data-tab") === tabName;
+      b.classList.toggle("active", isActive);
+      if (isActive && typeof b.scrollIntoView === "function") {
+        b.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
     });
     document.querySelectorAll(".tab-panel").forEach((p) => {
       p.classList.toggle("active", p.id === `tab-${tabName}`);
