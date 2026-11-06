@@ -107,33 +107,77 @@
       .filter((t) => t && t !== "無");
   }
 
+  // Fine-grained power ladder from highest rank (0) to lowest rank (46)
+  // Each index is exactly 1 step / 階級.
+  // Rule: 不超過三個階級 (i.e. 差距小於 3 個階級，最大相差 2 個小階級: Math.abs(rankA - rankB) <= 2)
+  // User example:
+  //   - 神王一級 (idx 6) vs 古神二級 (idx 8) -> 差距 2 (允許)
+  //   - 神王一級 (idx 6) vs 古神一級 (idx 9) -> 差距 3 (禁止！)
+  const POWER_LADDER = [
+    "現象級",
+    "終世級",
+    "降臨級",
+    "神座級",
+    "神王三級", "神王二級", "神王一級",
+    "古神三級", "古神二級", "古神一級",
+    "神明三級", "神明二級", "神明一級",
+    "準神三級", "準神二級", "準神一級",
+    "魔王三級", "魔王二級", "魔王一級",
+    "英雄三級", "英雄二級", "英雄一級",
+    "龍獸三級", "龍獸二級", "龍獸一級",
+    "天罰三級", "天罰二級", "天罰一級",
+    "猛鬼三級", "猛鬼二級", "猛鬼一級",
+    "精靈三級", "精靈二級", "精靈一級",
+    "魔導三級", "魔導二級", "魔導一級",
+    "騎士三級", "騎士二級", "騎士一級",
+    "魔獸三級", "魔獸二級", "魔獸一級",
+    "猛獸三級", "猛獸二級", "猛獸一級",
+    "凡人"
+  ];
+
   function computePowerRank(rawPower) {
     const p = String(rawPower || "").trim();
-    if (!p || p === "不明" || p === "未知" || p === "?") {
+    if (!p || p === "不明" || p === "未知" || p === "?" || p.includes("待補充")) {
       return { tierIdx: -1, subGrade: 0, score: -1 };
     }
-    let matchedTierIdx = -1;
-    for (let i = 0; i < POWER_TIER_ORDER.length; i++) {
-      if (p.includes(POWER_TIER_ORDER[i])) {
-        matchedTierIdx = i;
-        break;
+    // 1. Direct match on power ladder
+    for (let i = 0; i < POWER_LADDER.length; i++) {
+      if (p.includes(POWER_LADDER[i])) {
+        return { tierIdx: i, subGrade: 0, score: i };
       }
     }
-    if (matchedTierIdx === -1) {
-      return { tierIdx: -1, subGrade: 0, score: -1 };
+    // 2. Handle subgrade without the exact string
+    const majorTiers = [
+      { name: "神王", base: 4 },
+      { name: "古神", base: 7 },
+      { name: "神明", base: 10 },
+      { name: "準神", base: 13 },
+      { name: "魔王", base: 16 },
+      { name: "英雄", base: 19 },
+      { name: "龍獸", base: 22 },
+      { name: "天罰", base: 25 },
+      { name: "猛鬼", base: 28 },
+      { name: "精靈", base: 31 },
+      { name: "魔導", base: 34 },
+      { name: "騎士", base: 37 },
+      { name: "魔獸", base: 40 },
+      { name: "猛獸", base: 43 }
+    ];
+    for (const mt of majorTiers) {
+      if (p.includes(mt.name)) {
+        if (p.includes("三級")) return { tierIdx: mt.base, subGrade: 3, score: mt.base };
+        if (p.includes("二級")) return { tierIdx: mt.base + 1, subGrade: 2, score: mt.base + 1 };
+        if (p.includes("一級")) return { tierIdx: mt.base + 2, subGrade: 1, score: mt.base + 2 };
+        return { tierIdx: mt.base + 1, subGrade: 2, score: mt.base + 1 };
+      }
     }
-    let subGrade = 0;
-    if (/一級/.test(p)) subGrade = 0;
-    else if (/二級/.test(p)) subGrade = 1;
-    else if (/三級/.test(p)) subGrade = 2;
-    else if (/四級/.test(p)) subGrade = 3;
-    else if (/五級/.test(p)) subGrade = 4;
+    if (p.includes("現象")) return { tierIdx: 0, subGrade: 0, score: 0 };
+    if (p.includes("終世")) return { tierIdx: 1, subGrade: 0, score: 1 };
+    if (p.includes("降臨")) return { tierIdx: 2, subGrade: 0, score: 2 };
+    if (p.includes("神座")) return { tierIdx: 3, subGrade: 0, score: 3 };
+    if (p.includes("凡人")) return { tierIdx: 46, subGrade: 0, score: 46 };
 
-    return {
-      tierIdx: matchedTierIdx,
-      subGrade,
-      score: matchedTierIdx * 3 + subGrade
-    };
+    return { tierIdx: -1, subGrade: 0, score: -1 };
   }
 
   // Build attribute lookup map (attrName -> category id & record)
@@ -1345,26 +1389,30 @@
     if (randomSimilarBtn) {
       randomSimilarBtn.addEventListener("click", () => {
         if (characters.length < 2) return;
-        const rankedPool = characters.filter((c) => c.powerScore >= 0);
-        const sourcePool = rankedPool.length >= 2 ? rankedPool : characters;
-
-        const charA = sourcePool[Math.floor(Math.random() * sourcePool.length)];
-        const others = sourcePool.filter((c) => c.id !== charA.id);
-
-        // 1. Exact same power or within 1 sub-grade step (e.g., 神王一級 vs 神王一級/二級, or 神王三級 vs 古神一級)
-        let candidates = others.filter(
-          (c) => c.power === charA.power || Math.abs(c.powerScore - charA.powerScore) <= 1
-        );
-        // 2. Fallback: Same major tier or within 2 sub-grade steps
-        if (candidates.length === 0) {
-          candidates = others.filter(
-            (c) => c.powerTierIdx === charA.powerTierIdx || Math.abs(c.powerScore - charA.powerScore) <= 2
+        // 嚴格篩選具備天梯位階、且至少存在 1 位階級差距 <= 2 的對手角色群
+        const rankedPool = characters.filter((c) => {
+          if (c.powerScore < 0) return false;
+          return characters.some(
+            (other) =>
+              other.id !== c.id &&
+              other.powerScore >= 0 &&
+              Math.abs(other.powerScore - c.powerScore) <= 2
           );
-        }
-        // 3. Fallback: Adjacent major tier (e.g., 現象級 vs 終世級)
-        if (candidates.length === 0) {
-          candidates = others.filter((c) => Math.abs(c.powerTierIdx - charA.powerTierIdx) <= 1);
-        }
+        });
+        const pool = rankedPool.length >= 2 ? rankedPool : characters;
+
+        const charA = pool[Math.floor(Math.random() * pool.length)];
+        const others = pool.filter((c) => c.id !== charA.id);
+
+        // 核心規則：實力相近差距「不超過三個階級」（即差距 <= 2 個小階級）
+        // 例如：神王一級（score 6）對古神二級（score 8，相差 2 階）允許；神王一級對古神一級（score 9，相差 3 階）嚴格排除！
+        let candidates = others.filter(
+          (c) =>
+            c.powerScore >= 0 &&
+            charA.powerScore >= 0 &&
+            Math.abs(c.powerScore - charA.powerScore) <= 2
+        );
+
         if (candidates.length === 0) {
           candidates = others;
         }
