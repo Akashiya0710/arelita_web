@@ -52,10 +52,16 @@
           <span>🗑️</span>
           <span>清除兩邊角色</span>
         </button>
-        <button type="button" class="compare-action-btn" id="btnRandomPair" title="隨機抽選兩名角色進行能力對比">
-          <span>🎲</span>
-          <span>隨機對決</span>
-        </button>
+        <div class="compare-random-group" role="group" aria-label="隨機對決模式">
+          <button type="button" class="compare-action-btn random-group-btn" id="btnRandomPure" title="完全隨機抽選兩名角色進行對決">
+            <span>🎲</span>
+            <span>純粹隨機</span>
+          </button>
+          <button type="button" class="compare-action-btn random-group-btn random-balanced-btn" id="btnRandomSimilar" title="隨機抽選兩名強度階級相同或相近的角色進行對決">
+            <span>⚖️</span>
+            <span>實力相近隨機</span>
+          </button>
+        </div>
         <button type="button" class="compare-action-btn" id="btnToggleAllPickers" title="同時展開或收合左右角色的篩選器">
           <span>🔍</span>
           <span id="togglePickersLabel">展開雙邊選角器</span>

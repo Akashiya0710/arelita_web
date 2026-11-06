@@ -5118,6 +5118,37 @@ del.strikethrough-text {
   background: rgba(239, 68, 68, 0.16);
 }
 
+/* Dual-Mode Random Matchup Capsule Group */
+.compare-random-group {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-gold);
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.compare-random-group .random-group-btn {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0.4rem 0.72rem;
+}
+
+.compare-random-group .random-group-btn + .random-group-btn {
+  border-left: 1px solid var(--border-gold);
+}
+
+.compare-random-group .random-balanced-btn {
+  background: var(--accent-gold-soft);
+  color: var(--accent-gold);
+}
+
+.compare-random-group .random-group-btn:hover {
+  background: var(--accent-gold);
+  color: #08111e;
+}
+
 .compare-site-header .header-inner {
   max-width: 1460px;
   margin: 0 auto;

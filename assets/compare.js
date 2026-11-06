@@ -107,6 +107,35 @@
       .filter((t) => t && t !== "無");
   }
 
+  function computePowerRank(rawPower) {
+    const p = String(rawPower || "").trim();
+    if (!p || p === "不明" || p === "未知" || p === "?") {
+      return { tierIdx: -1, subGrade: 0, score: -1 };
+    }
+    let matchedTierIdx = -1;
+    for (let i = 0; i < POWER_TIER_ORDER.length; i++) {
+      if (p.includes(POWER_TIER_ORDER[i])) {
+        matchedTierIdx = i;
+        break;
+      }
+    }
+    if (matchedTierIdx === -1) {
+      return { tierIdx: -1, subGrade: 0, score: -1 };
+    }
+    let subGrade = 0;
+    if (/一級/.test(p)) subGrade = 0;
+    else if (/二級/.test(p)) subGrade = 1;
+    else if (/三級/.test(p)) subGrade = 2;
+    else if (/四級/.test(p)) subGrade = 3;
+    else if (/五級/.test(p)) subGrade = 4;
+
+    return {
+      tierIdx: matchedTierIdx,
+      subGrade,
+      score: matchedTierIdx * 3 + subGrade
+    };
+  }
+
   // Build attribute lookup map (attrName -> category id & record)
   const attrToCategoryMap = new Map();
   attributeCategories.forEach((cat) => {
@@ -134,6 +163,9 @@
     c.profile = c.profile || {};
     c.subFaction = c.subFaction || "";
     c.power = c.power || "";
+    const pRank = computePowerRank(c.power);
+    c.powerTierIdx = pRank.tierIdx;
+    c.powerScore = pRank.score;
     c.raceCategories = extractCharacterRaces(c.profile["種族"]);
     c.attrTokens = parseAttributeTokens(c.profile["屬性"]);
 
@@ -1286,22 +1318,63 @@
       });
     }
 
-    const randomBtn = document.getElementById("btnRandomPair");
-    if (randomBtn) {
-      randomBtn.addEventListener("click", () => {
+    const applyRandomPair = (leftId, rightId) => {
+      compareState.leftCharId = leftId;
+      compareState.rightCharId = rightId;
+      compareState.leftPickerOpen = false;
+      compareState.rightPickerOpen = false;
+      forceSelectAnim.left = true;
+      forceSelectAnim.right = true;
+      syncUrlAndStorage();
+      updatePickerVisibility();
+      renderAllComparisonViews();
+    };
+
+    const randomPureBtn = document.getElementById("btnRandomPure");
+    if (randomPureBtn) {
+      randomPureBtn.addEventListener("click", () => {
         if (characters.length < 2) return;
         const idx1 = Math.floor(Math.random() * characters.length);
         let idx2 = Math.floor(Math.random() * characters.length);
         if (idx2 === idx1) idx2 = (idx1 + 1) % characters.length;
-        compareState.leftCharId = characters[idx1].id;
-        compareState.rightCharId = characters[idx2].id;
-        compareState.leftPickerOpen = false;
-        compareState.rightPickerOpen = false;
-        forceSelectAnim.left = true;
-        forceSelectAnim.right = true;
-        syncUrlAndStorage();
-        updatePickerVisibility();
-        renderAllComparisonViews();
+        applyRandomPair(characters[idx1].id, characters[idx2].id);
+      });
+    }
+
+    const randomSimilarBtn = document.getElementById("btnRandomSimilar");
+    if (randomSimilarBtn) {
+      randomSimilarBtn.addEventListener("click", () => {
+        if (characters.length < 2) return;
+        const rankedPool = characters.filter((c) => c.powerScore >= 0);
+        const sourcePool = rankedPool.length >= 2 ? rankedPool : characters;
+
+        const charA = sourcePool[Math.floor(Math.random() * sourcePool.length)];
+        const others = sourcePool.filter((c) => c.id !== charA.id);
+
+        // 1. Exact same power or within 1 sub-grade step (e.g., 神王一級 vs 神王一級/二級, or 神王三級 vs 古神一級)
+        let candidates = others.filter(
+          (c) => c.power === charA.power || Math.abs(c.powerScore - charA.powerScore) <= 1
+        );
+        // 2. Fallback: Same major tier or within 2 sub-grade steps
+        if (candidates.length === 0) {
+          candidates = others.filter(
+            (c) => c.powerTierIdx === charA.powerTierIdx || Math.abs(c.powerScore - charA.powerScore) <= 2
+          );
+        }
+        // 3. Fallback: Adjacent major tier (e.g., 現象級 vs 終世級)
+        if (candidates.length === 0) {
+          candidates = others.filter((c) => Math.abs(c.powerTierIdx - charA.powerTierIdx) <= 1);
+        }
+        if (candidates.length === 0) {
+          candidates = others;
+        }
+
+        const charB = candidates[Math.floor(Math.random() * candidates.length)];
+        if (Math.random() < 0.5) {
+          applyRandomPair(charA.id, charB.id);
+        } else {
+          applyRandomPair(charB.id, charA.id);
+        }
       });
     }
 
