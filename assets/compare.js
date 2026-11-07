@@ -960,12 +960,71 @@
   const lastRenderedCharId = { left: "", right: "" };
   const forceSelectAnim = { left: false, right: false };
 
+  let compareSfxCtx = null;
+  function playCharSelectSfx(side) {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!compareSfxCtx) {
+        compareSfxCtx = new AudioCtx();
+      }
+      if (compareSfxCtx.state === "suspended") {
+        compareSfxCtx.resume().catch(() => {});
+      }
+      if (compareSfxCtx.state !== "running") return;
+
+      const now = compareSfxCtx.currentTime;
+      const master = compareSfxCtx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.linearRampToValueAtTime(0.12, now + 0.015);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      master.connect(compareSfxCtx.destination);
+
+      if (side === "left") {
+        // Left side: Blue Tactical / Ethereal Ice Lock-in Chime
+        [587.33, 880.0, 1174.66, 1760.0].forEach((freq, idx) => {
+          const t = now + idx * 0.038;
+          const osc = compareSfxCtx.createOscillator();
+          const g = compareSfxCtx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, t);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.04, t + 0.22);
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(0.08, t + 0.008);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(t);
+          osc.stop(t + 0.28);
+        });
+      } else {
+        // Right side: Gold Heroic / Blade Lock-in Chime
+        [440.0, 659.25, 880.0, 1318.51].forEach((freq, idx) => {
+          const t = now + idx * 0.038;
+          const osc = compareSfxCtx.createOscillator();
+          const g = compareSfxCtx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, t);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.02, t + 0.25);
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(0.09, t + 0.008);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(t);
+          osc.stop(t + 0.32);
+        });
+      }
+    } catch (e) {}
+  }
+
   function triggerPaneSelectFlash(side) {
-    const paneEl = document.getElementById(side === "left" ? "paneLeft" : "paneRight");
+    const paneEl = document.getElementById(side === "left" ? "comparePaneLeft" : "comparePaneRight");
     if (!paneEl) return;
     paneEl.classList.remove("is-pane-selected-flash");
     void paneEl.offsetWidth;
     paneEl.classList.add("is-pane-selected-flash");
+    playCharSelectSfx(side);
   }
 
   // ==================== RENDER COMBAT & ABILITY DOSSIER (COMPACT, NO REDUNDANT BOXES) ====================
@@ -1033,9 +1092,29 @@
     const combatAbilities = c.combatAbilities || [];
 
     container.innerHTML = `
-      <article class="compare-dossier-card ${shouldAnimate ? "is-char-entering" : ""}">
+      <article class="compare-dossier-card ${shouldAnimate ? "is-char-entering side-" + side : ""}">
         <!-- Unified Compact Character Header + Basic Specs -->
         <div class="compare-char-header">
+          ${
+            shouldAnimate
+              ? `
+            <div class="compare-burst-fx side-${side}" aria-hidden="true">
+              <div class="burst-flare"></div>
+              <div class="burst-shockwave"></div>
+              <div class="burst-ring"></div>
+              <div class="burst-sparks">
+                <span class="b-spark sp-1"></span>
+                <span class="b-spark sp-2"></span>
+                <span class="b-spark sp-3"></span>
+                <span class="b-spark sp-4"></span>
+                <span class="b-spark sp-5"></span>
+                <span class="b-spark sp-6"></span>
+                <span class="b-spark sp-7"></span>
+                <span class="b-spark sp-8"></span>
+              </div>
+            </div>`
+              : ""
+          }
           <div class="compare-char-avatar-lg">
             ${
               c.image
@@ -1308,7 +1387,7 @@
   }
 
   function applyCompareTheme(theme) {
-    const valid = ["ocean", "worldtree", "starry", "dark", "light"];
+    const valid = ["ocean", "beach", "worldtree", "starry", "dark", "light"];
     compareState.theme = valid.includes(theme) ? theme : "ocean";
     document.documentElement.setAttribute("data-theme", compareState.theme);
     localStorage.setItem("arelita_theme", compareState.theme);
@@ -1319,6 +1398,9 @@
       if (compareState.theme === "ocean") {
         iconEl.textContent = "🌊";
         textEl.textContent = "夏日海洋";
+      } else if (compareState.theme === "beach") {
+        iconEl.textContent = "🏖️";
+        textEl.textContent = "假日海灘";
       } else if (compareState.theme === "worldtree") {
         iconEl.textContent = "🌳";
         textEl.textContent = "世界樹版";
@@ -1459,7 +1541,8 @@
     if (themeBtn) {
       themeBtn.addEventListener("click", () => {
         const nextMap = {
-          ocean: "worldtree",
+          ocean: "beach",
+          beach: "worldtree",
           worldtree: "starry",
           starry: "dark",
           dark: "light",

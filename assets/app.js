@@ -2911,6 +2911,96 @@
     { pad: [45, 52, 55, 60, 64], arp: [69, null, 76, 79, null, 76, 72, null] }  // Am7
   ];
 
+  // Track 3: 《夏日海灘・陽光微風》 (C Major Tropical Bossa Marimba & Gentle Surf)
+  const BEACH_PROGRESSION = [
+    { pad: [36, 48, 55, 59, 62], arp: [72, 76, 79, 83, 79, 76, 83, 79] }, // Cmaj9
+    { pad: [45, 52, 57, 60, 64], arp: [72, 76, 79, 81, 79, 76, 79, 72] }, // Am9
+    { pad: [38, 50, 57, 60, 65], arp: [74, 77, 81, 84, 81, 77, 81, 74] }, // Dm7
+    { pad: [43, 50, 55, 59, 65], arp: [71, 74, 77, 81, 79, 77, 74, 71] }, // G9
+    { pad: [41, 48, 53, 57, 64], arp: [69, 72, 76, 81, 76, 72, 76, 69] }, // Fmaj7
+    { pad: [40, 47, 52, 55, 59], arp: [67, 71, 74, 79, 76, 74, 79, 72] }  // Em7
+  ];
+
+  function playMarimbaNote(ctx, outNode, midi, duration, vel = 0.13) {
+    const now = ctx.currentTime;
+    const freq = midiToFreq(midi);
+
+    // Warm wooden bar fundamental (sine)
+    const osc1 = ctx.createOscillator();
+    osc1.type = "sine";
+    osc1.frequency.setValueAtTime(freq, now);
+
+    // Woody fourth harmonic overtone (characteristic marimba resonance)
+    const osc2 = ctx.createOscillator();
+    osc2.type = "sine";
+    osc2.frequency.setValueAtTime(freq * 3.98, now);
+
+    // Transient attack mallet click
+    const oscClick = ctx.createOscillator();
+    oscClick.type = "triangle";
+    oscClick.frequency.setValueAtTime(freq * 7.5, now);
+    oscClick.frequency.exponentialRampToValueAtTime(Math.max(120, freq * 0.6), now + 0.022);
+
+    const clickEnv = ctx.createGain();
+    clickEnv.gain.setValueAtTime(vel * 0.45, now);
+    clickEnv.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+    oscClick.connect(clickEnv);
+    clickEnv.connect(outNode);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(freq * 4.2, now);
+    filter.frequency.exponentialRampToValueAtTime(Math.max(220, freq * 1.1), now + duration * 0.65);
+
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, now);
+    env.gain.linearRampToValueAtTime(vel, now + 0.008);
+    env.gain.exponentialRampToValueAtTime(0.0005, now + duration);
+
+    const harmEnv = ctx.createGain();
+    harmEnv.gain.setValueAtTime(vel * 0.35, now);
+    harmEnv.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.28);
+
+    osc1.connect(filter);
+    filter.connect(env);
+    env.connect(outNode);
+
+    osc2.connect(harmEnv);
+    harmEnv.connect(outNode);
+
+    osc1.start(now);
+    osc2.start(now);
+    oscClick.start(now);
+    osc1.stop(now + duration + 0.04);
+    osc2.stop(now + duration * 0.3 + 0.02);
+    oscClick.stop(now + 0.03);
+  }
+
+  function playOceanSurfSwell(ctx, outNode, duration, peakVol = 0.024) {
+    const now = ctx.currentTime;
+    const noise = ctx.createBufferSource();
+    noise.buffer = getCachedNoiseBuffer(ctx);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(220, now);
+    filter.frequency.exponentialRampToValueAtTime(680, now + duration * 0.45);
+    filter.frequency.exponentialRampToValueAtTime(160, now + duration);
+    filter.Q.value = 1.6;
+
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, now);
+    env.gain.linearRampToValueAtTime(peakVol, now + duration * 0.45);
+    env.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    noise.connect(filter);
+    filter.connect(env);
+    env.connect(outNode);
+
+    noise.start(now);
+    noise.stop(now + duration + 0.02);
+  }
+
   function startBgmScheduler() {
     stopBgmScheduler();
     const audioEl = document.getElementById("bgmCustomAudio");
@@ -2929,28 +3019,47 @@
     bgmSystem.masterGain.gain.setValueAtTime(Math.max(0.001, bgmSystem.masterGain.gain.value), ctx.currentTime);
     bgmSystem.masterGain.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + 0.5);
 
-    const stepMs = bgmSystem.track === "astral" ? 560 : 410;
+    const stepMs = bgmSystem.track === "astral" ? 560 : (bgmSystem.track === "beach" ? 380 : 410);
 
     function step() {
       if (!bgmSystem.isPlaying) return;
-      const list = bgmSystem.track === "astral" ? ASTRAL_PROGRESSION : HARP_PROGRESSION;
+      let list = HARP_PROGRESSION;
+      if (bgmSystem.track === "astral") {
+        list = ASTRAL_PROGRESSION;
+      } else if (bgmSystem.track === "beach") {
+        list = BEACH_PROGRESSION;
+      }
       const barIdx = Math.floor(bgmSystem.stepIdx / 8) % list.length;
       const noteIdx = bgmSystem.stepIdx % 8;
       const bar = list[barIdx];
 
       if (noteIdx === 0) {
-        playWarmPadChord(ctx, bgmSystem.masterGain, bar.pad, (stepMs * 8) / 1000 + 0.6, bgmSystem.track === "astral" ? 0.055 : 0.042);
+        const padVol = bgmSystem.track === "beach" ? 0.038 : (bgmSystem.track === "astral" ? 0.055 : 0.042);
+        playWarmPadChord(ctx, bgmSystem.masterGain, bar.pad, (stepMs * 8) / 1000 + 0.6, padVol);
+        if (bgmSystem.track === "beach" && (barIdx % 2 === 0)) {
+          playOceanSurfSwell(ctx, bgmSystem.masterGain, (stepMs * 16) / 1000, 0.024);
+        }
       }
 
       const noteMidi = bar.arp[noteIdx];
       if (noteMidi) {
-        playHarpPluck(
-          ctx,
-          bgmSystem.masterGain,
-          noteMidi,
-          bgmSystem.track === "astral" ? 2.4 : 1.65,
-          bgmSystem.track === "astral" ? 0.1 : 0.13
-        );
+        if (bgmSystem.track === "beach") {
+          playMarimbaNote(
+            ctx,
+            bgmSystem.masterGain,
+            noteMidi,
+            (stepMs * 1.6) / 1000,
+            0.125
+          );
+        } else {
+          playHarpPluck(
+            ctx,
+            bgmSystem.masterGain,
+            noteMidi,
+            bgmSystem.track === "astral" ? 2.4 : 1.65,
+            bgmSystem.track === "astral" ? 0.1 : 0.13
+          );
+        }
       }
 
       bgmSystem.stepIdx++;
@@ -3085,7 +3194,7 @@
 
   // ==================== THEME & SCROLL CONTROLS ====================
   function applyTheme(theme) {
-    const validThemes = ["ocean", "worldtree", "starry", "dark", "light"];
+    const validThemes = ["ocean", "beach", "worldtree", "starry", "dark", "light"];
     state.theme = validThemes.includes(theme) ? theme : "ocean";
     document.documentElement.setAttribute("data-theme", state.theme);
     localStorage.setItem("arelita_theme", state.theme);
@@ -3096,6 +3205,9 @@
       if (state.theme === "ocean") {
         iconEl.textContent = "🌊";
         textEl.textContent = "夏日海洋";
+      } else if (state.theme === "beach") {
+        iconEl.textContent = "🏖️";
+        textEl.textContent = "假日海灘";
       } else if (state.theme === "worldtree") {
         iconEl.textContent = "🌳";
         textEl.textContent = "世界樹版";
@@ -3114,12 +3226,13 @@
 
   // ==================== EVENT LISTENERS ====================
   function initEventListeners() {
-    // Theme toggle button (Summer Ocean / World Tree / Starry / Dark / Light mode cycle)
+    // Theme toggle button (Summer Ocean / Beach / World Tree / Starry / Dark / Light mode cycle)
     const themeToggleBtn = document.getElementById("themeToggleBtn");
     if (themeToggleBtn) {
       themeToggleBtn.addEventListener("click", () => {
         const nextMap = {
-          ocean: "worldtree",
+          ocean: "beach",
+          beach: "worldtree",
           worldtree: "starry",
           starry: "dark",
           dark: "light",
@@ -3128,6 +3241,24 @@
         const nextTheme = nextMap[state.theme] || "ocean";
         applyTheme(nextTheme);
         runIntroSplash({ theme: nextTheme, isThemeSwitch: true });
+
+        // Auto-harmonize default BGM soundtrack with matching theme
+        if (nextTheme === "beach") {
+          bgmSystem.track = "beach";
+          localStorage.setItem("arelita_bgm_track", "beach");
+          updateBgmUI();
+          if (bgmSystem.isPlaying) startBgmScheduler();
+        } else if (nextTheme === "worldtree") {
+          bgmSystem.track = "harp";
+          localStorage.setItem("arelita_bgm_track", "harp");
+          updateBgmUI();
+          if (bgmSystem.isPlaying) startBgmScheduler();
+        } else if (nextTheme === "starry") {
+          bgmSystem.track = "astral";
+          localStorage.setItem("arelita_bgm_track", "astral");
+          updateBgmUI();
+          if (bgmSystem.isPlaying) startBgmScheduler();
+        }
       });
     }
 
@@ -3319,6 +3450,17 @@
       stage2: (s) => `SURFACING ${s} ABYSSAL CHRONICLES...`,
       stage3: "OCEAN REALM ONLINE // 碧海領域展開完成",
     },
+    beach: {
+      badge: "🏖️ SUNNY RESORT COAST // 假日海灘領域",
+      kicker: "TROPICAL BREEZE // WELCOME TO SUNNY EMERALD SHORE",
+      subtitle: "GOLDEN BEACH, AZURE SURF & SWAYING PALMS ARCHIVE",
+      telemetryLeft: "CLIMATE // 28°C SUNSHINE & TROPICAL BREEZE",
+      telemetryRight: "🔊 SFX: TROPICAL MARIMBA & OCEAN SURF WASH",
+      coreSvg: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="11" r="5"/><path d="M4 27c4-3 8 0 12-2s8 0 12-2M2 29c5-2 9 1 14-1s9 1 14-1M16 16v3"/></svg>`,
+      stage1: (c) => `WARMING ${c} SUNLIT ARCHIVE DOSSIERS...`,
+      stage2: (s) => `SURFING ${s} TROPICAL BREEZE CHRONICLES...`,
+      stage3: "BEACH RESORT ONLINE // 陽光海灘度假領域展開",
+    },
     worldtree: {
       badge: "🌳 SACRED YGGDRASIL // 世界樹領域",
       kicker: "ROOT CONVERGENCE // AWAKENING YGGDRASIL CANOPY",
@@ -3487,6 +3629,29 @@
             endFreq: f * 1.03,
             gain: 0.055,
             attack: 0.01,
+          });
+        });
+      } else if (theme === "beach") {
+        // 🏖️ Beach: Tropical ocean surf wash swell + bright sunny acoustic marimba arpeggio
+        playNoiseBurstHelper(ctx, master, now, 1.25, {
+          filterType: "lowpass",
+          startFreq: 260,
+          endFreq: 720,
+          Q: 1.4,
+          gain: 0.055,
+        });
+        // Warm sunny major chime arpeggio (Cmaj9: C5, E5, G5, B5, D6, E6)
+        [523.25, 659.25, 783.99, 987.77, 1174.66, 1318.51].forEach((f, idx) => {
+          const t = now + 0.08 + idx * 0.08;
+          playToneHelper(ctx, master, f, t, 0.65, {
+            type: "sine",
+            gain: 0.07,
+            attack: 0.008,
+          });
+          playToneHelper(ctx, master, f * 3, t, 0.25, {
+            type: "triangle",
+            gain: 0.02,
+            attack: 0.005,
           });
         });
       } else if (theme === "worldtree") {

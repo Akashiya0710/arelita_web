@@ -221,6 +221,63 @@
     linear-gradient(180deg, #0c3b5e 0%, #072842 52%, #041829 100%);
 }
 
+/* Sunny Vacation Beach Theme (假日海灘版本：晴空蔚藍、薄荷淺海、暖奶金沙灘與翠綠椰林動漫夏日色調) */
+[data-theme="beach"] {
+  --bg-base: #eef9ff;
+  --bg-surface: rgba(255, 250, 238, 0.86);
+  --bg-elevated: #fdf5e2;
+  --bg-card: rgba(255, 251, 241, 0.84);
+  --bg-card-hover: rgba(255, 253, 247, 0.94);
+  --bg-subtle: rgba(46, 198, 204, 0.11);
+  --bg-input: rgba(250, 241, 220, 0.90);
+  --bg-glass: rgba(255, 249, 236, 0.86);
+  --bg-portrait: radial-gradient(circle at 50% 24%, rgba(125, 232, 215, 0.42), rgba(248, 226, 174, 0.40) 58%, #d2f2f8 96%);
+
+  --grid-line: rgba(28, 165, 201, 0.055);
+  --border-subtle: rgba(214, 172, 105, 0.30);
+  --border-medium: rgba(46, 198, 204, 0.40);
+  --border-strong: rgba(28, 165, 201, 0.56);
+  --border-gold: rgba(217, 138, 43, 0.58);
+  --border-accent: rgba(46, 198, 204, 0.56);
+
+  --text-primary: #153b4a;
+  --text-secondary: #286478;
+  --text-body: #1f4959;
+  --text-muted: #5c8494;
+
+  --accent-gold: #d47a1e;
+  --accent-gold-soft: rgba(212, 122, 30, 0.14);
+  --accent-blue: #1496b8;
+  --accent-blue-soft: rgba(20, 150, 184, 0.13);
+  --accent-purple: #389e56;
+  --accent-purple-soft: rgba(56, 158, 86, 0.13);
+  --accent-crimson: #e05a47;
+  --accent-crimson-soft: rgba(224, 90, 71, 0.13);
+
+  --shadow-card: 0 10px 28px -4px rgba(21, 68, 88, 0.11), 0 2px 10px rgba(218, 165, 92, 0.10);
+  --shadow-header: 0 6px 24px rgba(21, 68, 88, 0.10);
+  --shadow-modal: 0 24px 64px rgba(18, 56, 74, 0.24);
+  --scrollbar-thumb: #64c5d6;
+  --scrollbar-thumb-hover: #1ca5c9;
+}
+
+[data-theme="beach"] .bg-graphic-layer {
+  background-image:
+    radial-gradient(ellipse at 78% 14%, rgba(255, 253, 235, 0.48) 0%, rgba(168, 230, 255, 0.25) 32%, transparent 62%),
+    radial-gradient(ellipse at 18% 88%, rgba(248, 222, 162, 0.55) 0%, rgba(245, 208, 130, 0.25) 45%, transparent 72%),
+    radial-gradient(ellipse at 82% 72%, rgba(62, 206, 208, 0.35) 0%, transparent 60%),
+    linear-gradient(
+      180deg,
+      #4fa8f6 0%,
+      #74c4fc 26%,
+      #a8e2ff 46%,
+      #5cd6d8 62%,
+      #8cebe0 75%,
+      #f9e8bc 88%,
+      #efd396 100%
+    );
+}
+
 :root {
   --header-height: 72px;
   --radius-xs: 4px;
@@ -308,6 +365,10 @@ body {
   opacity: 0.68;
 }
 
+[data-theme="beach"] .bg-orb {
+  opacity: 0.65;
+}
+
 .bg-orb-gold {
   width: 680px;
   height: 680px;
@@ -326,6 +387,10 @@ body {
 
 [data-theme="ocean"] .bg-orb-gold {
   background: radial-gradient(circle, rgba(253, 224, 71, 0.28) 0%, rgba(34, 211, 238, 0.14) 45%, transparent 72%);
+}
+
+[data-theme="beach"] .bg-orb-gold {
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.35) 0%, rgba(245, 158, 11, 0.14) 45%, transparent 72%);
 }
 
 .bg-orb-blue {
@@ -347,6 +412,10 @@ body {
 
 [data-theme="ocean"] .bg-orb-blue {
   background: radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, rgba(14, 165, 233, 0.12) 45%, transparent 72%);
+}
+
+[data-theme="beach"] .bg-orb-blue {
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, rgba(56, 189, 248, 0.1) 45%, transparent 72%);
 }
 
 /* Starry Sky & Shooting Stars Layer (星空版本專屬背景與流星) */
@@ -657,6 +726,224 @@ body {
 .ocean-bubble.ob-9  { left: 93%; width: 6px;  height: 6px;  animation-duration: 8.9s;  animation-delay: 1.4s; }
 .ocean-bubble.ob-10 { left: 35%; width: 9px;  height: 9px;  animation-duration: 10.8s; animation-delay: 5.0s; }
 
+/* Holiday Beach Layer (假日海灘版本專屬背景：溫暖柔光斜射、搖曳棕櫚樹影、碧綠柔浪與金沙微光) */
+.beach-layer {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+[data-theme="beach"] .beach-layer {
+  display: block;
+}
+
+/* Soft Warm Golden Sun & Conic Sunbeams (溫柔暖陽光暈與斜射光束) */
+.beach-sun-wrap {
+  position: absolute;
+  top: -12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 135vw;
+  height: 78vh;
+  pointer-events: none;
+}
+
+.beach-sun-core {
+  position: absolute;
+  top: 14%;
+  right: 14%;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 251, 235, 0.88) 0%, rgba(254, 240, 138, 0.55) 45%, rgba(251, 191, 36, 0.22) 78%, transparent 100%);
+  box-shadow: 0 0 60px rgba(251, 191, 36, 0.42), 0 0 120px rgba(253, 186, 116, 0.25);
+}
+
+.beach-sun-corona {
+  position: absolute;
+  top: 8%;
+  right: 11%;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.24) 0%, rgba(251, 191, 36, 0.10) 52%, transparent 74%);
+  animation: beachSunPulse 5.5s ease-in-out infinite alternate;
+}
+
+.beach-sun-rays {
+  position: absolute;
+  inset: 0;
+  background:
+    conic-gradient(
+      from 132deg at 56% 0%,
+      transparent 0deg,
+      rgba(253, 224, 71, 0.12) 11deg,
+      rgba(251, 191, 36, 0.10) 22deg,
+      transparent 35deg,
+      rgba(45, 212, 191, 0.09) 48deg,
+      transparent 60deg,
+      rgba(253, 186, 116, 0.11) 72deg,
+      rgba(253, 224, 71, 0.09) 82deg,
+      transparent 95deg
+    );
+  opacity: 0.92;
+}
+
+@keyframes beachSunPulse {
+  0% { transform: scale(0.95); opacity: 0.72; }
+  100% { transform: scale(1.06); opacity: 0.96; }
+}
+
+/* Swaying Tropical Palm Trees (左右兩側翠綠椰子樹 / 棕櫚樹與沙灘樹影) */
+.beach-palm {
+  position: absolute;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.72;
+}
+
+.beach-sky-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 55vh;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.beach-palm-shadow {
+  position: absolute;
+  left: -20px;
+  bottom: -15px;
+  width: clamp(260px, 28vw, 440px);
+  height: clamp(120px, 16vh, 220px);
+  pointer-events: none;
+  opacity: 0.28;
+  transform-origin: 10% 80%;
+  animation: beachPalmSwayLeft 8.5s ease-in-out infinite alternate;
+}
+
+.beach-palm-left {
+  left: -45px;
+  bottom: -30px;
+  width: clamp(250px, 26vw, 420px);
+  height: clamp(400px, 46vh, 680px);
+  transform-origin: 15% 100%;
+  animation: beachPalmSwayLeft 8.5s ease-in-out infinite alternate;
+}
+
+.beach-palm-right {
+  right: -55px;
+  bottom: -40px;
+  width: clamp(270px, 28vw, 450px);
+  height: clamp(420px, 48vh, 720px);
+  transform: scaleX(-1);
+  transform-origin: 15% 100%;
+  animation: beachPalmSwayRight 9.5s ease-in-out infinite alternate;
+}
+
+@keyframes beachPalmSwayLeft {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(2.0deg) skewX(-0.8deg); }
+  100% { transform: rotate(3.6deg) skewX(-1.5deg); }
+}
+
+@keyframes beachPalmSwayRight {
+  0% { transform: scaleX(-1) rotate(0deg); }
+  50% { transform: scaleX(-1) rotate(2.4deg) skewX(-1.0deg); }
+  100% { transform: scaleX(-1) rotate(4.0deg) skewX(-1.6deg); }
+}
+
+.palm-fronds-group {
+  animation: beachFrondFlutter 5.2s ease-in-out infinite alternate;
+  transform-origin: 280px 110px;
+}
+
+@keyframes beachFrondFlutter {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(2.2deg) scale(1.015); }
+}
+
+/* Multi-layered Gentle Rolling Beach Surf & Warm Golden Sand Glow */
+.beach-waves-svg {
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  width: 110%;
+  height: clamp(130px, 23vh, 250px);
+  opacity: 0.88;
+}
+
+.beach-wave {
+  animation: beachWaveRoll 9s ease-in-out infinite alternate;
+}
+
+.beach-wave.wave-deep {
+  animation-duration: 9.5s;
+}
+
+.beach-wave.wave-aqua {
+  animation-duration: 7.2s;
+  animation-direction: alternate-reverse;
+}
+
+.beach-wave.wave-foam {
+  animation-duration: 5.8s;
+}
+
+@keyframes beachWaveRoll {
+  0% { transform: translateX(-2%) scaleY(0.96); }
+  100% { transform: translateX(2%) scaleY(1.05); }
+}
+
+/* Soft Warm Golden Sand Shore Glow (溫柔暖奶金沙灘海岸) */
+.beach-shore-sand {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: clamp(90px, 16vh, 170px);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 244, 214, 0.45) 35%,
+    rgba(246, 223, 166, 0.72) 72%,
+    rgba(232, 200, 133, 0.88) 100%
+  );
+}
+
+/* Floating Golden Sun & Sea Pearl Sparkles */
+.beach-sparkle {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 251, 235, 0.95) 0%, rgba(253, 224, 71, 0.65) 45%, rgba(45, 212, 191, 0.22) 82%, transparent 100%);
+  border: 1px solid rgba(253, 224, 71, 0.55);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5), inset 0 0 4px rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  animation: beachSparkleFloat 10.5s ease-in-out infinite;
+}
+
+@keyframes beachSparkleFloat {
+  0% { transform: translateY(0) translateX(0) scale(0.5); opacity: 0; }
+  16% { opacity: 0.82; }
+  55% { transform: translateY(-46vh) translateX(18px) scale(1); opacity: 0.85; }
+  86% { opacity: 0.42; }
+  100% { transform: translateY(-92vh) translateX(-14px) scale(1.1); opacity: 0; }
+}
+
+.beach-sparkle.sp-1 { left: 9%;  width: 8px;  height: 8px;  animation-duration: 9.8s;  animation-delay: 0.3s; }
+.beach-sparkle.sp-2 { left: 22%; width: 11px; height: 11px; animation-duration: 11.6s; animation-delay: 1.7s; }
+.beach-sparkle.sp-3 { left: 36%; width: 6px;  height: 6px;  animation-duration: 8.9s;  animation-delay: 3.2s; }
+.beach-sparkle.sp-4 { left: 50%; width: 10px; height: 10px; animation-duration: 12.0s; animation-delay: 0.9s; }
+.beach-sparkle.sp-5 { left: 64%; width: 7px;  height: 7px;  animation-duration: 10.2s; animation-delay: 2.5s; }
+.beach-sparkle.sp-6 { left: 77%; width: 12px; height: 12px; animation-duration: 11.4s; animation-delay: 1.1s; }
+.beach-sparkle.sp-7 { left: 89%; width: 8px;  height: 8px;  animation-duration: 9.4s;  animation-delay: 3.9s; }
+
 .bg-watermark-text {
   position: absolute;
   bottom: 4%;
@@ -693,6 +980,12 @@ body.modal-open .starfield-dots,
 body.modal-open .tree-mote,
 body.modal-open .ocean-bubble,
 body.modal-open .ocean-wave,
+body.modal-open .beach-palm,
+body.modal-open .palm-fronds-group,
+body.modal-open .beach-wave,
+body.modal-open .beach-sparkle,
+body.modal-open .beach-sun-rays,
+body.modal-open .beach-sun-corona,
 body.is-loading .bg-orb,
 body.is-loading .bg-astrolabe,
 body.is-loading .meteor,
@@ -700,13 +993,25 @@ body.is-loading .starfield-dots,
 body.is-loading .tree-mote,
 body.is-loading .ocean-bubble,
 body.is-loading .ocean-wave,
+body.is-loading .beach-palm,
+body.is-loading .palm-fronds-group,
+body.is-loading .beach-wave,
+body.is-loading .beach-sparkle,
+body.is-loading .beach-sun-rays,
+body.is-loading .beach-sun-corona,
 body.intro-active .bg-orb,
 body.intro-active .bg-astrolabe,
 body.intro-active .meteor,
 body.intro-active .starfield-dots,
 body.intro-active .tree-mote,
 body.intro-active .ocean-bubble,
-body.intro-active .ocean-wave {
+body.intro-active .ocean-wave,
+body.intro-active .beach-palm,
+body.intro-active .palm-fronds-group,
+body.intro-active .beach-wave,
+body.intro-active .beach-sparkle,
+body.intro-active .beach-sun-rays,
+body.intro-active .beach-sun-corona {
   animation-play-state: paused !important;
 }
 
@@ -727,6 +1032,11 @@ body.intro-active .ocean-wave {
 [data-theme="ocean"] .bg-astrolabe {
   opacity: 0.14;
   color: #67e8f9;
+}
+
+[data-theme="beach"] .bg-astrolabe {
+  opacity: 0.12;
+  color: #f59e0b;
 }
 
 @keyframes floatOrb {
@@ -803,6 +1113,15 @@ body.intro-active .ocean-wave {
   --intro-glow: rgba(56, 232, 255, 0.34);
   --intro-stage-bg: linear-gradient(155deg, #06233c, #041426);
   --intro-shutter-bg: radial-gradient(circle at 50% 50%, #093558 0%, #041526 75%);
+}
+
+.intro-splash[data-intro-theme="beach"],
+[data-theme="beach"] .intro-splash {
+  --intro-primary: #1496b8;
+  --intro-secondary: #d47a1e;
+  --intro-glow: rgba(46, 198, 204, 0.36);
+  --intro-stage-bg: linear-gradient(155deg, rgba(255, 252, 244, 0.96), rgba(248, 236, 208, 0.96));
+  --intro-shutter-bg: radial-gradient(circle at 50% 42%, #d8f3ff 0%, #98e6e8 48%, #f6e1b2 100%);
 }
 
 .intro-splash[data-intro-theme="worldtree"],
@@ -886,6 +1205,7 @@ body.intro-active .ocean-wave {
 }
 
 .intro-fx-ocean,
+.intro-fx-beach,
 .intro-fx-worldtree,
 .intro-fx-starry,
 .intro-fx-dark,
@@ -896,10 +1216,54 @@ body.intro-active .ocean-wave {
 }
 
 .intro-splash[data-intro-theme="ocean"] .intro-fx-ocean { display: block; }
+.intro-splash[data-intro-theme="beach"] .intro-fx-beach { display: block; }
 .intro-splash[data-intro-theme="worldtree"] .intro-fx-worldtree { display: block; }
 .intro-splash[data-intro-theme="starry"] .intro-fx-starry { display: block; }
 .intro-splash[data-intro-theme="dark"] .intro-fx-dark { display: block; }
 .intro-splash[data-intro-theme="light"] .intro-fx-light { display: block; }
+
+/* Beach FX: Sunny Ripples, Golden Sparkles & Sea Foam */
+.intro-beach-sunburst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 380px;
+  height: 380px;
+  margin-left: -190px;
+  margin-top: -190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.45) 0%, rgba(245, 158, 11, 0.18) 50%, transparent 72%);
+  animation: beachSunPulse 3.5s ease-in-out infinite alternate;
+}
+
+.intro-beach-ripple {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  margin-left: -110px;
+  margin-top: -110px;
+  border: 1.5px solid rgba(251, 191, 36, 0.45);
+  border-radius: 50%;
+  will-change: transform, opacity;
+  animation: introSonarExpand 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+.intro-beach-ripple.br-2 { animation-delay: 1.1s; }
+
+.intro-beach-sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #fef08a 60%, rgba(245, 158, 11, 0) 100%);
+  box-shadow: 0 0 10px #ffffff, 0 0 18px rgba(245, 158, 11, 0.85);
+  will-change: transform, opacity;
+  animation: introBubbleRise 3.5s ease-in infinite;
+}
+.intro-beach-sparkle.bs-1 { left: 18%; width: 10px; height: 10px; animation-duration: 3s; }
+.intro-beach-sparkle.bs-2 { left: 32%; width: 14px; height: 14px; animation-duration: 3.6s; animation-delay: 0.4s; }
+.intro-beach-sparkle.bs-3 { left: 58%; width: 9px;  height: 9px;  animation-duration: 2.6s; animation-delay: 0.8s; }
+.intro-beach-sparkle.bs-4 { left: 74%; width: 12px; height: 12px; animation-duration: 3.2s; animation-delay: 0.3s; }
+.intro-beach-sparkle.bs-5 { left: 85%; width: 16px; height: 16px; animation-duration: 3.8s; animation-delay: 0.6s; }
 
 /* Ocean FX: Sonar Waves & Rising Bubbles */
 .intro-sonar-wave {
@@ -1101,8 +1465,10 @@ body.intro-active .ocean-wave {
 }
 
 .intro-splash[data-intro-theme="light"] .intro-theme-pill,
-[data-theme="light"] .intro-splash .intro-theme-pill {
-  background: rgba(255, 255, 255, 0.8);
+[data-theme="light"] .intro-splash .intro-theme-pill,
+.intro-splash[data-intro-theme="beach"] .intro-theme-pill,
+[data-theme="beach"] .intro-splash .intro-theme-pill {
+  background: rgba(255, 251, 240, 0.88);
 }
 
 .intro-theme-pill-dot {
@@ -1180,8 +1546,9 @@ body.intro-active .ocean-wave {
   z-index: 2;
 }
 
-.intro-splash[data-intro-theme="light"] .intro-core-diamond {
-  background: radial-gradient(circle, rgba(255, 248, 224, 0.95) 0%, rgba(243, 182, 68, 0.28) 100%);
+.intro-splash[data-intro-theme="light"] .intro-core-diamond,
+.intro-splash[data-intro-theme="beach"] .intro-core-diamond {
+  background: radial-gradient(circle, rgba(255, 248, 224, 0.95) 0%, rgba(125, 232, 215, 0.32) 100%);
 }
 
 .intro-core-icon {
@@ -1255,8 +1622,9 @@ body.intro-active .ocean-wave {
   position: relative;
 }
 
-.intro-splash[data-intro-theme="light"] .intro-progress-track {
-  background: rgba(180, 150, 95, 0.18);
+.intro-splash[data-intro-theme="light"] .intro-progress-track,
+.intro-splash[data-intro-theme="beach"] .intro-progress-track {
+  background: rgba(180, 150, 95, 0.22);
 }
 
 .intro-progress-bar {
@@ -2593,8 +2961,9 @@ body.is-loaded .workspace-layout {
   box-shadow: 0 18px 40px -8px rgba(0, 0, 0, 0.48), 0 0 22px var(--accent-gold-soft);
 }
 
-[data-theme="light"] .char-showcase-card:hover {
-  box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.12), 0 0 18px var(--accent-gold-soft);
+[data-theme="light"] .char-showcase-card:hover,
+[data-theme="beach"] .char-showcase-card:hover {
+  box-shadow: 0 16px 36px -6px rgba(21, 68, 88, 0.14), 0 0 18px var(--accent-gold-soft);
 }
 
 .card-graphic-watermark {
@@ -3570,8 +3939,9 @@ del.strikethrough-text {
   box-shadow: 0 18px 36px -6px rgba(0, 0, 0, 0.48), 0 0 20px var(--accent-gold-soft);
 }
 
-[data-theme="light"] .gallery-card:hover {
-  box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.14), 0 0 18px var(--accent-gold-soft);
+[data-theme="light"] .gallery-card:hover,
+[data-theme="beach"] .gallery-card:hover {
+  box-shadow: 0 16px 32px -6px rgba(21, 68, 88, 0.16), 0 0 18px var(--accent-gold-soft);
 }
 
 .gallery-img-box {
@@ -3718,8 +4088,9 @@ del.strikethrough-text {
   padding: 1.5rem;
 }
 
-[data-theme="light"] .modal-backdrop {
-  background: radial-gradient(circle at 50% 35%, rgba(15, 23, 42, 0.68), rgba(9, 13, 24, 0.82));
+[data-theme="light"] .modal-backdrop,
+[data-theme="beach"] .modal-backdrop {
+  background: radial-gradient(circle at 50% 35%, rgba(21, 59, 74, 0.65), rgba(11, 34, 46, 0.80));
 }
 
 .modal-dialog {
@@ -5538,6 +5909,7 @@ del.strikethrough-text {
 }
 
 .compare-char-header {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 0.95rem;
@@ -5780,50 +6152,196 @@ del.strikethrough-text {
 /* ==================== CHARACTER SELECTION POP-IN ANIMATIONS (60FPS GPU) ==================== */
 @keyframes comparePaneSelectFlashLeft {
   0% {
-    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.55), var(--shadow-card);
-    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.75), var(--shadow-card);
+    border-color: #38bdf8;
+    transform: scale(1.008);
   }
-  45% {
-    box-shadow: 0 0 24px 2px rgba(56, 189, 248, 0.32), var(--shadow-card);
-    border-color: var(--accent-blue);
+  35% {
+    box-shadow: 0 0 35px 5px rgba(56, 189, 248, 0.5), inset 0 0 16px rgba(56, 189, 248, 0.25), var(--shadow-card);
+    border-color: #38bdf8;
+    transform: scale(1.008);
   }
   100% {
     box-shadow: var(--shadow-card);
     border-color: var(--border-subtle);
+    transform: scale(1);
   }
 }
 
 @keyframes comparePaneSelectFlashRight {
   0% {
-    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.55), var(--shadow-card);
-    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.75), var(--shadow-card);
+    border-color: #facc15;
+    transform: scale(1.008);
   }
-  45% {
-    box-shadow: 0 0 24px 2px rgba(250, 204, 21, 0.32), var(--shadow-card);
-    border-color: var(--accent-gold);
+  35% {
+    box-shadow: 0 0 35px 5px rgba(250, 204, 21, 0.5), inset 0 0 16px rgba(250, 204, 21, 0.25), var(--shadow-card);
+    border-color: #facc15;
+    transform: scale(1.008);
   }
   100% {
     box-shadow: var(--shadow-card);
     border-color: var(--border-subtle);
+    transform: scale(1);
   }
 }
 
 .compare-window-pane.pane-left.is-pane-selected-flash {
-  animation: comparePaneSelectFlashLeft 0.58s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: comparePaneSelectFlashLeft 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .compare-window-pane.pane-right.is-pane-selected-flash {
-  animation: comparePaneSelectFlashRight 0.58s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: comparePaneSelectFlashRight 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes compareAvatarPopIn {
+/* ==================== BURST FX: SHOCKWAVE, FLARE, RING, SPARKS ==================== */
+.compare-burst-fx {
+  position: absolute;
+  left: 41px;
+  top: 54px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.compare-burst-fx .burst-flare {
+  position: absolute;
+  left: -120px;
+  top: -120px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: burstFlarePulse 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  mix-blend-mode: screen;
+}
+
+.compare-burst-fx.side-left .burst-flare {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.95) 0%, rgba(14, 165, 233, 0.55) 35%, rgba(2, 132, 199, 0) 72%);
+}
+
+.compare-burst-fx.side-right .burst-flare {
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.98) 0%, rgba(245, 158, 11, 0.65) 38%, rgba(217, 119, 6, 0) 75%);
+}
+
+.compare-burst-fx .burst-shockwave {
+  position: absolute;
+  left: -70px;
+  top: -70px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: burstShockwaveExpand 0.62s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+.compare-burst-fx.side-left .burst-shockwave {
+  border: 2.5px solid rgba(125, 211, 252, 0.95);
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.8), inset 0 0 16px rgba(56, 189, 248, 0.5);
+}
+
+.compare-burst-fx.side-right .burst-shockwave {
+  border: 2.5px solid rgba(253, 224, 71, 0.95);
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.85), inset 0 0 16px rgba(245, 158, 11, 0.5);
+}
+
+.compare-burst-fx .burst-ring {
+  position: absolute;
+  left: -55px;
+  top: -55px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: burstRingSpin 0.68s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+}
+
+.compare-burst-fx.side-left .burst-ring {
+  border: 2px dashed rgba(56, 189, 248, 0.85);
+}
+
+.compare-burst-fx.side-right .burst-ring {
+  border: 2px dashed rgba(250, 204, 21, 0.9);
+}
+
+.compare-burst-fx .burst-sparks {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.compare-burst-fx .b-spark {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(0, 0) scale(1);
+}
+
+.compare-burst-fx.side-left .b-spark {
+  background: #e0f2fe;
+  box-shadow: 0 0 10px 2px #38bdf8, 0 0 4px #fff;
+}
+
+.compare-burst-fx.side-right .b-spark {
+  background: #fef08a;
+  box-shadow: 0 0 10px 2px #f59e0b, 0 0 4px #fff;
+}
+
+.compare-burst-fx .sp-1 { animation: sparkShoot1 0.55s cubic-bezier(0.12, 0.9, 0.3, 1) forwards; }
+.compare-burst-fx .sp-2 { animation: sparkShoot2 0.55s cubic-bezier(0.12, 0.9, 0.3, 1) forwards; }
+.compare-burst-fx .sp-3 { animation: sparkShoot3 0.55s cubic-bezier(0.12, 0.9, 0.3, 1) forwards; }
+.compare-burst-fx .sp-4 { animation: sparkShoot4 0.55s cubic-bezier(0.12, 0.9, 0.3, 1) forwards; }
+.compare-burst-fx .sp-5 { animation: sparkShoot5 0.55s cubic-bezier(0.12, 0.9, 0.3, 1) forwards; }
+.compare-burst-fx .sp-6 { animation: sparkShoot6 0.55s cubic-bezier(0.12, 0.9, 0.3, 1) forwards; }
+.compare-burst-fx .sp-7 { animation: sparkShoot7 0.55s cubic-bezier(0.12, 0.9, 0.3, 1) forwards; }
+.compare-burst-fx .sp-8 { animation: sparkShoot8 0.55s cubic-bezier(0.12, 0.9, 0.3, 1) forwards; }
+
+@keyframes sparkShoot1 { 0% { opacity: 1; transform: translate(0, 0) scale(1.4); } 100% { opacity: 0; transform: translate(0px, -68px) scale(0.2); } }
+@keyframes sparkShoot2 { 0% { opacity: 1; transform: translate(0, 0) scale(1.4); } 100% { opacity: 0; transform: translate(48px, -48px) scale(0.2); } }
+@keyframes sparkShoot3 { 0% { opacity: 1; transform: translate(0, 0) scale(1.4); } 100% { opacity: 0; transform: translate(68px, 0px) scale(0.2); } }
+@keyframes sparkShoot4 { 0% { opacity: 1; transform: translate(0, 0) scale(1.4); } 100% { opacity: 0; transform: translate(48px, 48px) scale(0.2); } }
+@keyframes sparkShoot5 { 0% { opacity: 1; transform: translate(0, 0) scale(1.4); } 100% { opacity: 0; transform: translate(0px, 68px) scale(0.2); } }
+@keyframes sparkShoot6 { 0% { opacity: 1; transform: translate(0, 0) scale(1.4); } 100% { opacity: 0; transform: translate(-48px, 48px) scale(0.2); } }
+@keyframes sparkShoot7 { 0% { opacity: 1; transform: translate(0, 0) scale(1.4); } 100% { opacity: 0; transform: translate(-68px, 0px) scale(0.2); } }
+@keyframes sparkShoot8 { 0% { opacity: 1; transform: translate(0, 0) scale(1.4); } 100% { opacity: 0; transform: translate(-48px, -48px) scale(0.2); } }
+
+@keyframes burstFlarePulse {
+  0% { opacity: 0.95; transform: scale(0.15); }
+  50% { opacity: 0.85; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes burstShockwaveExpand {
+  0% { opacity: 1; transform: scale(0.2); }
+  50% { opacity: 0.85; }
+  100% { opacity: 0; transform: scale(2.3); }
+}
+
+@keyframes burstRingSpin {
+  0% { opacity: 0.9; transform: rotate(0deg) scale(0.4); }
+  100% { opacity: 0; transform: rotate(120deg) scale(2.1); }
+}
+
+/* ==================== AVATAR GRAND POP & DUAL SHEEN ==================== */
+@keyframes compareAvatarGrandPop {
   0% {
     opacity: 0;
-    transform: scale(0.76) translateY(10px);
+    transform: scale(0.68) translateY(14px);
   }
   62% {
     opacity: 1;
-    transform: scale(1.06) translateY(-2px);
+    transform: scale(1.08) translateY(-4px);
+  }
+  82% {
+    transform: scale(0.97) translateY(1px);
   }
   100% {
     opacity: 1;
@@ -5831,13 +6349,37 @@ del.strikethrough-text {
   }
 }
 
-@keyframes compareAvatarSheen {
+@keyframes compareAvatarHaloLeft {
   0% {
-    transform: translateX(-140%) skewX(-24deg);
-    opacity: 0.9;
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.85), 0 0 25px rgba(56, 189, 248, 0.6);
+  }
+  45% {
+    box-shadow: 0 0 24px 6px rgba(56, 189, 248, 0.75), 0 0 35px rgba(14, 165, 233, 0.55);
   }
   100% {
-    transform: translateX(220%) skewX(-24deg);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes compareAvatarHaloRight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.85), 0 0 25px rgba(245, 158, 11, 0.6);
+  }
+  45% {
+    box-shadow: 0 0 24px 6px rgba(250, 204, 21, 0.75), 0 0 35px rgba(245, 158, 11, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes compareAvatarSheen {
+  0% {
+    transform: translateX(-150%) skewX(-24deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateX(240%) skewX(-24deg);
     opacity: 0;
   }
 }
@@ -5845,7 +6387,7 @@ del.strikethrough-text {
 @keyframes compareTitleSlidePop {
   0% {
     opacity: 0;
-    transform: translateX(12px) scale(0.97);
+    transform: translateX(14px) scale(0.97);
   }
   68% {
     opacity: 1;
@@ -5854,6 +6396,21 @@ del.strikethrough-text {
   100% {
     opacity: 1;
     transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes compareBadgeStamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.35) rotate(-6deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(0.96) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
   }
 }
 
@@ -5873,7 +6430,35 @@ del.strikethrough-text {
 }
 
 .compare-dossier-card.is-char-entering .compare-char-avatar-lg {
-  animation: compareAvatarPopIn 0.44s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: compareAvatarGrandPop 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.compare-dossier-card.is-char-entering.side-left .compare-char-avatar-lg {
+  animation: compareAvatarGrandPop 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    compareAvatarHaloLeft 0.72s ease-out both;
+}
+
+.compare-dossier-card.is-char-entering.side-right .compare-char-avatar-lg {
+  animation: compareAvatarGrandPop 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    compareAvatarHaloRight 0.72s ease-out both;
+}
+
+/* Dual sweeping laser sheen */
+.compare-dossier-card.is-char-entering .compare-char-avatar-lg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 25%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.85) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+  animation: compareAvatarSheen 0.46s cubic-bezier(0.2, 0.9, 0.3, 1) 0.04s both;
 }
 
 .compare-dossier-card.is-char-entering .compare-char-avatar-lg::after {
@@ -5881,19 +6466,24 @@ del.strikethrough-text {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 55%;
+  width: 60%;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.52) 50%,
+    rgba(255, 255, 255, 0.45) 50%,
     transparent 100%
   );
   pointer-events: none;
-  animation: compareAvatarSheen 0.56s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  z-index: 4;
+  animation: compareAvatarSheen 0.62s cubic-bezier(0.2, 0.9, 0.3, 1) 0.1s both;
 }
 
 .compare-dossier-card.is-char-entering .compare-char-title-box {
   animation: compareTitleSlidePop 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+
+.compare-dossier-card.is-char-entering .badge-power {
+  animation: compareBadgeStamp 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s both;
 }
 
 .compare-dossier-card.is-char-entering .compare-abilities-list .ability-card {

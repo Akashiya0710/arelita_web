@@ -14,7 +14,7 @@
           localStorage.setItem("arelita_ocean_init", "1");
         }
         var saved = localStorage.getItem("arelita_theme");
-        if (saved === "light" || saved === "dark" || saved === "starry" || saved === "worldtree" || saved === "ocean") {
+        if (saved === "light" || saved === "dark" || saved === "starry" || saved === "worldtree" || saved === "ocean" || saved === "beach") {
           document.documentElement.setAttribute("data-theme", saved);
         }
       } catch (e) {}
@@ -40,6 +40,16 @@
         <span class="intro-bubble b-4"></span>
         <span class="intro-bubble b-5"></span>
         <span class="intro-bubble b-6"></span>
+      </div>
+      <div class="intro-fx-beach">
+        <div class="intro-beach-sunburst"></div>
+        <span class="intro-beach-ripple br-1"></span>
+        <span class="intro-beach-ripple br-2"></span>
+        <span class="intro-beach-sparkle bs-1"></span>
+        <span class="intro-beach-sparkle bs-2"></span>
+        <span class="intro-beach-sparkle bs-3"></span>
+        <span class="intro-beach-sparkle bs-4"></span>
+        <span class="intro-beach-sparkle bs-5"></span>
       </div>
       <div class="intro-fx-worldtree">
         <div class="intro-tree-halo"></div>
@@ -227,6 +237,134 @@
       <span class="ocean-bubble ob-10"></span>
     </div>
 
+    <!-- Sunny Holiday Beach Layer (Active in Beach Theme) -->
+    <div class="beach-layer">
+      <!-- Radiant Summer Sun & Sky Halo Rings + Fluffy Clouds -->
+      <div class="beach-sun-wrap">
+        <div class="beach-sun-corona"></div>
+        <div class="beach-sun-rays"></div>
+        <div class="beach-sun-core"></div>
+      </div>
+
+      <svg class="beach-sky-svg" viewBox="0 0 1440 420" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Celestial Sky Halo Ellipses -->
+        <ellipse cx="1060" cy="145" rx="340" ry="72" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.5" fill="none" />
+        <ellipse cx="1060" cy="145" rx="235" ry="48" stroke="rgba(186, 242, 255, 0.45)" stroke-width="1.2" stroke-dasharray="8 6" fill="none" />
+        <ellipse cx="380" cy="110" rx="260" ry="52" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1.2" fill="none" />
+        <!-- Soft Summer Cumulus Clouds -->
+        <path fill="rgba(255, 255, 255, 0.42)" d="M920,320 C920,285 950,260 985,265 C1000,230 1045,215 1080,235 C1110,210 1160,225 1175,260 C1210,260 1235,285 1235,320 Z" />
+        <path fill="rgba(255, 255, 255, 0.32)" d="M140,290 C140,265 165,245 195,250 C210,222 250,215 278,235 C305,225 335,245 340,275 C365,278 380,295 380,315 L140,315 Z" />
+      </svg>
+
+      <!-- Left Tropical Swaying Palm Tree -->
+      <svg class="beach-palm beach-palm-left" viewBox="0 0 400 650" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="palmTrunkGradL" x1="50" y1="650" x2="280" y2="110" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#624b34" />
+            <stop offset="55%" stop-color="#8f6e49" />
+            <stop offset="100%" stop-color="#b58d5d" />
+          </linearGradient>
+          <linearGradient id="palmLeafGrad1L" x1="100" y1="50" x2="350" y2="250" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#92e65a" />
+            <stop offset="58%" stop-color="#4ab552" />
+            <stop offset="100%" stop-color="#267d49" />
+          </linearGradient>
+          <linearGradient id="palmLeafGrad2L" x1="280" y1="100" x2="400" y2="10" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7ce04f" />
+            <stop offset="100%" stop-color="#2e8b57" />
+          </linearGradient>
+        </defs>
+        <path d="M40 650 C60 520 90 380 140 260 C170 190 220 140 280 110" stroke="url(#palmTrunkGradL)" stroke-width="26" stroke-linecap="round" />
+        <path d="M45 610 C55 608 65 612 70 615" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
+        <path d="M60 540 C72 538 84 542 90 545" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
+        <path d="M80 460 C94 458 106 462 112 465" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
+        <path d="M105 380 C120 378 132 382 138 385" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M140 290 C156 288 168 292 174 295" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M190 200 C206 198 218 202 224 205" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3" stroke-linecap="round" />
+        <circle cx="270" cy="125" r="10" fill="#5c7a35" />
+        <circle cx="282" cy="132" r="9" fill="#708f40" />
+        <circle cx="265" cy="138" r="8.5" fill="#4f6b2c" />
+        <g class="palm-fronds-group">
+          <path d="M280 110 C240 60 170 40 100 65 C60 80 30 110 10 140" stroke="#4ab552" stroke-width="4" stroke-linecap="round" />
+          <path d="M280 110 Q190 50 100 65 Q50 90 10 140 Q60 110 120 90 Q200 80 280 110Z" fill="url(#palmLeafGrad1L)" opacity="0.92" />
+          <path d="M280 110 C300 40 340 15 390 10" stroke="#3da35d" stroke-width="3.5" stroke-linecap="round" />
+          <path d="M280 110 Q330 20 390 10 Q350 45 320 80 Q300 100 280 110Z" fill="url(#palmLeafGrad2L)" opacity="0.88" />
+          <path d="M280 110 C340 100 385 140 400 200" stroke="#4ab552" stroke-width="3.5" stroke-linecap="round" />
+          <path d="M280 110 Q360 110 400 200 Q360 160 320 145 Q295 125 280 110Z" fill="url(#palmLeafGrad1L)" opacity="0.88" />
+          <path d="M280 110 C210 110 150 150 110 220" stroke="#3da35d" stroke-width="3.5" stroke-linecap="round" />
+          <path d="M280 110 Q190 130 110 220 Q160 180 220 150 Q260 130 280 110Z" fill="url(#palmLeafGrad2L)" opacity="0.9" />
+          <path d="M280 110 C260 160 250 220 250 270" stroke="#267d49" stroke-width="3" stroke-linecap="round" />
+          <path d="M280 110 Q240 180 250 270 Q270 210 280 170 Q285 135 280 110Z" fill="url(#palmLeafGrad1L)" opacity="0.86" />
+        </g>
+      </svg>
+
+      <!-- Soft Blue-Grey Palm Frond Shadow on the Sand -->
+      <svg class="beach-palm-shadow" viewBox="0 0 420 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="rgba(78, 112, 132, 0.55)" d="M0,165 Q90,120 210,130 Q140,95 65,105 Q155,75 265,95 Q195,62 120,68 Q220,48 330,78 Q260,92 195,112 Q295,108 380,142 Q270,135 180,148 Q245,158 310,175 L0,180 Z" />
+      </svg>
+
+      <!-- Right Tropical Swaying Palm Tree -->
+      <svg class="beach-palm beach-palm-right" viewBox="0 0 400 650" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="palmTrunkGradR" x1="50" y1="650" x2="280" y2="110" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#624b34" />
+            <stop offset="55%" stop-color="#8f6e49" />
+            <stop offset="100%" stop-color="#b58d5d" />
+          </linearGradient>
+          <linearGradient id="palmLeafGrad1R" x1="100" y1="50" x2="350" y2="250" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#92e65a" />
+            <stop offset="58%" stop-color="#4ab552" />
+            <stop offset="100%" stop-color="#267d49" />
+          </linearGradient>
+          <linearGradient id="palmLeafGrad2R" x1="280" y1="100" x2="400" y2="10" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7ce04f" />
+            <stop offset="100%" stop-color="#2e8b57" />
+          </linearGradient>
+        </defs>
+        <path d="M40 650 C60 520 90 380 140 260 C170 190 220 140 280 110" stroke="url(#palmTrunkGradR)" stroke-width="26" stroke-linecap="round" />
+        <path d="M45 610 C55 608 65 612 70 615" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
+        <path d="M60 540 C72 538 84 542 90 545" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
+        <path d="M80 460 C94 458 106 462 112 465" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
+        <path d="M105 380 C120 378 132 382 138 385" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M140 290 C156 288 168 292 174 295" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M190 200 C206 198 218 202 224 205" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3" stroke-linecap="round" />
+        <circle cx="270" cy="125" r="10" fill="#5c7a35" />
+        <circle cx="282" cy="132" r="9" fill="#708f40" />
+        <circle cx="265" cy="138" r="8.5" fill="#4f6b2c" />
+        <g class="palm-fronds-group">
+          <path d="M280 110 C240 60 170 40 100 65 C60 80 30 110 10 140" stroke="#4ab552" stroke-width="4" stroke-linecap="round" />
+          <path d="M280 110 Q190 50 100 65 Q50 90 10 140 Q60 110 120 90 Q200 80 280 110Z" fill="url(#palmLeafGrad1R)" opacity="0.92" />
+          <path d="M280 110 C300 40 340 15 390 10" stroke="#3da35d" stroke-width="3.5" stroke-linecap="round" />
+          <path d="M280 110 Q330 20 390 10 Q350 45 320 80 Q300 100 280 110Z" fill="url(#palmLeafGrad2R)" opacity="0.88" />
+          <path d="M280 110 C340 100 385 140 400 200" stroke="#4ab552" stroke-width="3.5" stroke-linecap="round" />
+          <path d="M280 110 Q360 110 400 200 Q360 160 320 145 Q295 125 280 110Z" fill="url(#palmLeafGrad1R)" opacity="0.88" />
+          <path d="M280 110 C210 110 150 150 110 220" stroke="#3da35d" stroke-width="3.5" stroke-linecap="round" />
+          <path d="M280 110 Q190 130 110 220 Q160 180 220 150 Q260 130 280 110Z" fill="url(#palmLeafGrad2R)" opacity="0.9" />
+          <path d="M280 110 C260 160 250 220 250 270" stroke="#267d49" stroke-width="3" stroke-linecap="round" />
+          <path d="M280 110 Q240 180 250 270 Q270 210 280 170 Q285 135 280 110Z" fill="url(#palmLeafGrad1R)" opacity="0.86" />
+        </g>
+      </svg>
+
+      <!-- Multi-layered Rolling Beach Surf Waves -->
+      <svg class="beach-waves-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="beach-wave wave-deep" fill="rgba(28, 165, 201, 0.24)" d="M0,192L60,181.3C120,171,240,149,360,154.7C480,160,600,192,720,197.3C840,203,960,181,1080,165.3C1200,149,1320,139,1380,133.3L1440,128L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+        <path class="beach-wave wave-aqua" fill="rgba(92, 224, 212, 0.32)" d="M0,224L80,213.3C160,203,320,181,480,186.7C640,192,800,224,960,224C1120,224,1280,192,1360,176L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+        <path class="beach-wave wave-foam" fill="rgba(255, 255, 255, 0.52)" d="M0,250L60,246C120,242,240,234,360,238C480,242,600,260,720,260C840,260,960,242,1080,233C1200,224,1320,224,1380,224L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+      </svg>
+
+      <!-- Warm Golden Sand Shore -->
+      <div class="beach-shore-sand"></div>
+
+      <!-- Sun Sparkles -->
+      <span class="beach-sparkle sp-1"></span>
+      <span class="beach-sparkle sp-2"></span>
+      <span class="beach-sparkle sp-3"></span>
+      <span class="beach-sparkle sp-4"></span>
+      <span class="beach-sparkle sp-5"></span>
+      <span class="beach-sparkle sp-6"></span>
+      <span class="beach-sparkle sp-7"></span>
+    </div>
+
     <div class="bg-watermark-text">ARELITA // CHRONICLES</div>
     <svg class="bg-astrolabe" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="300" cy="300" r="260" stroke="currentColor" stroke-width="1" stroke-dasharray="6 8" />
@@ -331,6 +469,7 @@
             <div class="bgm-track-list">
               <button class="bgm-track-btn active" data-bgm-track="harp">🎵 曲目一：《世界樹之息》奇幻豎琴</button>
               <button class="bgm-track-btn" data-bgm-track="astral">🌌 曲目二：《星界檔案庫》空靈星音</button>
+              <button class="bgm-track-btn" data-bgm-track="beach">🏖️ 曲目三：《夏日海灘・陽光微風》熱帶海浪木琴</button>
               <button class="bgm-track-btn hidden" id="bgmCustomTrackBtn" data-bgm-track="custom">💿 自訂曲目：外部音樂檔</button>
             </div>
             <div class="bgm-custom-upload">
