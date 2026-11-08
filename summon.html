@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="ocean">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>角色召喚模擬器｜亞雷利塔 ARELITA 官方世界觀檔案庫</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body class="compare-page-body summon-page-body">
+  <!-- Decorative Game-Portal Background Grid & Orbs -->
+  <div class="bg-grid-overlay" aria-hidden="true"></div>
+  <div class="bg-graphic-layer" aria-hidden="true">
+    <div class="bg-orb bg-orb-gold"></div>
+    <div class="bg-orb bg-orb-blue"></div>
+
+    <!-- Starry Sky & Shooting Meteors Layer -->
+    <div class="starry-sky-layer">
+      <div class="starfield-dots starfield-sm"></div>
+      <div class="starfield-dots starfield-md"></div>
+      <span class="meteor m-1"></span>
+      <span class="meteor m-2"></span>
+      <span class="meteor m-3"></span>
+      <span class="meteor m-4"></span>
+    </div>
+
+    <!-- Sunny Holiday Beach Layer -->
+    <div class="beach-layer">
+      <div class="beach-sun-wrap">
+        <div class="beach-sun-corona"></div>
+        <div class="beach-sun-rays"></div>
+        <div class="beach-sun-core"></div>
+      </div>
+      <div class="beach-shore-sand"></div>
+      <span class="beach-sparkle sp-1"></span>
+      <span class="beach-sparkle sp-2"></span>
+      <span class="beach-sparkle sp-3"></span>
+      <span class="beach-sparkle sp-4"></span>
+    </div>
+    <div class="bg-watermark-text">ARELITA // SUMMON</div>
+  </div>
+
+  <!-- Sleek Single-Row Header -->
+  <header class="site-header compare-site-header" id="summonHeader">
+    <div class="header-inner">
+      <a href="index.html" class="brand" title="返回亞雷利塔主檔案庫">
+        <div class="brand-emblem">
+          <span class="emblem-diamond">✨</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
+            <span>亞雷利塔・角色召喚模擬器</span>
+            <span class="brand-sub-en">CHARACTER SUMMON SIMULATOR</span>
+          </div>
+          <div class="brand-subtitle">自訂偏好種族與善惡傾向・依強度稀有度權重抽取</div>
+        </div>
+      </a>
+
+      <div class="compare-header-controls">
+        <button type="button" class="compare-action-btn is-active" id="btnToggleSummonSfx" aria-pressed="true" title="開啟或關閉召喚音效">
+          <span id="summonSfxIcon">🔊</span>
+          <span id="summonSfxText">音效：ON</span>
+        </button>
+        <button type="button" class="compare-action-btn" id="btnToggleFastSummon" aria-pressed="false" title="縮短召喚前導動畫時間">
+          <span id="fastSummonIcon">⚡</span>
+          <span id="fastSummonText">快速動畫：OFF</span>
+        </button>
+        <button type="button" class="compare-action-btn" id="btnOpenTierGuide" title="檢視各稀有度分級與抽取機率說明">
+          <span>📊</span>
+          <span>機率與分級說明</span>
+        </button>
+        <button type="button" class="compare-action-btn compare-clear-both-btn" id="btnResetSummonHistory" title="清空本次召喚收集紀錄">
+          <span>🗑️</span>
+          <span>重置紀錄</span>
+        </button>
+        <button type="button" id="summonThemeToggleBtn" class="theme-toggle-btn" title="切換網頁主題風格">
+          <span class="theme-icon" id="summonThemeIcon">🌊</span>
+          <span class="theme-text" id="summonThemeText">夏日海洋</span>
+        </button>
+        <a href="compare.html" target="_blank" rel="noopener" class="compare-action-btn" title="前往角色能力對比系統">
+          <span>⚔️</span>
+          <span>能力對比 ↗</span>
+        </a>
+        <a href="index.html" class="compare-action-btn primary-back-btn" title="返回亞雷利塔主頁面">
+          <span>🏛️</span>
+          <span>返回主檔案庫</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="summon-main-container">
+    <!-- Top Workspace Grid: Left Control Panel + Right Summoning Stage -->
+    <div class="summon-workspace-grid">
+      <!-- ==================== LEFT: SUMMON PREFERENCE CONTROLS ==================== -->
+      <aside class="summon-control-panel" aria-label="召喚偏好設定">
+        <div class="summon-panel-header">
+          <div class="summon-kicker">SUMMON SETTINGS // 召喚條件設定</div>
+          <h1 class="summon-panel-title">選擇偏好種族與善惡值</h1>
+          <p class="summon-panel-desc">可指定偏好的種族與善惡傾向。角色越強抽取機率越低，並會依稀有度（N ～ ？）呈現不同華麗度的專屬抽卡特效與音效。</p>
+        </div>
+
+        <div class="summon-pref-form">
+          <!-- 1. Preferred Race -->
+          <div class="summon-field-block">
+            <div class="summon-field-label-row">
+              <label for="prefRaceSelect" class="summon-field-label">🧬 偏好種族</label>
+              <button type="button" class="summon-field-reset" id="btnResetRace" title="重設為不限種族">重設</button>
+            </div>
+            <select id="prefRaceSelect" class="summon-select">
+              <option value="">🌟 不限種族（全部種族）</option>
+            </select>
+            <div class="summon-quick-chips" id="quickRaceChips" aria-label="熱門種族快速選擇"></div>
+          </div>
+
+          <!-- 2. Preferred Alignment -->
+          <div class="summon-field-block">
+            <div class="summon-field-label-row">
+              <label for="prefAlignSelect" class="summon-field-label">⚖️ 偏好善惡值</label>
+              <button type="button" class="summon-field-reset" id="btnResetAlign" title="重設為不限善惡">重設</button>
+            </div>
+            <select id="prefAlignSelect" class="summon-select">
+              <option value="">🌟 不限善惡（全部善惡）</option>
+            </select>
+            <div class="summon-align-pills" id="quickAlignPills" role="group" aria-label="善惡陣營快速切換">
+              <button type="button" class="align-pill active" data-align-val="">全部</button>
+              <button type="button" class="align-pill is-good" data-align-val="GROUP_GOOD">✨ 善系</button>
+              <button type="button" class="align-pill is-neutral" data-align-val="GROUP_NEUTRAL">⚖️ 中立</button>
+              <button type="button" class="align-pill is-evil" data-align-val="GROUP_EVIL">💀 惡系</button>
+            </div>
+          </div>
+
+          <!-- 3. Match Mode (Strict Filter vs Rate-Up PU) -->
+          <div class="summon-field-block">
+            <div class="summon-field-label-row">
+              <span class="summon-field-label">🎯 篩選模式</span>
+            </div>
+            <div class="summon-mode-switch" role="radiogroup" aria-label="篩選模式">
+              <button type="button" class="summon-mode-btn active" data-mode="strict" id="modeBtnStrict">
+                <strong>🔒 指定篩選</strong>
+                <small>只從符合所選條件的角色中抽取</small>
+              </button>
+              <button type="button" class="summon-mode-btn" data-mode="rateup" id="modeBtnRateup">
+                <strong>🔥 偏好機率 UP</strong>
+                <small>符合條件角色機率大幅提升，仍可抽到其他角色</small>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Pool Status & Probability Box -->
+          <div class="summon-pool-status" id="summonPoolStatus">
+            <div class="pool-status-top">
+              <span class="pool-status-label">當前卡池人數與各階級綜合機率</span>
+              <span class="pool-status-count" id="poolMatchCount">175 名角色</span>
+            </div>
+            <div class="pool-tier-mini-bars" id="poolTierBreakdown"></div>
+          </div>
+
+          <!-- Primary Summon Action Buttons -->
+          <div class="summon-cta-stack">
+            <button type="button" class="btn-summon-main is-single" id="btnSummonSingle">
+              <span class="btn-summon-glow" aria-hidden="true"></span>
+              <span class="btn-summon-icon">✨</span>
+              <span class="btn-summon-text">
+                <strong>單次召喚（×1）</strong>
+                <small id="summonBtnSubLabel">隨機召喚 1 名角色</small>
+              </span>
+            </button>
+
+            <button type="button" class="btn-summon-main is-multi" id="btnSummonMulti">
+              <span class="btn-summon-icon">🌟</span>
+              <span class="btn-summon-text">
+                <strong>十連召喚（×10）</strong>
+                <small>一次召喚 10 名角色（保底至少 1 名 SR 以上）</small>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Collection Stats Mini Box -->
+        <div class="summon-stats-card">
+          <div class="s-stat-item">
+            <span class="s-stat-label">累積召喚</span>
+            <strong class="s-stat-val" id="statTotalPulls">0 次</strong>
+          </div>
+          <div class="s-stat-item">
+            <span class="s-stat-label">角色收集率</span>
+            <strong class="s-stat-val" id="statCollectionRate">0 / 175 (0%)</strong>
+          </div>
+          <div class="s-stat-item">
+            <span class="s-stat-label">UR / EX / ？</span>
+            <strong class="s-stat-val is-gold" id="statHighRarityCount">0 次</strong>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==================== RIGHT: SUMMONING STAGE & RESULT SHOWCASE ==================== -->
+      <section class="summon-stage-panel" aria-label="召喚演出舞台與角色結果">
+        <!-- Main Interactive Summon Stage -->
+        <div class="summon-stage-viewport" id="summonStageViewport" data-tier="idle">
+          <!-- High-FPS Canvas for Ribbons, Lightning, Meteors, Shockwaves & Prism Beams -->
+          <canvas id="summonFxCanvas" class="summon-fx-canvas" aria-hidden="true"></canvas>
+
+          <!-- Screen Flash Overlay -->
+          <div class="summon-screen-flash" id="summonScreenFlash" aria-hidden="true"></div>
+
+          <!-- Skip Animation Button (Visible during summoning sequence) -->
+          <button type="button" class="summon-skip-btn hidden" id="btnSkipSummonAnim">
+            <span>⏩ 略過動畫 (SKIP)</span>
+          </button>
+
+          <!-- 1. IDLE STAGE STATE (Before first summon) -->
+          <div class="summon-idle-state" id="summonIdleState">
+            <div class="altar-magic-circle-wrap" id="idleAltarCircle">
+              <svg class="altar-svg ring-outer" viewBox="0 0 300 300" fill="none">
+                <circle cx="150" cy="150" r="142" stroke="currentColor" stroke-width="1.2" stroke-dasharray="6 8" opacity="0.6" />
+                <circle cx="150" cy="150" r="128" stroke="currentColor" stroke-width="1.5" stroke-dasharray="32 12 8 12" />
+                <path d="M150 4 L156 20 L144 20 Z M150 296 L156 280 L144 280 Z M4 150 L20 156 L20 144 Z M296 150 L280 156 L280 144 Z" fill="currentColor" />
+              </svg>
+              <svg class="altar-svg ring-mid" viewBox="0 0 300 300" fill="none">
+                <circle cx="150" cy="150" r="106" stroke="currentColor" stroke-width="1.2" opacity="0.75" />
+                <polygon points="150,42 243,204 57,204" stroke="currentColor" stroke-width="1.3" fill="none" opacity="0.8" />
+                <polygon points="150,258 243,96 57,96" stroke="currentColor" stroke-width="1.3" fill="none" opacity="0.8" />
+                <rect x="75" y="75" width="150" height="150" stroke="currentColor" stroke-width="1" stroke-dasharray="8 6" transform="rotate(45 150 150)" opacity="0.55" />
+              </svg>
+              <svg class="altar-svg ring-inner" viewBox="0 0 300 300" fill="none">
+                <circle cx="150" cy="150" r="68" stroke="currentColor" stroke-width="1.8" stroke-dasharray="18 10" />
+                <circle cx="150" cy="150" r="52" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" />
+              </svg>
+              <div class="altar-core-gem" id="idleAltarCoreBtn" role="button" tabindex="0" title="點擊直接進行單次召喚">
+                <span class="core-gem-icon">✨</span>
+                <span class="core-gem-hint">SUMMON</span>
+              </div>
+            </div>
+            <div class="idle-stage-caption">
+              <h2>準備進行角色召喚</h2>
+              <p>可於左側設定偏好「種族」與「善惡值」，或直接點擊中央核心進行召喚</p>
+            </div>
+          </div>
+
+          <!-- 2. ACTIVE CINEMATIC SUMMONING SEQUENCE OVERLAY -->
+          <div class="summon-cinematic-layer hidden" id="summonCinematicLayer" aria-live="assertive">
+            <!-- Dynamic Multi-Beam & Perspective Floor Array -->
+            <div class="cinematic-sky-glow" id="cinematicSkyGlow"></div>
+            <div class="cinematic-pillar-beam" id="cinematicPillarBeam"></div>
+            <div class="cinematic-floor-halo" id="cinematicFloorHalo"></div>
+            <!-- Evil Abyssal Blood-Eclipse Overlay (Exclusive to ？ Tier) -->
+            <div class="cinematic-abyss-overlay" id="cinematicAbyssOverlay" aria-hidden="true">
+              <div class="abyss-blood-vignette"></div>
+              <div class="abyss-eclipse-sun"></div>
+              <div class="abyss-runes-ring"></div>
+            </div>
+
+            <!-- Multi-Ring Ritual Circle & 3D Card Materialization -->
+            <div class="cinematic-ritual-wrap" id="cinematicRitualWrap">
+              <div class="ritual-shockwave sw-1"></div>
+              <div class="ritual-shockwave sw-2"></div>
+              <div class="ritual-shockwave sw-3"></div>
+              <svg class="ritual-svg r-outer" viewBox="0 0 320 320" fill="none">
+                <circle cx="160" cy="160" r="152" stroke="currentColor" stroke-width="1.8" stroke-dasharray="10 8" />
+                <circle cx="160" cy="160" r="138" stroke="currentColor" stroke-width="2.2" stroke-dasharray="40 14 8 14" />
+                <polygon points="160,12 288,234 32,234" stroke="currentColor" stroke-width="1.6" fill="none" />
+                <polygon points="160,308 288,86 32,86" stroke="currentColor" stroke-width="1.6" fill="none" />
+              </svg>
+              <svg class="ritual-svg r-mid" viewBox="0 0 320 320" fill="none">
+                <circle cx="160" cy="160" r="108" stroke="currentColor" stroke-width="2" />
+                <rect x="82" y="82" width="156" height="156" stroke="currentColor" stroke-width="1.6" />
+                <rect x="82" y="82" width="156" height="156" stroke="currentColor" stroke-width="1.6" transform="rotate(45 160 160)" />
+              </svg>
+              <svg class="ritual-svg r-inner" viewBox="0 0 320 320" fill="none">
+                <circle cx="160" cy="160" r="64" stroke="currentColor" stroke-width="2.6" stroke-dasharray="22 10" />
+                <circle cx="160" cy="160" r="44" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 6" />
+              </svg>
+
+              <!-- 3D Spinning Summon Card Core -->
+              <div class="ritual-summon-card-3d" id="ritualSummonCard3d">
+                <div class="card-3d-inner">
+                  <span class="card-3d-emblem" id="ritualCoreSymbol">❖</span>
+                  <span class="card-3d-tier" id="ritualCardTierText">SUMMON</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CENTER-SCREEN GIANT IMPACT TYPOGRAPHY OVERLAY (跳出來的大字：台詞／稱號／武器 ➔ 強度 ➔ 種族 ➔ 陣營) -->
+            <div class="cinematic-impact-stage" id="cinematicImpactStage">
+              <div class="impact-slash-line slash-top" aria-hidden="true"></div>
+              <div class="impact-big-text" id="impactBigText">「——」</div>
+              <div class="impact-slash-line slash-bottom" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <!-- 3. SUMMONED CHARACTER REVEAL CONTAINER -->
+          <div class="summon-result-container hidden" id="summonResultContainer"></div>
+        </div>
+
+        <!-- 10-Pull Batch Strip (Visible ONLY after 10-pull animation finishes) -->
+        <div class="summon-ten-batch-panel hidden" id="summonTenBatchPanel">
+          <div class="ten-batch-header">
+            <div class="ten-batch-title-group">
+              <span class="ten-batch-badge">🌟 十連召喚結果總覽</span>
+              <span class="ten-batch-hint">點擊任一角色小卡可於上方檢視完整能力資料</span>
+            </div>
+          </div>
+          <div class="ten-batch-grid" id="summonTenBatchGrid"></div>
+        </div>
+
+        <!-- Recent Summon History Bar -->
+        <div class="summon-history-panel">
+          <div class="summon-history-header">
+            <span class="sh-title">📜 近期召喚紀錄（點擊可回顧角色檔案）</span>
+            <span class="sh-sub" id="summonHistoryCountText">尚無召喚紀錄</span>
+          </div>
+          <div class="summon-history-list" id="summonHistoryList">
+            <div class="summon-history-empty">尚未進行召喚，點擊左側「單次召喚」或「十連召喚」開始抽卡！</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tier Probability & Animation Preview Modal -->
+    <section class="summon-tier-guide-modal hidden" id="summonTierGuideModal" role="dialog" aria-modal="true" aria-labelledby="tierGuideModalTitle">
+      <div class="tier-guide-backdrop" id="tierGuideBackdrop"></div>
+      <div class="tier-guide-dialog">
+        <div class="tier-guide-header">
+          <div>
+            <div class="summon-kicker">PROBABILITY &amp; RARITY TIERS // 稀有度分級與機率表</div>
+            <h2 id="tierGuideModalTitle">各稀有度強度劃分、抽取機率與動畫試播</h2>
+          </div>
+          <button type="button" class="tier-guide-close" id="btnCloseTierGuide" aria-label="關閉說明">✕</button>
+        </div>
+        <div class="tier-guide-body">
+          <p class="tier-guide-intro">系統依據角色的<strong>「強度階級」</strong>劃分為 7 個稀有度等級（<strong>N、R、SR、SSR、UR、EX、？</strong>）。角色實力越強，抽取機率越低，且抽中時的特效規模與音效層次越華麗（可點擊下方按鈕直接試播各階級特效）：</p>
+          <div class="tier-guide-grid" id="tierGuideGrid"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Load Official Data & Summon Simulator Engine -->
+  <script src="assets/data.js"></script>
+  <script src="assets/summon.js"></script>
+</body>
+</html>
