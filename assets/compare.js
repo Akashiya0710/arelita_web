@@ -961,7 +961,7 @@
   const forceSelectAnim = { left: false, right: false };
 
   let compareSfxCtx = null;
-  function playCharSelectSfx(side) {
+  function playCharSelectSfx(side, soundType) {
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
@@ -977,54 +977,644 @@
       const master = compareSfxCtx.createGain();
       master.gain.setValueAtTime(0.0001, now);
       master.gain.linearRampToValueAtTime(0.12, now + 0.015);
-      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.44);
       master.connect(compareSfxCtx.destination);
 
-      if (side === "left") {
-        // Left side: Blue Tactical / Ethereal Ice Lock-in Chime
-        [587.33, 880.0, 1174.66, 1760.0].forEach((freq, idx) => {
-          const t = now + idx * 0.038;
-          const osc = compareSfxCtx.createOscillator();
-          const g = compareSfxCtx.createGain();
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(freq, t);
-          osc.frequency.exponentialRampToValueAtTime(freq * 1.04, t + 0.22);
-          g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(0.08, t + 0.008);
-          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
-          osc.connect(g);
-          g.connect(master);
-          osc.start(t);
-          osc.stop(t + 0.28);
-        });
-      } else {
-        // Right side: Gold Heroic / Blade Lock-in Chime
-        [440.0, 659.25, 880.0, 1318.51].forEach((freq, idx) => {
-          const t = now + idx * 0.038;
-          const osc = compareSfxCtx.createOscillator();
-          const g = compareSfxCtx.createGain();
-          osc.type = "triangle";
-          osc.frequency.setValueAtTime(freq, t);
-          osc.frequency.exponentialRampToValueAtTime(freq * 1.02, t + 0.25);
-          g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(0.09, t + 0.008);
-          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
-          osc.connect(g);
-          g.connect(master);
-          osc.start(t);
-          osc.stop(t + 0.32);
-        });
+      let freqs = [587.33, 880.0, 1174.66, 1760.0];
+      let waveType = "sine";
+      let spacing = 0.038;
+
+      if (soundType === "fire" || soundType === "destruction") {
+        freqs = [220.0, 329.63, 440.0, 659.25];
+        waveType = "triangle";
+        spacing = 0.032;
+      } else if (soundType === "lightning") {
+        freqs = [440.0, 880.0, 1320.0, 2200.0];
+        waveType = "sawtooth";
+        spacing = 0.024;
+      } else if (soundType === "holy" || soundType === "supreme") {
+        freqs = [523.25, 659.25, 783.99, 1046.5, 1567.98];
+        waveType = "sine";
+        spacing = 0.034;
+      } else if (soundType === "dark" || soundType === "abyss") {
+        freqs = [196.0, 277.18, 392.0, 554.37];
+        waveType = "sine";
+        spacing = 0.045;
+      } else if (soundType === "blood") {
+        freqs = [246.94, 349.23, 493.88, 698.46];
+        waveType = "triangle";
+        spacing = 0.035;
+      } else if (soundType === "nature" || soundType === "wind") {
+        freqs = [440.0, 587.33, 739.99, 880.0];
+        waveType = "sine";
+        spacing = 0.04;
+      } else if (soundType === "blade" || (!soundType && side === "right")) {
+        freqs = [440.0, 659.25, 880.0, 1318.51];
+        waveType = "triangle";
+        spacing = 0.038;
       }
+
+      freqs.forEach((freq, idx) => {
+        const t = now + idx * spacing;
+        const osc = compareSfxCtx.createOscillator();
+        const g = compareSfxCtx.createGain();
+        osc.type = waveType;
+        osc.frequency.setValueAtTime(freq, t);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.03, t + 0.22);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(0.08, t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+        osc.connect(g);
+        g.connect(master);
+        osc.start(t);
+        osc.stop(t + 0.3);
+      });
     } catch (e) {}
   }
 
-  function triggerPaneSelectFlash(side) {
+  // Determine dynamic visual flare & particle color theme based on character's attributes
+  function getCharacterAttrBurstTheme(attrTokens, side) {
+    const tokens = Array.isArray(attrTokens) ? attrTokens.filter(Boolean) : [];
+    const joined = tokens.join(" ");
+
+    // Default fallback based on side
+    const isLeft = side === "left";
+    const defaultTheme = isLeft
+      ? {
+          primary: "#38bdf8",
+          secondary: "#7dd3fc",
+          border: "rgba(125, 211, 252, 0.95)",
+          glow: "rgba(56, 189, 248, 0.85)",
+          glowSubtle: "rgba(14, 165, 233, 0.6)",
+          glowInner: "rgba(56, 189, 248, 0.45)",
+          ring: "rgba(56, 189, 248, 0.85)",
+          sparkBg: "#e0f2fe",
+          flare: "radial-gradient(circle, rgba(56, 189, 248, 0.95) 0%, rgba(14, 165, 233, 0.55) 35%, rgba(2, 132, 199, 0) 72%)",
+          soundType: "ice"
+        }
+      : {
+          primary: "#facc15",
+          secondary: "#fde047",
+          border: "rgba(253, 224, 71, 0.95)",
+          glow: "rgba(250, 204, 21, 0.85)",
+          glowSubtle: "rgba(245, 158, 11, 0.6)",
+          glowInner: "rgba(250, 204, 21, 0.45)",
+          ring: "rgba(250, 204, 21, 0.9)",
+          sparkBg: "#fef08a",
+          flare: "radial-gradient(circle, rgba(254, 240, 138, 0.98) 0%, rgba(245, 158, 11, 0.65) 38%, rgba(217, 119, 6, 0) 75%)",
+          soundType: "blade"
+        };
+
+    if (tokens.length === 0) return defaultTheme;
+
+    // Pattern matching ordered from specific/supreme to elemental
+    if (/真實|理|始源|萬物|無限|創生|極光|境界/.test(joined)) {
+      return {
+        primary: "#38bdf8",
+        secondary: "#fde047",
+        border: "#fef08a",
+        glow: "rgba(56, 189, 248, 0.92)",
+        glowSubtle: "rgba(254, 240, 138, 0.75)",
+        glowInner: "rgba(56, 189, 248, 0.5)",
+        ring: "rgba(254, 240, 138, 0.95)",
+        sparkBg: "#ffffff",
+        flare: "radial-gradient(circle, #ffffff 0%, rgba(56, 189, 248, 0.9) 32%, rgba(254, 240, 138, 0.65) 60%, transparent 78%)",
+        soundType: "supreme"
+      };
+    }
+    if (/深淵|至淵|空洞|虛空|淵蝕/.test(joined)) {
+      return {
+        primary: "#e11d48",
+        secondary: "#c084fc",
+        border: "#f43f5e",
+        glow: "rgba(225, 29, 72, 0.92)",
+        glowSubtle: "rgba(112, 26, 117, 0.8)",
+        glowInner: "rgba(225, 29, 72, 0.5)",
+        ring: "rgba(244, 63, 94, 0.92)",
+        sparkBg: "#ffe4e6",
+        flare: "radial-gradient(circle, rgba(254, 205, 211, 0.98) 0%, rgba(225, 29, 72, 0.88) 35%, rgba(59, 7, 100, 0.78) 64%, transparent 80%)",
+        soundType: "abyss"
+      };
+    }
+    if (/暗|影|夜|冥|黑泥|霸王之暗|原罪之暗|死|災厄|邪/.test(joined)) {
+      return {
+        primary: "#a855f7",
+        secondary: "#c084fc",
+        border: "#c084fc",
+        glow: "rgba(168, 85, 247, 0.92)",
+        glowSubtle: "rgba(88, 28, 135, 0.75)",
+        glowInner: "rgba(168, 85, 247, 0.5)",
+        ring: "rgba(192, 132, 252, 0.92)",
+        sparkBg: "#f3e8ff",
+        flare: "radial-gradient(circle, rgba(243, 232, 255, 0.98) 0%, rgba(192, 132, 252, 0.85) 32%, rgba(88, 28, 135, 0.75) 64%, transparent 80%)",
+        soundType: "dark"
+      };
+    }
+    if (/血|猩紅|肉體/.test(joined)) {
+      return {
+        primary: "#dc2626",
+        secondary: "#fb7185",
+        border: "#f87171",
+        glow: "rgba(220, 38, 38, 0.92)",
+        glowSubtle: "rgba(153, 27, 27, 0.75)",
+        glowInner: "rgba(220, 38, 38, 0.5)",
+        ring: "rgba(248, 113, 113, 0.92)",
+        sparkBg: "#fee2e2",
+        flare: "radial-gradient(circle, rgba(254, 226, 226, 0.98) 0%, rgba(239, 68, 68, 0.88) 35%, rgba(127, 29, 29, 0.75) 62%, transparent 78%)",
+        soundType: "blood"
+      };
+    }
+    if (/火|炎|焰|爆炎|薪火|紅蓮|煉獄|地獄火|岩漿|灰燼/.test(joined)) {
+      return {
+        primary: "#ef4444",
+        secondary: "#fb923c",
+        border: "#f97316",
+        glow: "rgba(239, 68, 68, 0.9)",
+        glowSubtle: "rgba(249, 115, 22, 0.7)",
+        glowInner: "rgba(239, 68, 68, 0.45)",
+        ring: "rgba(249, 115, 22, 0.92)",
+        sparkBg: "#fef2f2",
+        flare: "radial-gradient(circle, rgba(254, 215, 170, 0.98) 0%, rgba(249, 115, 22, 0.85) 35%, rgba(220, 38, 38, 0.7) 62%, transparent 78%)",
+        soundType: "fire"
+      };
+    }
+    if (/雷|電|紫電|白雷|銀雷|灰黯之雷|神雷/.test(joined)) {
+      return {
+        primary: "#facc15",
+        secondary: "#38bdf8",
+        border: "#fef08a",
+        glow: "rgba(250, 204, 21, 0.92)",
+        glowSubtle: "rgba(56, 189, 248, 0.7)",
+        glowInner: "rgba(250, 204, 21, 0.48)",
+        ring: "rgba(250, 204, 21, 0.95)",
+        sparkBg: "#fefce8",
+        flare: "radial-gradient(circle, rgba(254, 240, 138, 0.98) 0%, rgba(250, 204, 21, 0.88) 35%, rgba(2, 132, 199, 0.6) 62%, transparent 78%)",
+        soundType: "lightning"
+      };
+    }
+    if (/冰|雪|霜|冰晶|冰楔|凍魂/.test(joined)) {
+      return {
+        primary: "#06b6d4",
+        secondary: "#a5f3fc",
+        border: "#67e8f9",
+        glow: "rgba(6, 182, 212, 0.88)",
+        glowSubtle: "rgba(14, 165, 233, 0.65)",
+        glowInner: "rgba(6, 182, 212, 0.45)",
+        ring: "rgba(103, 232, 249, 0.92)",
+        sparkBg: "#cffafe",
+        flare: "radial-gradient(circle, rgba(236, 254, 255, 0.98) 0%, rgba(103, 232, 249, 0.85) 32%, rgba(2, 132, 199, 0.65) 62%, transparent 78%)",
+        soundType: "ice"
+      };
+    }
+    if (/水|海|霧|源水|月水/.test(joined)) {
+      return {
+        primary: "#0284c7",
+        secondary: "#60a5fa",
+        border: "#38bdf8",
+        glow: "rgba(2, 132, 199, 0.88)",
+        glowSubtle: "rgba(37, 99, 235, 0.65)",
+        glowInner: "rgba(2, 132, 199, 0.45)",
+        ring: "rgba(56, 189, 248, 0.92)",
+        sparkBg: "#e0f2fe",
+        flare: "radial-gradient(circle, rgba(186, 230, 253, 0.98) 0%, rgba(14, 165, 233, 0.8) 35%, rgba(29, 78, 216, 0.65) 62%, transparent 78%)",
+        soundType: "water"
+      };
+    }
+    if (/風|嵐|空氣|妖翠|天氣/.test(joined)) {
+      return {
+        primary: "#10b981",
+        secondary: "#6ee7b7",
+        border: "#34d399",
+        glow: "rgba(16, 185, 129, 0.88)",
+        glowSubtle: "rgba(5, 150, 105, 0.65)",
+        glowInner: "rgba(16, 185, 129, 0.45)",
+        ring: "rgba(52, 211, 153, 0.92)",
+        sparkBg: "#ecfdf5",
+        flare: "radial-gradient(circle, rgba(209, 250, 229, 0.98) 0%, rgba(52, 211, 153, 0.85) 35%, rgba(4, 120, 87, 0.65) 62%, transparent 78%)",
+        soundType: "wind"
+      };
+    }
+    if (/草|木|樹|植物|葉|自然|生命|神花|櫻|紫羅蘭|白玫瑰|銀草/.test(joined)) {
+      return {
+        primary: "#22c55e",
+        secondary: "#fbcfe8",
+        border: "#86efac",
+        glow: "rgba(34, 197, 94, 0.88)",
+        glowSubtle: "rgba(22, 163, 74, 0.65)",
+        glowInner: "rgba(34, 197, 94, 0.45)",
+        ring: "rgba(74, 222, 128, 0.92)",
+        sparkBg: "#f0fdf4",
+        flare: "radial-gradient(circle, rgba(220, 252, 231, 0.98) 0%, rgba(74, 222, 128, 0.85) 35%, rgba(21, 128, 61, 0.65) 62%, transparent 78%)",
+        soundType: "nature"
+      };
+    }
+    if (/光|聖|黎明|晨光|純白|白|神/.test(joined)) {
+      return {
+        primary: "#f59e0b",
+        secondary: "#fef08a",
+        border: "#fde047",
+        glow: "rgba(253, 224, 71, 0.95)",
+        glowSubtle: "rgba(245, 158, 11, 0.75)",
+        glowInner: "rgba(253, 224, 71, 0.52)",
+        ring: "rgba(254, 240, 138, 0.95)",
+        sparkBg: "#ffffff",
+        flare: "radial-gradient(circle, #ffffff 0%, rgba(254, 240, 138, 0.92) 32%, rgba(245, 158, 11, 0.65) 62%, transparent 78%)",
+        soundType: "holy"
+      };
+    }
+    if (/破壞|毀滅|粉碎|滅世|戰爭|狂/.test(joined)) {
+      return {
+        primary: "#ea580c",
+        secondary: "#dc2626",
+        border: "#f97316",
+        glow: "rgba(234, 88, 12, 0.92)",
+        glowSubtle: "rgba(185, 28, 28, 0.75)",
+        glowInner: "rgba(234, 88, 12, 0.48)",
+        ring: "rgba(249, 115, 22, 0.95)",
+        sparkBg: "#ffedd5",
+        flare: "radial-gradient(circle, rgba(255, 237, 213, 0.98) 0%, rgba(249, 115, 22, 0.88) 35%, rgba(153, 27, 27, 0.75) 62%, transparent 78%)",
+        soundType: "destruction"
+      };
+    }
+    if (/毒|腐蝕|瘟疫|腐化/.test(joined)) {
+      return {
+        primary: "#84cc16",
+        secondary: "#a855f7",
+        border: "#a3e635",
+        glow: "rgba(132, 204, 22, 0.9)",
+        glowSubtle: "rgba(34, 197, 94, 0.7)",
+        glowInner: "rgba(132, 204, 22, 0.48)",
+        ring: "rgba(163, 230, 53, 0.92)",
+        sparkBg: "#f7fee7",
+        flare: "radial-gradient(circle, rgba(247, 254, 231, 0.98) 0%, rgba(163, 230, 53, 0.88) 35%, rgba(63, 98, 18, 0.65) 62%, transparent 78%)",
+        soundType: "poison"
+      };
+    }
+    if (/星|天體|天空|月|行星|重力|銀河/.test(joined)) {
+      return {
+        primary: "#6366f1",
+        secondary: "#c084fc",
+        border: "#818cf8",
+        glow: "rgba(99, 102, 241, 0.92)",
+        glowSubtle: "rgba(139, 92, 246, 0.7)",
+        glowInner: "rgba(99, 102, 241, 0.48)",
+        ring: "rgba(129, 140, 248, 0.92)",
+        sparkBg: "#eff6ff",
+        flare: "radial-gradient(circle, rgba(238, 242, 255, 0.98) 0%, rgba(129, 140, 248, 0.88) 32%, rgba(88, 28, 135, 0.65) 62%, transparent 78%)",
+        soundType: "cosmos"
+      };
+    }
+    if (/時間|空間|時空|量子|混沌/.test(joined)) {
+      return {
+        primary: "#0d9488",
+        secondary: "#facc15",
+        border: "#2dd4bf",
+        glow: "rgba(13, 148, 136, 0.92)",
+        glowSubtle: "rgba(79, 70, 229, 0.7)",
+        glowInner: "rgba(13, 148, 136, 0.48)",
+        ring: "rgba(45, 212, 191, 0.92)",
+        sparkBg: "#ccfbf1",
+        flare: "radial-gradient(circle, rgba(204, 251, 241, 0.98) 0%, rgba(45, 212, 191, 0.85) 32%, rgba(67, 56, 202, 0.65) 62%, transparent 78%)",
+        soundType: "spacetime"
+      };
+    }
+    if (/精神|靈魂|魂|認知|幻|夢|音|音樂|言靈|慾望|恐懼/.test(joined)) {
+      return {
+        primary: "#c084fc",
+        secondary: "#f472b6",
+        border: "#e879f9",
+        glow: "rgba(192, 132, 252, 0.92)",
+        glowSubtle: "rgba(232, 121, 249, 0.7)",
+        glowInner: "rgba(192, 132, 252, 0.48)",
+        ring: "rgba(232, 121, 249, 0.92)",
+        sparkBg: "#fae8ff",
+        flare: "radial-gradient(circle, rgba(250, 232, 255, 0.98) 0%, rgba(216, 180, 254, 0.88) 32%, rgba(190, 24, 93, 0.6) 62%, transparent 78%)",
+        soundType: "psyche"
+      };
+    }
+    if (/土|大地|岩石|沙|鋼|金屬|黃金|白銀|水晶|建築|鹽/.test(joined)) {
+      return {
+        primary: "#d97706",
+        secondary: "#fbbf24",
+        border: "#fbbf24",
+        glow: "rgba(217, 119, 6, 0.88)",
+        glowSubtle: "rgba(180, 83, 9, 0.7)",
+        glowInner: "rgba(217, 119, 6, 0.45)",
+        ring: "rgba(251, 191, 36, 0.92)",
+        sparkBg: "#fef3c7",
+        flare: "radial-gradient(circle, rgba(254, 243, 199, 0.98) 0%, rgba(245, 158, 11, 0.85) 35%, rgba(120, 53, 15, 0.65) 62%, transparent 78%)",
+        soundType: "earth"
+      };
+    }
+    if (/武|劍|銳利|守護|力量|忠義|王/.test(joined)) {
+      return {
+        primary: "#f59e0b",
+        secondary: "#e2e8f0",
+        border: "#fef08a",
+        glow: "rgba(245, 158, 11, 0.88)",
+        glowSubtle: "rgba(217, 119, 6, 0.65)",
+        glowInner: "rgba(245, 158, 11, 0.45)",
+        ring: "rgba(254, 240, 138, 0.92)",
+        sparkBg: "#fefce8",
+        flare: "radial-gradient(circle, rgba(254, 240, 138, 0.98) 0%, rgba(245, 158, 11, 0.85) 35%, rgba(180, 83, 9, 0.65) 62%, transparent 78%)",
+        soundType: "blade"
+      };
+    }
+
+    return defaultTheme;
+  }
+
+  function buildAttrThemeCssVars(t) {
+    if (!t) return "";
+    return [
+      `--attr-primary:${t.primary}`,
+      `--attr-secondary:${t.secondary}`,
+      `--attr-border:${t.border}`,
+      `--attr-glow:${t.glow}`,
+      `--attr-glow-subtle:${t.glowSubtle}`,
+      `--attr-glow-inner:${t.glowInner}`,
+      `--attr-ring-color:${t.ring}`,
+      `--attr-spark-bg:${t.sparkBg}`,
+      `--attr-flare-bg:${t.flare}`
+    ].join(";");
+  }
+
+  function triggerPaneSelectFlash(side, attrTheme) {
     const paneEl = document.getElementById(side === "left" ? "comparePaneLeft" : "comparePaneRight");
     if (!paneEl) return;
     paneEl.classList.remove("is-pane-selected-flash");
     void paneEl.offsetWidth;
+    if (attrTheme) {
+      paneEl.style.setProperty("--pane-flash-color", attrTheme.primary);
+      paneEl.style.setProperty("--pane-flash-glow", attrTheme.glow);
+      paneEl.style.setProperty("--pane-flash-glow-inner", attrTheme.glowInner);
+    }
     paneEl.classList.add("is-pane-selected-flash");
-    playCharSelectSfx(side);
+    playCharSelectSfx(side, attrTheme ? attrTheme.soundType : null);
+  }
+
+  // ==================== GAUNTLET / DEFEAT & NEXT STRONGER CHALLENGER SYSTEM ====================
+  const gauntletState = {
+    isAnimating: false,
+    streaks: {},
+    recentDefeatedIds: [],
+    lastBattleLog: null,
+    challengerArrival: { left: null, right: null }
+  };
+
+  function playKoDefeatSfx() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!compareSfxCtx) {
+        compareSfxCtx = new AudioCtx();
+      }
+      if (compareSfxCtx.state === "suspended") {
+        compareSfxCtx.resume().catch(() => {});
+      }
+      if (compareSfxCtx.state !== "running") return;
+
+      const now = compareSfxCtx.currentTime;
+      const master = compareSfxCtx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.linearRampToValueAtTime(0.18, now + 0.01);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.58);
+      master.connect(compareSfxCtx.destination);
+
+      // 1. High-velocity diagonal blade slash (sawtooth sweep)
+      const slashOsc = compareSfxCtx.createOscillator();
+      const slashGain = compareSfxCtx.createGain();
+      slashOsc.type = "sawtooth";
+      slashOsc.frequency.setValueAtTime(1180, now);
+      slashOsc.frequency.exponentialRampToValueAtTime(95, now + 0.19);
+      slashGain.gain.setValueAtTime(0.0001, now);
+      slashGain.gain.linearRampToValueAtTime(0.14, now + 0.012);
+      slashGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.21);
+      slashOsc.connect(slashGain);
+      slashGain.connect(master);
+      slashOsc.start(now);
+      slashOsc.stop(now + 0.22);
+
+      // 2. Second cross-slash echo
+      const slashOsc2 = compareSfxCtx.createOscillator();
+      const slashGain2 = compareSfxCtx.createGain();
+      slashOsc2.type = "triangle";
+      slashOsc2.frequency.setValueAtTime(1480, now + 0.09);
+      slashOsc2.frequency.exponentialRampToValueAtTime(120, now + 0.26);
+      slashGain2.gain.setValueAtTime(0.0001, now + 0.09);
+      slashGain2.gain.linearRampToValueAtTime(0.12, now + 0.105);
+      slashGain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+      slashOsc2.connect(slashGain2);
+      slashGain2.connect(master);
+      slashOsc2.start(now + 0.09);
+      slashOsc2.stop(now + 0.29);
+
+      // 3. Heavy K.O. shatter impact boom
+      const boomOsc = compareSfxCtx.createOscillator();
+      const boomGain = compareSfxCtx.createGain();
+      boomOsc.type = "sine";
+      boomOsc.frequency.setValueAtTime(165, now + 0.14);
+      boomOsc.frequency.exponentialRampToValueAtTime(34, now + 0.52);
+      boomGain.gain.setValueAtTime(0.0001, now + 0.14);
+      boomGain.gain.linearRampToValueAtTime(0.22, now + 0.16);
+      boomGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.54);
+      boomOsc.connect(boomGain);
+      boomGain.connect(master);
+      boomOsc.start(now + 0.14);
+      boomOsc.stop(now + 0.56);
+    } catch (e) {}
+  }
+
+  // Build candidate pool for the next challenger that is 1~2 steps stronger than loserChar
+  // Example: 龍獸二級 (score 23) loses -> next challenger is 龍獸三級 (score 22) or 英雄一級 (score 21)
+  function getStrongerChallengerPool(loserChar, winnerChar) {
+    if (!loserChar) return [];
+    const excludeIds = new Set([loserChar.id, winnerChar ? winnerChar.id : ""]);
+    const basePool = characters.filter((c) => !excludeIds.has(c.id));
+    if (basePool.length === 0) return [];
+
+    const loserScore = loserChar.powerScore;
+
+    if (loserScore > 0) {
+      // Priority 1: Exactly 1 or 2 steps stronger on POWER_LADDER (e.g. 龍獸二級[23] -> 龍獸三級[22] or 英雄一級[21])
+      const stepUpPool = basePool.filter(
+        (c) => c.powerScore === loserScore - 1 || c.powerScore === loserScore - 2
+      );
+      if (stepUpPool.length > 0) return stepUpPool;
+
+      // Priority 2: Closest available stronger tiers (score < loserScore)
+      const allStronger = basePool.filter((c) => c.powerScore >= 0 && c.powerScore < loserScore);
+      if (allStronger.length > 0) {
+        const closestScore = Math.max(...allStronger.map((c) => c.powerScore));
+        return allStronger.filter(
+          (c) => c.powerScore === closestScore || c.powerScore === closestScore - 1
+        );
+      }
+
+      // Priority 3: Same tier or apex fallback
+      const sameTier = basePool.filter((c) => c.powerScore === loserScore);
+      if (sameTier.length > 0) return sameTier;
+    } else if (loserScore === 0) {
+      // Already at apex (現象級, score 0) -> challenge other apex/top-tier characters
+      const apexPool = basePool.filter((c) => c.powerScore === 0 || c.powerScore === 1);
+      if (apexPool.length > 0) return apexPool;
+    }
+
+    // Fallback when loser has unranked powerScore (-1)
+    if (winnerChar && winnerChar.powerScore >= 0) {
+      const nearWinner = basePool.filter(
+        (c) => c.powerScore >= 0 && Math.abs(c.powerScore - winnerChar.powerScore) <= 1
+      );
+      if (nearWinner.length > 0) return nearWinner;
+    }
+
+    return basePool;
+  }
+
+  function getNextChallengerTierLabel(loserChar, winnerChar) {
+    if (!loserChar) return "更強挑戰者";
+    const ls = loserChar.powerScore;
+    if (ls > 0) {
+      const t1 = POWER_LADDER[ls - 1];
+      const t2 = ls - 2 >= 0 ? POWER_LADDER[ls - 2] : null;
+      const pool = getStrongerChallengerPool(loserChar, winnerChar);
+      const poolTiers = Array.from(
+        new Set(
+          pool
+            .map((c) => (c.powerScore >= 0 ? POWER_LADDER[c.powerScore] : c.power))
+            .filter(Boolean)
+        )
+      );
+      if (poolTiers.length > 0) {
+        return poolTiers.slice(0, 2).join(" ／ ");
+      }
+      return [t1, t2].filter(Boolean).join(" ／ ");
+    }
+    if (ls === 0) return "現象級 ／ 終世級巔峰強者";
+    return "更高階挑戰者";
+  }
+
+  function pickNextStrongerChallenger(loserChar, winnerChar) {
+    const pool = getStrongerChallengerPool(loserChar, winnerChar);
+    if (pool.length === 0) return null;
+
+    // Prefer characters not recently defeated in this session
+    const recentSet = new Set(gauntletState.recentDefeatedIds);
+    const freshPool = pool.filter((c) => !recentSet.has(c.id));
+    const finalPool = freshPool.length > 0 ? freshPool : pool;
+
+    return finalPool[Math.floor(Math.random() * finalPool.length)];
+  }
+
+  function executeDefeatAndReplace(loserSide) {
+    if (gauntletState.isAnimating) return;
+
+    const winnerSide = loserSide === "left" ? "right" : "left";
+    const leftChar = characters.find((c) => c.id === compareState.leftCharId) || null;
+    const rightChar = characters.find((c) => c.id === compareState.rightCharId) || null;
+    const loserChar = loserSide === "left" ? leftChar : rightChar;
+    const winnerChar = loserSide === "left" ? rightChar : leftChar;
+
+    if (!loserChar) return;
+    const nextChar = pickNextStrongerChallenger(loserChar, winnerChar);
+    if (!nextChar) return;
+
+    gauntletState.isAnimating = true;
+    if (loserSide === "left") compareState.leftPickerOpen = false;
+    else compareState.rightPickerOpen = false;
+    updatePickerVisibility();
+
+    // 1. Trigger K.O. Sound & Slash Shatter Animation on Loser's Pane
+    playKoDefeatSfx();
+
+    const loserPane = document.getElementById(
+      loserSide === "left" ? "comparePaneLeft" : "comparePaneRight"
+    );
+    const winnerPane = document.getElementById(
+      winnerSide === "left" ? "comparePaneLeft" : "comparePaneRight"
+    );
+    const loserDossierBody = document.getElementById(
+      loserSide === "left" ? "dossierBodyLeft" : "dossierBodyRight"
+    );
+    const loserCard = loserDossierBody
+      ? loserDossierBody.querySelector(".compare-dossier-card")
+      : null;
+
+    if (loserPane) {
+      loserPane.classList.remove("is-pane-selected-flash");
+      loserPane.classList.add("is-pane-ko-shake");
+    }
+    if (winnerPane && winnerChar) {
+      winnerPane.classList.add("is-pane-victory-pulse");
+    }
+
+    if (loserCard) {
+      loserCard.classList.add("is-ko-eliminating");
+      const koOverlay = document.createElement("div");
+      koOverlay.className = "ko-execution-fx";
+      koOverlay.setAttribute("aria-hidden", "true");
+      koOverlay.innerHTML = `
+        <div class="ko-crimson-vignette"></div>
+        <div class="ko-slash-line slash-1"></div>
+        <div class="ko-slash-line slash-2"></div>
+        <div class="ko-impact-ring"></div>
+        <div class="ko-stamp-box">
+          <div class="ko-stamp-main">💥 DEFEATED // 擊敗淘汰</div>
+          <div class="ko-stamp-sub">${esc(loserChar.name)}（${esc(loserChar.power || "未知")}）敗陣退場！</div>
+        </div>
+      `;
+      loserCard.appendChild(koOverlay);
+    }
+
+    // 2. After K.O. animation completes, slot in the stronger challenger with Grand Burst FX
+    setTimeout(() => {
+      if (loserPane) loserPane.classList.remove("is-pane-ko-shake");
+      if (winnerPane) winnerPane.classList.remove("is-pane-victory-pulse");
+
+      // Record defeated character in recent history
+      gauntletState.recentDefeatedIds.push(loserChar.id);
+      if (gauntletState.recentDefeatedIds.length > 10) {
+        gauntletState.recentDefeatedIds.shift();
+      }
+
+      // Update win streak
+      let currentStreak = 0;
+      if (winnerChar) {
+        gauntletState.streaks[winnerChar.id] = (gauntletState.streaks[winnerChar.id] || 0) + 1;
+        currentStreak = gauntletState.streaks[winnerChar.id];
+      }
+      gauntletState.streaks[loserChar.id] = 0;
+
+      // Record challenger arrival info & battle broadcast log
+      gauntletState.challengerArrival[loserSide] = {
+        prevName: loserChar.name,
+        prevPower: loserChar.power || "未標註",
+        newPower: nextChar.power || "未標註"
+      };
+
+      gauntletState.lastBattleLog = {
+        winnerName: winnerChar ? winnerChar.name : "守擂方",
+        winnerPower: winnerChar ? winnerChar.power || "未標註" : "",
+        loserName: loserChar.name,
+        loserPower: loserChar.power || "未標註",
+        nextName: nextChar.name,
+        nextPower: nextChar.power || "未標註",
+        loserSide,
+        streak: currentStreak
+      };
+
+      if (loserSide === "left") {
+        compareState.leftCharId = nextChar.id;
+        forceSelectAnim.left = true;
+      } else {
+        compareState.rightCharId = nextChar.id;
+        forceSelectAnim.right = true;
+      }
+
+      gauntletState.isAnimating = false;
+      syncUrlAndStorage();
+      renderAllComparisonViews();
+    }, 640);
   }
 
   // ==================== RENDER COMBAT & ABILITY DOSSIER (COMPACT, NO REDUNDANT BOXES) ====================
@@ -1037,6 +1627,7 @@
     if (!c) {
       lastRenderedCharId[side] = "";
       forceSelectAnim[side] = false;
+      gauntletState.challengerArrival[side] = null;
       if (isPickerOpen) {
         container.innerHTML = "";
         container.classList.add("is-empty-hidden");
@@ -1063,12 +1654,18 @@
 
     container.classList.remove("is-empty-hidden");
 
+    const attrTheme = getCharacterAttrBurstTheme(c.attrTokens, side);
+    const attrCssVars = buildAttrThemeCssVars(attrTheme);
+
     const shouldAnimate = forceSelectAnim[side] || lastRenderedCharId[side] !== c.id;
     lastRenderedCharId[side] = c.id;
     forceSelectAnim[side] = false;
     if (shouldAnimate) {
-      triggerPaneSelectFlash(side);
+      triggerPaneSelectFlash(side, attrTheme);
     }
+
+    const arrivalInfo = shouldAnimate ? gauntletState.challengerArrival[side] : null;
+    gauntletState.challengerArrival[side] = null;
 
     const epithet = c.profile["稱號"] || "";
     const portraitSrc = getPortraitUrl(c.image);
@@ -1091,14 +1688,66 @@
 
     const combatAbilities = c.combatAbilities || [];
 
+    // Power comparison status vs opponentChar
+    let powerStatusHtml = "";
+    const streakCount = gauntletState.streaks[c.id] || 0;
+    const nextTierLabel = getNextChallengerTierLabel(c, opponentChar);
+
+    if (opponentChar) {
+      const bothRanked = c.powerScore >= 0 && opponentChar.powerScore >= 0;
+      const isWeaker = bothRanked && c.powerScore > opponentChar.powerScore;
+      const isStronger = bothRanked && c.powerScore < opponentChar.powerScore;
+
+      powerStatusHtml = `
+        <div class="compare-duel-action-row">
+          ${
+            streakCount > 0
+              ? `<span class="duel-streak-pill">🔥 ${streakCount} 連勝守擂中</span>`
+              : ""
+          }
+          ${
+            isStronger
+              ? `<span class="duel-advantage-pill is-stronger">👑 階級優勢（領先 ${opponentChar.powerScore - c.powerScore} 階）</span>`
+              : isWeaker
+              ? `<span class="duel-advantage-pill is-weaker">⚠️ 階級劣勢（落後 ${c.powerScore - opponentChar.powerScore} 階）</span>`
+              : bothRanked
+              ? `<span class="duel-advantage-pill is-equal">⚖️ 同階對決</span>`
+              : ""
+          }
+          <button
+            type="button"
+            class="btn-ko-replace ${isWeaker ? "is-weaker-target" : "is-secondary-target"}"
+            data-ko-side="${side}"
+            title="擊敗淘汰【${esc(c.name)}】，並自動派上比他強 1～2 階的下一位挑戰者（${esc(nextTierLabel)}）"
+          >
+            <span class="ko-btn-icon">${isWeaker ? "💥" : "⚔️"}</span>
+            <span class="ko-btn-text">${
+              isWeaker
+                ? `幹掉弱方敗者 ➜ 換【${esc(nextTierLabel)}】強敵登場`
+                : `擊敗換將 ➜ 換【${esc(nextTierLabel)}】登場`
+            }</span>
+          </button>
+        </div>
+      `;
+    }
+
     container.innerHTML = `
-      <article class="compare-dossier-card ${shouldAnimate ? "is-char-entering side-" + side : ""}">
+      <article class="compare-dossier-card ${shouldAnimate ? "is-char-entering side-" + side : ""}" style="${attrCssVars}">
+        ${
+          arrivalInfo
+            ? `
+          <div class="challenger-arrival-banner">
+            <span class="challenger-tag">⚡ NEW CHALLENGER // 強敵亂入</span>
+            <span class="challenger-step">原【${esc(arrivalInfo.prevName)}（${esc(arrivalInfo.prevPower)}）】敗退 ➔ 階級躍升為 <strong>${esc(arrivalInfo.newPower)}</strong>！</span>
+          </div>`
+            : ""
+        }
         <!-- Unified Compact Character Header + Basic Specs -->
         <div class="compare-char-header">
           ${
             shouldAnimate
               ? `
-            <div class="compare-burst-fx side-${side}" aria-hidden="true">
+            <div class="compare-burst-fx side-${side}" style="${attrCssVars}" aria-hidden="true">
               <div class="burst-flare"></div>
               <div class="burst-shockwave"></div>
               <div class="burst-ring"></div>
@@ -1133,6 +1782,8 @@
               </div>
               ${c.power ? `<span class="badge-power">⚡ 強度：${esc(c.power)}</span>` : ""}
             </div>
+
+            ${powerStatusHtml}
 
             <!-- Faction & Identities Inline Row -->
             <div class="compare-faction-inline">
@@ -1179,96 +1830,157 @@
         </div>
       </article>
     `;
+
+    const koBtn = container.querySelector("[data-ko-side]");
+    if (koBtn) {
+      koBtn.addEventListener("click", () => {
+        executeDefeatAndReplace(side);
+      });
+    }
   }
 
-  // ==================== RENDER HEAD-TO-HEAD VERSUS SUMMARY BANNER ====================
+  // ==================== RENDER TACTICAL GAUNTLET / DEFEAT & NEXT CHALLENGER BAR ====================
   function renderVersusSummary(leftChar, rightChar) {
-    const banner = document.getElementById("compareVersusBanner");
-    if (!banner) return;
+    const gauntletBar = document.getElementById("compareGauntletBar");
+    if (!gauntletBar) return;
 
     if (!leftChar || !rightChar) {
-      banner.innerHTML = `
-        <div class="vs-summary-empty">
-          <span>⚔️ 請於下方左右兩個視窗分別選取角色，即可自動生成雙角陣營、強度階級、共同／專屬屬性與能力體系對照表。</span>
-        </div>
-      `;
+      gauntletBar.innerHTML = "";
+      gauntletBar.classList.add("is-hidden");
       return;
     }
 
-    const leftAttrs = leftChar.attrTokens || [];
-    const rightAttrs = rightChar.attrTokens || [];
-    const sharedAttrs = leftAttrs.filter((t) => rightAttrs.includes(t));
+    gauntletBar.classList.remove("is-hidden");
 
-    // All distinct ability types across both characters
-    const combinedAbilityTypes = Array.from(
-      new Set([...(leftChar.abilityTypes || []), ...(rightChar.abilityTypes || [])])
-    );
+    const bothRanked = leftChar.powerScore >= 0 && rightChar.powerScore >= 0;
+    const leftStronger = bothRanked && leftChar.powerScore < rightChar.powerScore;
+    const rightStronger = bothRanked && rightChar.powerScore < leftChar.powerScore;
+    const isEqual = bothRanked && leftChar.powerScore === rightChar.powerScore;
 
-    banner.innerHTML = `
-      <div class="vs-summary-grid">
-        <!-- Left Contender Mini Card -->
-        <div class="vs-side vs-side-left">
-          <div class="vs-side-tag">LEFT // 角色 A</div>
-          <div class="vs-side-name">${formatCharacterDisplayName(leftChar.name)}</div>
-          <div class="vs-side-meta">
-            <span class="badge-realm">${esc(leftChar.realm)}</span>
-            <span>${esc(leftChar.faction)}${leftChar.subFaction ? ` › ${esc(leftChar.subFaction)}` : ""}</span>
+    const leftStreak = gauntletState.streaks[leftChar.id] || 0;
+    const rightStreak = gauntletState.streaks[rightChar.id] || 0;
+
+    const leftNextTier = getNextChallengerTierLabel(leftChar, rightChar);
+    const rightNextTier = getNextChallengerTierLabel(rightChar, leftChar);
+
+    let centerActionHtml = "";
+    if (leftStronger) {
+      // Left is stronger, Right is weaker -> Primary action knocks out Right
+      centerActionHtml = `
+        <div class="gauntlet-verdict-tag">
+          <span>⚔️ 戰力判定：左方 <strong>${esc(leftChar.name)}（${esc(leftChar.power)}）</strong> 階級較高！</span>
+        </div>
+        <div class="gauntlet-cta-group">
+          <button type="button" class="gauntlet-ko-btn is-primary-ko" data-gauntlet-ko="right">
+            <span class="g-ko-icon">💥</span>
+            <span class="g-ko-body">
+              <strong>幹掉弱方【${esc(rightChar.name)}（${esc(rightChar.power)}）】</strong>
+              <small>➜ 召喚更強挑戰者（${esc(rightNextTier)}）登場對決</small>
+            </span>
+          </button>
+          <button type="button" class="gauntlet-ko-btn is-upset-ko" data-gauntlet-ko="left" title="逆轉幹掉強方【${esc(leftChar.name)}】，換上【${esc(leftNextTier)}】">
+            <span>⚡ 逆轉淘汰左方</span>
+          </button>
+        </div>
+      `;
+    } else if (rightStronger) {
+      // Right is stronger, Left is weaker -> Primary action knocks out Left
+      centerActionHtml = `
+        <div class="gauntlet-verdict-tag">
+          <span>⚔️ 戰力判定：右方 <strong>${esc(rightChar.name)}（${esc(rightChar.power)}）</strong> 階級較高！</span>
+        </div>
+        <div class="gauntlet-cta-group">
+          <button type="button" class="gauntlet-ko-btn is-primary-ko" data-gauntlet-ko="left">
+            <span class="g-ko-icon">💥</span>
+            <span class="g-ko-body">
+              <strong>幹掉弱方【${esc(leftChar.name)}（${esc(leftChar.power)}）】</strong>
+              <small>➜ 召喚更強挑戰者（${esc(leftNextTier)}）登場對決</small>
+            </span>
+          </button>
+          <button type="button" class="gauntlet-ko-btn is-upset-ko" data-gauntlet-ko="right" title="逆轉幹掉強方【${esc(rightChar.name)}】，換上【${esc(rightNextTier)}】">
+            <span>⚡ 逆轉淘汰右方</span>
+          </button>
+        </div>
+      `;
+    } else {
+      // Equal power tier or unranked -> Both can be knocked out equally
+      centerActionHtml = `
+        <div class="gauntlet-verdict-tag">
+          <span>⚖️ ${
+            isEqual
+              ? `雙方同為 <strong>${esc(leftChar.power)}</strong> 勢均力敵！選擇要幹掉哪一方以召喚更強挑戰者：`
+              : `選擇要淘汰哪一方，並召喚更高階挑戰者登場：`
+          }</span>
+        </div>
+        <div class="gauntlet-cta-group is-dual-equal">
+          <button type="button" class="gauntlet-ko-btn is-primary-ko" data-gauntlet-ko="left">
+            <span class="g-ko-icon">💥</span>
+            <span class="g-ko-body">
+              <strong>幹掉左方【${esc(leftChar.name)}】</strong>
+              <small>➜ 換上（${esc(leftNextTier)}）</small>
+            </span>
+          </button>
+          <button type="button" class="gauntlet-ko-btn is-primary-ko" data-gauntlet-ko="right">
+            <span class="g-ko-icon">💥</span>
+            <span class="g-ko-body">
+              <strong>幹掉右方【${esc(rightChar.name)}】</strong>
+              <small>➜ 換上（${esc(rightNextTier)}）</small>
+            </span>
+          </button>
+        </div>
+      `;
+    }
+
+    const log = gauntletState.lastBattleLog;
+    const logHtml = log
+      ? `
+      <div class="gauntlet-battle-log">
+        <span class="log-badge">📢 連戰快報</span>
+        <span class="log-text">
+          <strong>${esc(log.winnerName)}</strong> 擊敗了 <em>${esc(log.loserName)}（${esc(log.loserPower)}）</em>！
+          ${log.streak >= 2 ? `<b class="log-streak">🔥 達成 ${log.streak} 連勝！</b>` : ""}
+          全新強敵 <strong>${esc(log.nextName)}（${esc(log.nextPower)}）</strong> 已切入${log.loserSide === "left" ? "左側" : "右側"}戰場！
+        </span>
+      </div>`
+      : "";
+
+    gauntletBar.innerHTML = `
+      <div class="gauntlet-bar-inner">
+        <div class="gauntlet-fighter fighter-left ${leftStronger ? "is-dominant" : rightStronger ? "is-underdog" : "is-even"}">
+          <div class="gf-top">
+            <span class="gf-slot">LEFT // 角色 A</span>
+            ${leftStreak > 0 ? `<span class="gf-streak">🔥 ${leftStreak} 連勝</span>` : ""}
+            ${leftStronger ? `<span class="gf-crown">👑 強方</span>` : rightStronger ? `<span class="gf-skull">💀 弱方</span>` : `<span class="gf-even">⚖️ 平手</span>`}
           </div>
-          <div class="vs-side-stats">
-            <span class="vs-stat-pill">⚡ 強度：<strong>${esc(leftChar.power || "未標註")}</strong></span>
-            <span class="vs-stat-pill">🧬 種族：<strong>${esc(leftChar.profile["種族"] || "未知")}</strong></span>
-            <span class="vs-stat-pill">⚖️ 善惡：<strong>${esc(leftChar.profile["善惡"] || "未知")}</strong></span>
-            <span class="vs-stat-pill">✦ 能力體系：<strong>${leftChar.combatAbilities.length} 項</strong></span>
-          </div>
+          <div class="gf-name">${formatCharacterDisplayName(leftChar.name)}</div>
+          <div class="gf-power">⚡ ${esc(leftChar.power || "未標註")}</div>
         </div>
 
-        <!-- Center VS Matrix -->
-        <div class="vs-center-core">
-          <div class="vs-emblem-circle">VS</div>
-          <div class="vs-shared-box">
-            <div class="vs-shared-label">共同持有屬性 (${sharedAttrs.length})</div>
-            <div class="vs-shared-val">
-              ${
-                sharedAttrs.length > 0
-                  ? renderAttributeBadgesHtml(sharedAttrs)
-                  : `<span class="vs-none-text">無重疊屬性（屬性完全相異）</span>`
-              }
-            </div>
-          </div>
-          ${
-            combinedAbilityTypes.length > 0
-              ? `<div class="vs-matrix-pills">
-                  ${combinedAbilityTypes
-                    .map((t) => {
-                      const hasL = leftChar.abilityTypes.includes(t);
-                      const hasR = rightChar.abilityTypes.includes(t);
-                      const cls = hasL && hasR ? "both" : hasL ? "only-left" : "only-right";
-                      const tag = hasL && hasR ? "雙" : hasL ? "左" : "右";
-                      return `<span class="vs-matrix-chip ${cls}" title="${esc(t)}：${hasL && hasR ? "雙方皆持有" : hasL ? "僅左側角色持有" : "僅右側角色持有"}"><b>[${tag}]</b> ${esc(t)}</span>`;
-                    })
-                    .join("")}
-                </div>`
-              : ""
-          }
+        <div class="gauntlet-center-hub">
+          ${centerActionHtml}
         </div>
 
-        <!-- Right Contender Mini Card -->
-        <div class="vs-side vs-side-right">
-          <div class="vs-side-tag">RIGHT // 角色 B</div>
-          <div class="vs-side-name">${formatCharacterDisplayName(rightChar.name)}</div>
-          <div class="vs-side-meta">
-            <span class="badge-realm">${esc(rightChar.realm)}</span>
-            <span>${esc(rightChar.faction)}${rightChar.subFaction ? ` › ${esc(rightChar.subFaction)}` : ""}</span>
+        <div class="gauntlet-fighter fighter-right ${rightStronger ? "is-dominant" : leftStronger ? "is-underdog" : "is-even"}">
+          <div class="gf-top">
+            <span class="gf-slot">RIGHT // 角色 B</span>
+            ${rightStreak > 0 ? `<span class="gf-streak">🔥 ${rightStreak} 連勝</span>` : ""}
+            ${rightStronger ? `<span class="gf-crown">👑 強方</span>` : leftStronger ? `<span class="gf-skull">💀 弱方</span>` : `<span class="gf-even">⚖️ 平手</span>`}
           </div>
-          <div class="vs-side-stats">
-            <span class="vs-stat-pill">⚡ 強度：<strong>${esc(rightChar.power || "未標註")}</strong></span>
-            <span class="vs-stat-pill">🧬 種族：<strong>${esc(rightChar.profile["種族"] || "未知")}</strong></span>
-            <span class="vs-stat-pill">⚖️ 善惡：<strong>${esc(rightChar.profile["善惡"] || "未知")}</strong></span>
-            <span class="vs-stat-pill">✦ 能力體系：<strong>${rightChar.combatAbilities.length} 項</strong></span>
-          </div>
+          <div class="gf-name">${formatCharacterDisplayName(rightChar.name)}</div>
+          <div class="gf-power">⚡ ${esc(rightChar.power || "未標註")}</div>
         </div>
       </div>
+      ${logHtml}
     `;
+
+    gauntletBar.querySelectorAll("[data-gauntlet-ko]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const koSide = btn.getAttribute("data-gauntlet-ko");
+        if (koSide === "left" || koSide === "right") {
+          executeDefeatAndReplace(koSide);
+        }
+      });
+    });
   }
 
   function updatePickerVisibility() {
@@ -1438,6 +2150,9 @@
         compareState.rightCharId = "";
         compareState.leftPickerOpen = true;
         compareState.rightPickerOpen = true;
+        gauntletState.lastBattleLog = null;
+        gauntletState.challengerArrival = { left: null, right: null };
+        gauntletState.streaks = {};
         syncUrlAndStorage();
         updatePickerVisibility();
         renderAllComparisonViews();
@@ -1451,6 +2166,9 @@
       compareState.rightPickerOpen = false;
       forceSelectAnim.left = true;
       forceSelectAnim.right = true;
+      gauntletState.lastBattleLog = null;
+      gauntletState.challengerArrival = { left: null, right: null };
+      gauntletState.streaks = {};
       syncUrlAndStorage();
       updatePickerVisibility();
       renderAllComparisonViews();
