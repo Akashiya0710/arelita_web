@@ -1353,14 +1353,101 @@
     playCharSelectSfx(side, attrTheme ? attrTheme.soundType : null);
   }
 
-  // ==================== GAUNTLET / DEFEAT & NEXT STRONGER CHALLENGER SYSTEM ====================
+  // ==================== GAUNTLET / ARENA TOURNAMENT MODE (擂台賽模式) ====================
   const gauntletState = {
+    arenaMode: (function () {
+      try {
+        const saved = localStorage.getItem("arelita_arena_mode");
+        return saved === null ? true : saved === "true";
+      } catch (e) {
+        return true;
+      }
+    })(),
     isAnimating: false,
     streaks: {},
+    defeatedInRoundIds: new Set(),
     recentDefeatedIds: [],
+    championCharId: null,
+    championSide: null,
+    defeatedFinalBoss: null,
     lastBattleLog: null,
     challengerArrival: { left: null, right: null }
   };
+
+  function syncArenaModeToggleUI() {
+    const btn = document.getElementById("btnToggleArenaMode");
+    const textEl = document.getElementById("arenaModeToggleText");
+    const iconEl = document.getElementById("arenaModeToggleIcon");
+    const on = Boolean(gauntletState.arenaMode);
+    if (btn) {
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-pressed", String(on));
+    }
+    if (textEl) {
+      textEl.textContent = on ? "擂台賽模式：ON" : "擂台賽模式：OFF";
+    }
+    if (iconEl) {
+      iconEl.textContent = on ? "🔥" : "⚔️";
+    }
+  }
+
+  function setArenaMode(enabled) {
+    gauntletState.arenaMode = Boolean(enabled);
+    try {
+      localStorage.setItem("arelita_arena_mode", String(gauntletState.arenaMode));
+    } catch (e) {}
+    syncArenaModeToggleUI();
+    renderAllComparisonViews();
+  }
+
+  function resetArenaRoundState() {
+    gauntletState.streaks = {};
+    gauntletState.defeatedInRoundIds.clear();
+    gauntletState.recentDefeatedIds = [];
+    gauntletState.championCharId = null;
+    gauntletState.championSide = null;
+    gauntletState.defeatedFinalBoss = null;
+    gauntletState.lastBattleLog = null;
+    gauntletState.challengerArrival = { left: null, right: null };
+  }
+
+  function endCurrentArenaRound() {
+    const hadEmptySide = !compareState.leftCharId || !compareState.rightCharId;
+    resetArenaRoundState();
+
+    const paneL = document.getElementById("comparePaneLeft");
+    const paneR = document.getElementById("comparePaneRight");
+    if (paneL) paneL.classList.remove("is-five-streak-flame", "is-champion-pane");
+    if (paneR) paneR.classList.remove("is-five-streak-flame", "is-champion-pane");
+
+    // If one side was wiped out in the champion finale, pick a fresh opponent so a new round can begin smoothly
+    if (hadEmptySide && characters.length >= 2) {
+      const activeId = compareState.leftCharId || compareState.rightCharId;
+      const activeChar = characters.find((c) => c.id === activeId);
+      const others = characters.filter((c) => c.id !== activeId);
+      let candidates = others;
+      if (activeChar && activeChar.powerScore >= 0) {
+        const similar = others.filter(
+          (c) => c.powerScore >= 0 && Math.abs(c.powerScore - activeChar.powerScore) <= 2
+        );
+        if (similar.length > 0) candidates = similar;
+      }
+      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      if (!compareState.leftCharId) {
+        compareState.leftCharId = picked.id;
+        compareState.leftPickerOpen = false;
+        forceSelectAnim.left = true;
+      } else if (!compareState.rightCharId) {
+        compareState.rightCharId = picked.id;
+        compareState.rightPickerOpen = false;
+        forceSelectAnim.right = true;
+      }
+    }
+
+    syncUrlAndStorage();
+    updatePickerVisibility();
+    renderAllComparisonViews();
+  }
 
   function playKoDefeatSfx() {
     try {
@@ -1425,15 +1512,99 @@
     } catch (e) {}
   }
 
-  // Build candidate pool for the next challenger that is 1~2 steps stronger than loserChar
-  // Example: 龍獸二級 (score 23) loses -> next challenger is 龍獸三級 (score 22) or 英雄一級 (score 21)
+  function playFlameAwakenSfx() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!compareSfxCtx) compareSfxCtx = new AudioCtx();
+      if (compareSfxCtx.state === "suspended") compareSfxCtx.resume().catch(() => {});
+      if (compareSfxCtx.state !== "running") return;
+
+      const now = compareSfxCtx.currentTime;
+      const master = compareSfxCtx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.linearRampToValueAtTime(0.16, now + 0.02);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+      master.connect(compareSfxCtx.destination);
+
+      [220.0, 277.18, 329.63, 440.0, 659.25, 880.0].forEach((freq, idx) => {
+        const t = now + idx * 0.045;
+        const osc = compareSfxCtx.createOscillator();
+        const g = compareSfxCtx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(freq * 0.92, t);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.06, t + 0.28);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(0.06, t + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+        osc.connect(g);
+        g.connect(master);
+        osc.start(t);
+        osc.stop(t + 0.34);
+      });
+    } catch (e) {}
+  }
+
+  function playChampionFanfareSfx() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!compareSfxCtx) compareSfxCtx = new AudioCtx();
+      if (compareSfxCtx.state === "suspended") compareSfxCtx.resume().catch(() => {});
+      if (compareSfxCtx.state !== "running") return;
+
+      const now = compareSfxCtx.currentTime;
+      const master = compareSfxCtx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.linearRampToValueAtTime(0.2, now + 0.02);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.15);
+      master.connect(compareSfxCtx.destination);
+
+      // Triumphant sovereign fanfare notes
+      const notes = [
+        { f: 523.25, t: 0.0, d: 0.22 },
+        { f: 659.25, t: 0.11, d: 0.22 },
+        { f: 783.99, t: 0.22, d: 0.24 },
+        { f: 1046.5, t: 0.35, d: 0.68 },
+        { f: 1318.51, t: 0.35, d: 0.68 },
+        { f: 1567.98, t: 0.48, d: 0.62 }
+      ];
+      notes.forEach((n) => {
+        const start = now + n.t;
+        const osc = compareSfxCtx.createOscillator();
+        const g = compareSfxCtx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(n.f, start);
+        g.gain.setValueAtTime(0.0001, start);
+        g.gain.linearRampToValueAtTime(0.09, start + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + n.d);
+        osc.connect(g);
+        g.connect(master);
+        osc.start(start);
+        osc.stop(start + n.d + 0.02);
+      });
+    } catch (e) {}
+  }
+
+  // Build candidate pool for the next challenger that is 1~2 steps stronger than loserChar.
+  // Once 現象級 (score 0) is reached and all 現象級 opponents are defeated, returns [] -> Champion "最強"!
   function getStrongerChallengerPool(loserChar, winnerChar) {
     if (!loserChar) return [];
-    const excludeIds = new Set([loserChar.id, winnerChar ? winnerChar.id : ""]);
+    const excludeIds = new Set([
+      loserChar.id,
+      winnerChar ? winnerChar.id : "",
+      ...Array.from(gauntletState.defeatedInRoundIds)
+    ]);
     const basePool = characters.filter((c) => !excludeIds.has(c.id));
     if (basePool.length === 0) return [];
 
     const loserScore = loserChar.powerScore;
+
+    if (loserScore === 0) {
+      // Defeated opponent is 現象級 (score 0)!
+      // Check if any undefeated 現象級 opponent remains. If none, return [] -> Champion "最強"!
+      return basePool.filter((c) => c.powerScore === 0);
+    }
 
     if (loserScore > 0) {
       // Priority 1: Exactly 1 or 2 steps stronger on POWER_LADDER (e.g. 龍獸二級[23] -> 龍獸三級[22] or 英雄一級[21])
@@ -1442,7 +1613,7 @@
       );
       if (stepUpPool.length > 0) return stepUpPool;
 
-      // Priority 2: Closest available stronger tiers (score < loserScore)
+      // Priority 2: Closest available stronger tiers (0 <= score < loserScore)
       const allStronger = basePool.filter((c) => c.powerScore >= 0 && c.powerScore < loserScore);
       if (allStronger.length > 0) {
         const closestScore = Math.max(...allStronger.map((c) => c.powerScore));
@@ -1451,19 +1622,14 @@
         );
       }
 
-      // Priority 3: Same tier or apex fallback
-      const sameTier = basePool.filter((c) => c.powerScore === loserScore);
-      if (sameTier.length > 0) return sameTier;
-    } else if (loserScore === 0) {
-      // Already at apex (現象級, score 0) -> challenge other apex/top-tier characters
-      const apexPool = basePool.filter((c) => c.powerScore === 0 || c.powerScore === 1);
-      if (apexPool.length > 0) return apexPool;
+      // No stronger undefeated opponent exists (including 現象級)! Return [] -> Champion "最強"!
+      return [];
     }
 
     // Fallback when loser has unranked powerScore (-1)
     if (winnerChar && winnerChar.powerScore >= 0) {
       const nearWinner = basePool.filter(
-        (c) => c.powerScore >= 0 && Math.abs(c.powerScore - winnerChar.powerScore) <= 1
+        (c) => c.powerScore >= 0 && c.powerScore <= winnerChar.powerScore
       );
       if (nearWinner.length > 0) return nearWinner;
     }
@@ -1473,24 +1639,20 @@
 
   function getNextChallengerTierLabel(loserChar, winnerChar) {
     if (!loserChar) return "更強挑戰者";
-    const ls = loserChar.powerScore;
-    if (ls > 0) {
-      const t1 = POWER_LADDER[ls - 1];
-      const t2 = ls - 2 >= 0 ? POWER_LADDER[ls - 2] : null;
-      const pool = getStrongerChallengerPool(loserChar, winnerChar);
-      const poolTiers = Array.from(
-        new Set(
-          pool
-            .map((c) => (c.powerScore >= 0 ? POWER_LADDER[c.powerScore] : c.power))
-            .filter(Boolean)
-        )
-      );
-      if (poolTiers.length > 0) {
-        return poolTiers.slice(0, 2).join(" ／ ");
-      }
-      return [t1, t2].filter(Boolean).join(" ／ ");
+    const pool = getStrongerChallengerPool(loserChar, winnerChar);
+    if (pool.length === 0) {
+      return "👑 已無對手（擊敗即登頂【最強】）";
     }
-    if (ls === 0) return "現象級 ／ 終世級巔峰強者";
+    const poolTiers = Array.from(
+      new Set(
+        pool
+          .map((c) => (c.powerScore >= 0 ? POWER_LADDER[c.powerScore] : c.power))
+          .filter(Boolean)
+      )
+    );
+    if (poolTiers.length > 0) {
+      return poolTiers.slice(0, 2).join(" ／ ");
+    }
     return "更高階挑戰者";
   }
 
@@ -1498,7 +1660,6 @@
     const pool = getStrongerChallengerPool(loserChar, winnerChar);
     if (pool.length === 0) return null;
 
-    // Prefer characters not recently defeated in this session
     const recentSet = new Set(gauntletState.recentDefeatedIds);
     const freshPool = pool.filter((c) => !recentSet.has(c.id));
     const finalPool = freshPool.length > 0 ? freshPool : pool;
@@ -1507,7 +1668,7 @@
   }
 
   function executeDefeatAndReplace(loserSide) {
-    if (gauntletState.isAnimating) return;
+    if (gauntletState.isAnimating || !gauntletState.arenaMode) return;
 
     const winnerSide = loserSide === "left" ? "right" : "left";
     const leftChar = characters.find((c) => c.id === compareState.leftCharId) || null;
@@ -1516,8 +1677,6 @@
     const winnerChar = loserSide === "left" ? rightChar : leftChar;
 
     if (!loserChar) return;
-    const nextChar = pickNextStrongerChallenger(loserChar, winnerChar);
-    if (!nextChar) return;
 
     gauntletState.isAnimating = true;
     if (loserSide === "left") compareState.leftPickerOpen = false;
@@ -1566,12 +1725,13 @@
       loserCard.appendChild(koOverlay);
     }
 
-    // 2. After K.O. animation completes, slot in the stronger challenger with Grand Burst FX
+    // 2. After K.O. animation completes, check if a stronger challenger exists or if Champion "最強" is crowned!
     setTimeout(() => {
       if (loserPane) loserPane.classList.remove("is-pane-ko-shake");
       if (winnerPane) winnerPane.classList.remove("is-pane-victory-pulse");
 
-      // Record defeated character in recent history
+      // Record defeated character in round & recent history
+      gauntletState.defeatedInRoundIds.add(loserChar.id);
       gauntletState.recentDefeatedIds.push(loserChar.id);
       if (gauntletState.recentDefeatedIds.length > 10) {
         gauntletState.recentDefeatedIds.shift();
@@ -1585,30 +1745,68 @@
       }
       gauntletState.streaks[loserChar.id] = 0;
 
-      // Record challenger arrival info & battle broadcast log
-      gauntletState.challengerArrival[loserSide] = {
-        prevName: loserChar.name,
-        prevPower: loserChar.power || "未標註",
-        newPower: nextChar.power || "未標註"
-      };
+      const nextChar = pickNextStrongerChallenger(loserChar, winnerChar);
 
-      gauntletState.lastBattleLog = {
-        winnerName: winnerChar ? winnerChar.name : "守擂方",
-        winnerPower: winnerChar ? winnerChar.power || "未標註" : "",
-        loserName: loserChar.name,
-        loserPower: loserChar.power || "未標註",
-        nextName: nextChar.name,
-        nextPower: nextChar.power || "未標註",
-        loserSide,
-        streak: currentStreak
-      };
+      if (!nextChar) {
+        // ALL STRONGER / 現象級 OPPONENTS DEFEATED! Crown winnerChar as "最強"!
+        gauntletState.championCharId = winnerChar ? winnerChar.id : loserChar.id;
+        gauntletState.championSide = winnerChar ? winnerSide : loserSide;
+        gauntletState.defeatedFinalBoss = {
+          name: loserChar.name,
+          power: loserChar.power || "現象級"
+        };
+        gauntletState.lastBattleLog = {
+          isChampionFinale: true,
+          winnerName: winnerChar ? winnerChar.name : "守擂霸主",
+          winnerPower: winnerChar ? winnerChar.power || "未標註" : "",
+          loserName: loserChar.name,
+          loserPower: loserChar.power || "現象級",
+          loserSide,
+          streak: currentStreak
+        };
 
-      if (loserSide === "left") {
-        compareState.leftCharId = nextChar.id;
-        forceSelectAnim.left = true;
+        if (loserSide === "left") {
+          compareState.leftCharId = "";
+          compareState.leftPickerOpen = false;
+          forceSelectAnim.right = true;
+        } else {
+          compareState.rightCharId = "";
+          compareState.rightPickerOpen = false;
+          forceSelectAnim.left = true;
+        }
+
+        playChampionFanfareSfx();
       } else {
-        compareState.rightCharId = nextChar.id;
-        forceSelectAnim.right = true;
+        // Slot in the stronger challenger
+        if (currentStreak === 5) {
+          playFlameAwakenSfx();
+        }
+
+        gauntletState.challengerArrival[loserSide] = {
+          prevName: loserChar.name,
+          prevPower: loserChar.power || "未標註",
+          newPower: nextChar.power || "未標註"
+        };
+
+        gauntletState.lastBattleLog = {
+          isChampionFinale: false,
+          winnerName: winnerChar ? winnerChar.name : "守擂方",
+          winnerPower: winnerChar ? winnerChar.power || "未標註" : "",
+          loserName: loserChar.name,
+          loserPower: loserChar.power || "未標註",
+          nextName: nextChar.name,
+          nextPower: nextChar.power || "未標註",
+          loserSide,
+          streak: currentStreak
+        };
+
+        if (loserSide === "left") {
+          compareState.leftCharId = nextChar.id;
+          forceSelectAnim.left = true;
+        } else {
+          compareState.rightCharId = nextChar.id;
+          forceSelectAnim.right = true;
+        }
       }
 
       gauntletState.isAnimating = false;
@@ -1620,6 +1818,7 @@
   // ==================== RENDER COMBAT & ABILITY DOSSIER (COMPACT, NO REDUNDANT BOXES) ====================
   function renderCharacterCombatDossier(c, side, opponentChar) {
     const container = document.getElementById(side === "left" ? "dossierBodyLeft" : "dossierBodyRight");
+    const paneEl = document.getElementById(side === "left" ? "comparePaneLeft" : "comparePaneRight");
     if (!container) return;
 
     const isPickerOpen = side === "left" ? compareState.leftPickerOpen : compareState.rightPickerOpen;
@@ -1628,6 +1827,52 @@
       lastRenderedCharId[side] = "";
       forceSelectAnim[side] = false;
       gauntletState.challengerArrival[side] = null;
+      if (paneEl) {
+        paneEl.classList.remove("is-five-streak-flame", "is-champion-pane");
+      }
+
+      // If this slot was just wiped out in the Champion "最強" Finale, show the Conquered Final Boss screen!
+      if (
+        gauntletState.arenaMode &&
+        gauntletState.championCharId &&
+        gauntletState.championSide &&
+        gauntletState.championSide !== side &&
+        !isPickerOpen
+      ) {
+        const finalBoss = gauntletState.defeatedFinalBoss || { name: "現象級強敵", power: "現象級" };
+        container.classList.remove("is-empty-hidden");
+        container.innerHTML = `
+          <div class="compare-conquered-slot">
+            <div class="conquered-skull-icon">☠️</div>
+            <div class="conquered-title">現象級強敵全數潰敗・世間已無對手！</div>
+            <p class="conquered-desc">
+              最後一位巔峰強敵 <strong>【${esc(finalBoss.name)}（${esc(finalBoss.power)}）】</strong> 已被徹底擊破！<br/>
+              對側守擂角色已殺穿整座天梯，正式加冕為亞雷利塔<strong>「天下最強」</strong>！
+            </p>
+            <div class="conquered-actions">
+              <button type="button" class="btn-end-arena-round" data-end-round="true">
+                <span>🏁 結束本輪擂台賽（開啟新一輪對決）</span>
+              </button>
+              <button type="button" class="compare-action-btn" data-open-picker="${side}">
+                <span>🔍 手動挑選新對手</span>
+              </button>
+            </div>
+          </div>
+        `;
+        const endBtn = container.querySelector("[data-end-round]");
+        if (endBtn) endBtn.addEventListener("click", () => endCurrentArenaRound());
+        const openBtn = container.querySelector("[data-open-picker]");
+        if (openBtn) {
+          openBtn.addEventListener("click", () => {
+            if (side === "left") compareState.leftPickerOpen = true;
+            else compareState.rightPickerOpen = true;
+            updatePickerVisibility();
+            renderAllComparisonViews();
+          });
+        }
+        return;
+      }
+
       if (isPickerOpen) {
         container.innerHTML = "";
         container.classList.add("is-empty-hidden");
@@ -1688,12 +1933,32 @@
 
     const combatAbilities = c.combatAbilities || [];
 
-    // Power comparison status vs opponentChar
-    let powerStatusHtml = "";
-    const streakCount = gauntletState.streaks[c.id] || 0;
-    const nextTierLabel = getNextChallengerTierLabel(c, opponentChar);
+    // Arena Mode: Streak, 5-Streak Flame Effect, and Champion "最強" Status
+    const isArena = Boolean(gauntletState.arenaMode);
+    const streakCount = isArena ? gauntletState.streaks[c.id] || 0 : 0;
+    const isChampion = isArena && gauntletState.championCharId === c.id;
+    const hasFiveStreakFlame = isArena && (streakCount >= 5 || isChampion);
 
-    if (opponentChar) {
+    if (paneEl) {
+      paneEl.classList.toggle("is-five-streak-flame", hasFiveStreakFlame);
+      paneEl.classList.toggle("is-champion-pane", isChampion);
+    }
+
+    let powerStatusHtml = "";
+    const nextTierLabel = getNextChallengerTierLabel(c, opponentChar);
+    const nextPoolCount = getStrongerChallengerPool(c, opponentChar).length;
+
+    if (isArena && isChampion) {
+      powerStatusHtml = `
+        <div class="compare-duel-action-row is-champion-row">
+          <span class="duel-streak-pill is-blaze-streak">🔥🔥 ${streakCount} 連勝・制霸天梯巔峰</span>
+          <span class="duel-champion-pill">👑 已擊破現象級・天下無雙【最強】</span>
+          <button type="button" class="btn-end-arena-round sm" data-end-round="true">
+            <span>🏁 結束本輪</span>
+          </button>
+        </div>
+      `;
+    } else if (isArena && opponentChar) {
       const bothRanked = c.powerScore >= 0 && opponentChar.powerScore >= 0;
       const isWeaker = bothRanked && c.powerScore > opponentChar.powerScore;
       const isStronger = bothRanked && c.powerScore < opponentChar.powerScore;
@@ -1701,7 +1966,9 @@
       powerStatusHtml = `
         <div class="compare-duel-action-row">
           ${
-            streakCount > 0
+            streakCount >= 5
+              ? `<span class="duel-streak-pill is-blaze-streak">🔥🔥 ${streakCount} 連勝・烈焰霸主狀態！</span>`
+              : streakCount > 0
               ? `<span class="duel-streak-pill">🔥 ${streakCount} 連勝守擂中</span>`
               : ""
           }
@@ -1718,21 +1985,68 @@
             type="button"
             class="btn-ko-replace ${isWeaker ? "is-weaker-target" : "is-secondary-target"}"
             data-ko-side="${side}"
-            title="擊敗淘汰【${esc(c.name)}】，並自動派上比他強 1～2 階的下一位挑戰者（${esc(nextTierLabel)}）"
+            title="擊敗淘汰【${esc(c.name)}】，${nextPoolCount > 0 ? `自動派上（${esc(nextTierLabel)}）登場` : `對側角色將登頂【最強】`}"
           >
-            <span class="ko-btn-icon">${isWeaker ? "💥" : "⚔️"}</span>
+            <span class="ko-btn-icon">${nextPoolCount === 0 ? "👑" : isWeaker ? "💥" : "⚔️"}</span>
             <span class="ko-btn-text">${
-              isWeaker
+              nextPoolCount === 0
+                ? `幹掉最後強敵 ➜ 對側登頂【最強】！`
+                : isWeaker
                 ? `幹掉弱方敗者 ➜ 換【${esc(nextTierLabel)}】強敵登場`
                 : `擊敗換將 ➜ 換【${esc(nextTierLabel)}】登場`
             }</span>
           </button>
         </div>
       `;
+    } else if (isArena && streakCount > 0) {
+      powerStatusHtml = `
+        <div class="compare-duel-action-row">
+          <span class="duel-streak-pill ${streakCount >= 5 ? "is-blaze-streak" : ""}">
+            ${streakCount >= 5 ? `🔥🔥 ${streakCount} 連勝・烈焰霸主狀態！` : `🔥 ${streakCount} 連勝守擂中`}
+          </span>
+        </div>
+      `;
     }
 
     container.innerHTML = `
-      <article class="compare-dossier-card ${shouldAnimate ? "is-char-entering side-" + side : ""}" style="${attrCssVars}">
+      <article class="compare-dossier-card ${shouldAnimate ? "is-char-entering side-" + side : ""} ${hasFiveStreakFlame ? "is-five-streak-flame" : ""} ${isChampion ? "is-champion-card" : ""}" style="${attrCssVars}">
+        ${
+          hasFiveStreakFlame
+            ? `
+          <div class="five-streak-flame-overlay" aria-hidden="true">
+            <div class="flame-bottom-surge"></div>
+            <div class="flame-sparks">
+              <span class="f-spark s1"></span>
+              <span class="f-spark s2"></span>
+              <span class="f-spark s3"></span>
+              <span class="f-spark s4"></span>
+              <span class="f-spark s5"></span>
+            </div>
+          </div>`
+            : ""
+        }
+        ${
+          isChampion
+            ? `
+          <div class="champion-strongest-banner">
+            <div class="csb-left">
+              <span class="csb-crown">👑 SUPREME CHAMPION</span>
+              <span class="csb-title">殺穿現象級巔峰・世間已無對手！榮登亞雷利塔【最強】寶座！</span>
+            </div>
+            <button type="button" class="btn-end-arena-round sm" data-end-round="true">
+              <span>🏁 結束本輪</span>
+            </button>
+          </div>
+          <div class="champion-strongest-stamp" aria-label="天下無雙・最強印記">
+            <div class="strongest-seal-ring"></div>
+            <div class="strongest-seal-inner">
+              <span class="strongest-sub-top">UNRIVALED</span>
+              <span class="strongest-main-kanji">最強</span>
+              <span class="strongest-sub-bot">天下無雙</span>
+            </div>
+          </div>`
+            : ""
+        }
         ${
           arrivalInfo
             ? `
@@ -1772,6 +2086,7 @@
                   </a>`
                 : `<div class="avatar-lg-placeholder">❖</div>`
             }
+            ${isChampion ? `<span class="avatar-strongest-mini-seal">最強</span>` : ""}
           </div>
 
           <div class="compare-char-title-box">
@@ -1837,12 +2152,54 @@
         executeDefeatAndReplace(side);
       });
     }
+    container.querySelectorAll("[data-end-round]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        endCurrentArenaRound();
+      });
+    });
   }
 
-  // ==================== RENDER TACTICAL GAUNTLET / DEFEAT & NEXT CHALLENGER BAR ====================
+  // ==================== RENDER TACTICAL GAUNTLET / ARENA TOURNAMENT BAR ====================
   function renderVersusSummary(leftChar, rightChar) {
     const gauntletBar = document.getElementById("compareGauntletBar");
     if (!gauntletBar) return;
+
+    // When Arena Mode is switched OFF, hide the gauntlet bar completely
+    if (!gauntletState.arenaMode) {
+      gauntletBar.innerHTML = "";
+      gauntletBar.classList.add("is-hidden");
+      return;
+    }
+
+    // Champion "最強" Finale View in Gauntlet Bar
+    if (gauntletState.championCharId) {
+      const champChar = characters.find((c) => c.id === gauntletState.championCharId);
+      if (champChar) {
+        const champStreak = gauntletState.streaks[champChar.id] || 1;
+        const finalBoss = gauntletState.defeatedFinalBoss || { name: "現象級強敵", power: "現象級" };
+        gauntletBar.classList.remove("is-hidden");
+        gauntletBar.innerHTML = `
+          <div class="gauntlet-champion-finale-bar">
+            <div class="gcf-seal">最強</div>
+            <div class="gcf-info">
+              <div class="gcf-headline">
+                <span class="gcf-tag">👑 擂台賽模式・終極制霸</span>
+                <strong>【${formatCharacterDisplayName(champChar.name)}（${esc(champChar.power || "巔峰")}）】達成 ${champStreak} 連勝，連現象級【${esc(finalBoss.name)}】也徹底擊潰！</strong>
+              </div>
+              <div class="gcf-sub">世間已無任何更高階對手，特此烙印「天下無雙・最強」稱號！</div>
+            </div>
+            <div class="gcf-actions">
+              <button type="button" class="btn-end-arena-round" data-gauntlet-end-round="true">
+                <span>🏁 結束本輪（開啟新局）</span>
+              </button>
+            </div>
+          </div>
+        `;
+        const endBtn = gauntletBar.querySelector("[data-gauntlet-end-round]");
+        if (endBtn) endBtn.addEventListener("click", () => endCurrentArenaRound());
+        return;
+      }
+    }
 
     if (!leftChar || !rightChar) {
       gauntletBar.innerHTML = "";
@@ -1859,54 +2216,75 @@
 
     const leftStreak = gauntletState.streaks[leftChar.id] || 0;
     const rightStreak = gauntletState.streaks[rightChar.id] || 0;
+    const hasActiveRound = leftStreak > 0 || rightStreak > 0 || gauntletState.defeatedInRoundIds.size > 0;
 
     const leftNextTier = getNextChallengerTierLabel(leftChar, rightChar);
     const rightNextTier = getNextChallengerTierLabel(rightChar, leftChar);
+    const leftPoolLen = getStrongerChallengerPool(leftChar, rightChar).length;
+    const rightPoolLen = getStrongerChallengerPool(rightChar, leftChar).length;
 
     let centerActionHtml = "";
     if (leftStronger) {
       // Left is stronger, Right is weaker -> Primary action knocks out Right
       centerActionHtml = `
         <div class="gauntlet-verdict-tag">
-          <span>⚔️ 戰力判定：左方 <strong>${esc(leftChar.name)}（${esc(leftChar.power)}）</strong> 階級較高！</span>
+          <span>🏆 擂台賽模式｜左方 <strong>${esc(leftChar.name)}（${esc(leftChar.power)}）</strong> 階級較高！</span>
         </div>
         <div class="gauntlet-cta-group">
           <button type="button" class="gauntlet-ko-btn is-primary-ko" data-gauntlet-ko="right">
-            <span class="g-ko-icon">💥</span>
+            <span class="g-ko-icon">${rightPoolLen === 0 ? "👑" : "💥"}</span>
             <span class="g-ko-body">
               <strong>幹掉弱方【${esc(rightChar.name)}（${esc(rightChar.power)}）】</strong>
-              <small>➜ 召喚更強挑戰者（${esc(rightNextTier)}）登場對決</small>
+              <small>${
+                rightPoolLen === 0
+                  ? `➜ 已無更高階對手，擊敗即讓【${esc(leftChar.name)}】登頂【最強】！`
+                  : `➜ 召喚更強挑戰者（${esc(rightNextTier)}）登場對決`
+              }</small>
             </span>
           </button>
           <button type="button" class="gauntlet-ko-btn is-upset-ko" data-gauntlet-ko="left" title="逆轉幹掉強方【${esc(leftChar.name)}】，換上【${esc(leftNextTier)}】">
             <span>⚡ 逆轉淘汰左方</span>
           </button>
+          ${
+            hasActiveRound
+              ? `<button type="button" class="btn-end-arena-round sm" data-gauntlet-end-round="true" title="重置當前連勝與淘汰紀錄，結束本輪擂台賽">🏁 結束本輪</button>`
+              : ""
+          }
         </div>
       `;
     } else if (rightStronger) {
       // Right is stronger, Left is weaker -> Primary action knocks out Left
       centerActionHtml = `
         <div class="gauntlet-verdict-tag">
-          <span>⚔️ 戰力判定：右方 <strong>${esc(rightChar.name)}（${esc(rightChar.power)}）</strong> 階級較高！</span>
+          <span>🏆 擂台賽模式｜右方 <strong>${esc(rightChar.name)}（${esc(rightChar.power)}）</strong> 階級較高！</span>
         </div>
         <div class="gauntlet-cta-group">
           <button type="button" class="gauntlet-ko-btn is-primary-ko" data-gauntlet-ko="left">
-            <span class="g-ko-icon">💥</span>
+            <span class="g-ko-icon">${leftPoolLen === 0 ? "👑" : "💥"}</span>
             <span class="g-ko-body">
               <strong>幹掉弱方【${esc(leftChar.name)}（${esc(leftChar.power)}）】</strong>
-              <small>➜ 召喚更強挑戰者（${esc(leftNextTier)}）登場對決</small>
+              <small>${
+                leftPoolLen === 0
+                  ? `➜ 已無更高階對手，擊敗即讓【${esc(rightChar.name)}】登頂【最強】！`
+                  : `➜ 召喚更強挑戰者（${esc(leftNextTier)}）登場對決`
+              }</small>
             </span>
           </button>
           <button type="button" class="gauntlet-ko-btn is-upset-ko" data-gauntlet-ko="right" title="逆轉幹掉強方【${esc(rightChar.name)}】，換上【${esc(rightNextTier)}】">
             <span>⚡ 逆轉淘汰右方</span>
           </button>
+          ${
+            hasActiveRound
+              ? `<button type="button" class="btn-end-arena-round sm" data-gauntlet-end-round="true" title="重置當前連勝與淘汰紀錄，結束本輪擂台賽">🏁 結束本輪</button>`
+              : ""
+          }
         </div>
       `;
     } else {
       // Equal power tier or unranked -> Both can be knocked out equally
       centerActionHtml = `
         <div class="gauntlet-verdict-tag">
-          <span>⚖️ ${
+          <span>⚖️ 擂台賽模式｜${
             isEqual
               ? `雙方同為 <strong>${esc(leftChar.power)}</strong> 勢均力敵！選擇要幹掉哪一方以召喚更強挑戰者：`
               : `選擇要淘汰哪一方，並召喚更高階挑戰者登場：`
@@ -1914,19 +2292,24 @@
         </div>
         <div class="gauntlet-cta-group is-dual-equal">
           <button type="button" class="gauntlet-ko-btn is-primary-ko" data-gauntlet-ko="left">
-            <span class="g-ko-icon">💥</span>
+            <span class="g-ko-icon">${leftPoolLen === 0 ? "👑" : "💥"}</span>
             <span class="g-ko-body">
               <strong>幹掉左方【${esc(leftChar.name)}】</strong>
-              <small>➜ 換上（${esc(leftNextTier)}）</small>
+              <small>${leftPoolLen === 0 ? "➜ 右方登頂【最強】！" : `➜ 換上（${esc(leftNextTier)}）`}</small>
             </span>
           </button>
           <button type="button" class="gauntlet-ko-btn is-primary-ko" data-gauntlet-ko="right">
-            <span class="g-ko-icon">💥</span>
+            <span class="g-ko-icon">${rightPoolLen === 0 ? "👑" : "💥"}</span>
             <span class="g-ko-body">
               <strong>幹掉右方【${esc(rightChar.name)}】</strong>
-              <small>➜ 換上（${esc(rightNextTier)}）</small>
+              <small>${rightPoolLen === 0 ? "➜ 左方登頂【最強】！" : `➜ 換上（${esc(rightNextTier)}）`}</small>
             </span>
           </button>
+          ${
+            hasActiveRound
+              ? `<button type="button" class="btn-end-arena-round sm" data-gauntlet-end-round="true" title="重置當前連勝與淘汰紀錄，結束本輪擂台賽">🏁 結束本輪</button>`
+              : ""
+          }
         </div>
       `;
     }
@@ -1935,21 +2318,37 @@
     const logHtml = log
       ? `
       <div class="gauntlet-battle-log">
-        <span class="log-badge">📢 連戰快報</span>
+        <span class="log-badge">📢 擂台快報</span>
         <span class="log-text">
           <strong>${esc(log.winnerName)}</strong> 擊敗了 <em>${esc(log.loserName)}（${esc(log.loserPower)}）</em>！
-          ${log.streak >= 2 ? `<b class="log-streak">🔥 達成 ${log.streak} 連勝！</b>` : ""}
-          全新強敵 <strong>${esc(log.nextName)}（${esc(log.nextPower)}）</strong> 已切入${log.loserSide === "left" ? "左側" : "右側"}戰場！
+          ${
+            log.streak >= 5
+              ? `<b class="log-streak is-five-fire">🔥🔥 達成 ${log.streak} 連勝（烈焰霸主領域全開）！</b>`
+              : log.streak >= 2
+              ? `<b class="log-streak">🔥 達成 ${log.streak} 連勝！</b>`
+              : ""
+          }
+          ${
+            log.nextName
+              ? `全新強敵 <strong>${esc(log.nextName)}（${esc(log.nextPower)}）</strong> 已切入${log.loserSide === "left" ? "左側" : "右側"}戰場！`
+              : ""
+          }
         </span>
       </div>`
       : "";
 
     gauntletBar.innerHTML = `
       <div class="gauntlet-bar-inner">
-        <div class="gauntlet-fighter fighter-left ${leftStronger ? "is-dominant" : rightStronger ? "is-underdog" : "is-even"}">
+        <div class="gauntlet-fighter fighter-left ${leftStronger ? "is-dominant" : rightStronger ? "is-underdog" : "is-even"} ${leftStreak >= 5 ? "is-fighter-on-fire" : ""}">
           <div class="gf-top">
             <span class="gf-slot">LEFT // 角色 A</span>
-            ${leftStreak > 0 ? `<span class="gf-streak">🔥 ${leftStreak} 連勝</span>` : ""}
+            ${
+              leftStreak >= 5
+                ? `<span class="gf-streak is-fire-five">🔥🔥 ${leftStreak} 連勝・烈焰</span>`
+                : leftStreak > 0
+                ? `<span class="gf-streak">🔥 ${leftStreak} 連勝</span>`
+                : ""
+            }
             ${leftStronger ? `<span class="gf-crown">👑 強方</span>` : rightStronger ? `<span class="gf-skull">💀 弱方</span>` : `<span class="gf-even">⚖️ 平手</span>`}
           </div>
           <div class="gf-name">${formatCharacterDisplayName(leftChar.name)}</div>
@@ -1960,10 +2359,16 @@
           ${centerActionHtml}
         </div>
 
-        <div class="gauntlet-fighter fighter-right ${rightStronger ? "is-dominant" : leftStronger ? "is-underdog" : "is-even"}">
+        <div class="gauntlet-fighter fighter-right ${rightStronger ? "is-dominant" : leftStronger ? "is-underdog" : "is-even"} ${rightStreak >= 5 ? "is-fighter-on-fire" : ""}">
           <div class="gf-top">
             <span class="gf-slot">RIGHT // 角色 B</span>
-            ${rightStreak > 0 ? `<span class="gf-streak">🔥 ${rightStreak} 連勝</span>` : ""}
+            ${
+              rightStreak >= 5
+                ? `<span class="gf-streak is-fire-five">🔥🔥 ${rightStreak} 連勝・烈焰</span>`
+                : rightStreak > 0
+                ? `<span class="gf-streak">🔥 ${rightStreak} 連勝</span>`
+                : ""
+            }
             ${rightStronger ? `<span class="gf-crown">👑 強方</span>` : leftStronger ? `<span class="gf-skull">💀 弱方</span>` : `<span class="gf-even">⚖️ 平手</span>`}
           </div>
           <div class="gf-name">${formatCharacterDisplayName(rightChar.name)}</div>
@@ -1979,6 +2384,12 @@
         if (koSide === "left" || koSide === "right") {
           executeDefeatAndReplace(koSide);
         }
+      });
+    });
+
+    gauntletBar.querySelectorAll("[data-gauntlet-end-round]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        endCurrentArenaRound();
       });
     });
   }
@@ -2091,6 +2502,9 @@
           compareState.rightCharId = "";
           compareState.rightPickerOpen = true;
         }
+        if (gauntletState.championSide === side) {
+          resetArenaRoundState();
+        }
         syncUrlAndStorage();
         updatePickerVisibility();
         renderAllComparisonViews();
@@ -2130,12 +2544,24 @@
   }
 
   function initHeaderActions() {
+    const arenaToggleBtn = document.getElementById("btnToggleArenaMode");
+    if (arenaToggleBtn) {
+      arenaToggleBtn.addEventListener("click", () => {
+        setArenaMode(!gauntletState.arenaMode);
+      });
+    }
+
     const swapBtn = document.getElementById("btnSwapChars");
     if (swapBtn) {
       swapBtn.addEventListener("click", () => {
         const tmp = compareState.leftCharId;
         compareState.leftCharId = compareState.rightCharId;
         compareState.rightCharId = tmp;
+        if (gauntletState.championSide === "left") {
+          gauntletState.championSide = "right";
+        } else if (gauntletState.championSide === "right") {
+          gauntletState.championSide = "left";
+        }
         forceSelectAnim.left = Boolean(compareState.leftCharId);
         forceSelectAnim.right = Boolean(compareState.rightCharId);
         syncUrlAndStorage();
@@ -2150,9 +2576,7 @@
         compareState.rightCharId = "";
         compareState.leftPickerOpen = true;
         compareState.rightPickerOpen = true;
-        gauntletState.lastBattleLog = null;
-        gauntletState.challengerArrival = { left: null, right: null };
-        gauntletState.streaks = {};
+        resetArenaRoundState();
         syncUrlAndStorage();
         updatePickerVisibility();
         renderAllComparisonViews();
@@ -2166,9 +2590,7 @@
       compareState.rightPickerOpen = false;
       forceSelectAnim.left = true;
       forceSelectAnim.right = true;
-      gauntletState.lastBattleLog = null;
-      gauntletState.challengerArrival = { left: null, right: null };
-      gauntletState.streaks = {};
+      resetArenaRoundState();
       syncUrlAndStorage();
       updatePickerVisibility();
       renderAllComparisonViews();
@@ -2288,6 +2710,7 @@
 
   // Boot Comparison Page
   applyCompareTheme(compareState.theme);
+  syncArenaModeToggleUI();
   initSelectedCharacters();
   initStaticFilterSelects("left");
   initStaticFilterSelects("right");
