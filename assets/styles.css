@@ -7914,8 +7914,10 @@ body.compare-page-body {
   color: var(--text-muted);
 }
 
-.pool-tier-pill.tier-lv-7 { border-color: rgba(232, 121, 249, 0.7); background: rgba(232, 121, 249, 0.12); }
-.pool-tier-pill.tier-lv-7 b { color: #f5d0fe; text-shadow: 0 0 8px #e879f9; }
+.pool-tier-pill.tier-lv-8 { border-color: rgba(239, 68, 68, 0.85); background: rgba(239, 68, 68, 0.16); }
+.pool-tier-pill.tier-lv-8 b { color: #fca5a5; text-shadow: 0 0 10px #ef4444; }
+.pool-tier-pill.tier-lv-7 { border-color: rgba(251, 191, 36, 0.85); background: rgba(239, 68, 68, 0.18); }
+.pool-tier-pill.tier-lv-7 b { color: #fde047; text-shadow: 0 0 8px #f59e0b; }
 .pool-tier-pill.tier-lv-6 b { color: #fef08a; text-shadow: 0 0 6px #f43f5e; }
 .pool-tier-pill.tier-lv-5 b { color: #fde047; }
 .pool-tier-pill.tier-lv-4 b { color: #fb923c; }
@@ -8285,7 +8287,23 @@ body.compare-page-body {
   );
 }
 .summon-stage-viewport[data-tier="tier-7"] .cinematic-pillar-beam {
-  width: 450px;
+  width: 420px;
+  opacity: 1;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #450a0a 12%,
+    #dc2626 28%,
+    #fbbf24 45%,
+    #fef08a 50%,
+    #fbbf24 55%,
+    #dc2626 72%,
+    #450a0a 88%,
+    transparent 100%
+  );
+}
+.summon-stage-viewport[data-tier="tier-8"] .cinematic-pillar-beam {
+  width: 460px;
   opacity: 1;
   background: linear-gradient(
     90deg,
@@ -8538,12 +8556,14 @@ body.compare-page-body {
 /* Faster spin for higher tiers */
 .summon-stage-viewport[data-tier="tier-5"] .ritual-svg.r-outer,
 .summon-stage-viewport[data-tier="tier-6"] .ritual-svg.r-outer,
-.summon-stage-viewport[data-tier="tier-7"] .ritual-svg.r-outer {
+.summon-stage-viewport[data-tier="tier-7"] .ritual-svg.r-outer,
+.summon-stage-viewport[data-tier="tier-8"] .ritual-svg.r-outer {
   animation-duration: 1.8s;
 }
 .summon-stage-viewport[data-tier="tier-5"] .ritual-svg.r-mid,
 .summon-stage-viewport[data-tier="tier-6"] .ritual-svg.r-mid,
-.summon-stage-viewport[data-tier="tier-7"] .ritual-svg.r-mid {
+.summon-stage-viewport[data-tier="tier-7"] .ritual-svg.r-mid,
+.summon-stage-viewport[data-tier="tier-8"] .ritual-svg.r-mid {
   animation-duration: 1.2s;
 }
 
@@ -8874,9 +8894,13 @@ body.compare-page-body {
   animation: compareTitleSlidePop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.summon-reveal-card.tier-card-lv-7 {
+.summon-reveal-card.tier-card-lv-8 {
   border-color: #ef4444;
-  box-shadow: 0 0 40px rgba(220, 38, 38, 0.65), 0 0 20px rgba(147, 51, 234, 0.45), inset 0 0 26px rgba(127, 29, 29, 0.35);
+  box-shadow: 0 0 42px rgba(220, 38, 38, 0.72), 0 0 24px rgba(147, 51, 234, 0.52), inset 0 0 28px rgba(127, 29, 29, 0.42);
+}
+.summon-reveal-card.tier-card-lv-7 {
+  border-color: #f59e0b;
+  box-shadow: 0 0 36px rgba(239, 68, 68, 0.65), 0 0 22px rgba(245, 158, 11, 0.48), inset 0 0 24px rgba(180, 83, 9, 0.32);
 }
 .summon-reveal-card.tier-card-lv-6 {
   border-color: #fde047;
@@ -8928,10 +8952,15 @@ body.compare-page-body {
   color: #ffffff;
 }
 
-.tier-badge-lv-7 {
+.tier-badge-lv-8 {
   background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 48%, #581c87 100%);
   border: 1.5px solid #fca5a5;
   box-shadow: 0 0 16px rgba(239, 68, 68, 0.78);
+}
+.tier-badge-lv-7 {
+  background: linear-gradient(135deg, #991b1b 0%, #dc2626 45%, #d97706 100%);
+  border: 1.5px solid #fde047;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.78);
 }
 .tier-badge-lv-6 {
   background: linear-gradient(135deg, #e11d48 0%, #d97706 48%, #7c3aed 100%);
@@ -9304,7 +9333,8 @@ body.compare-page-body {
   background: var(--accent-gold-soft);
 }
 
-.ten-mini-card.tier-mini-lv-7 { border-color: #ef4444; box-shadow: 0 0 16px rgba(239, 68, 68, 0.72); }
+.ten-mini-card.tier-mini-lv-8 { border-color: #ef4444; box-shadow: 0 0 16px rgba(239, 68, 68, 0.72); }
+.ten-mini-card.tier-mini-lv-7 { border-color: #f59e0b; box-shadow: 0 0 14px rgba(245, 158, 11, 0.65); }
 .ten-mini-card.tier-mini-lv-6 { border-color: #fde047; box-shadow: 0 0 12px rgba(250, 204, 21, 0.45); }
 .ten-mini-card.tier-mini-lv-5 { border-color: #fbbf24; }
 .ten-mini-card.tier-mini-lv-4 { border-color: #fb923c; }
@@ -9420,7 +9450,8 @@ body.compare-page-body {
   transform: translateY(-1px);
 }
 
-.history-char-pill.tier-pill-lv-7 { border-color: #ef4444; background: rgba(127, 29, 29, 0.42); }
+.history-char-pill.tier-pill-lv-8 { border-color: #ef4444; background: rgba(127, 29, 29, 0.42); }
+.history-char-pill.tier-pill-lv-7 { border-color: #f59e0b; background: rgba(180, 83, 9, 0.28); }
 .history-char-pill.tier-pill-lv-6 { border-color: #fde047; background: rgba(234, 179, 8, 0.18); }
 .history-char-pill.tier-pill-lv-5 { border-color: #fbbf24; }
 .history-char-pill.tier-pill-lv-4 { border-color: #fb923c; }
@@ -9449,8 +9480,8 @@ body.compare-page-body {
 .tier-guide-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(2, 6, 23, 0.78);
-  backdrop-filter: blur(6px);
+  background: rgba(2, 6, 23, 0.85);
+  contain: strict;
 }
 
 .tier-guide-dialog {
@@ -9460,11 +9491,15 @@ body.compare-page-body {
   width: 100%;
   max-height: 86vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-md);
   border: 1.5px solid var(--border-gold);
   background: var(--bg-surface);
   box-shadow: var(--shadow-card);
   padding: 1.35rem 1.5rem;
+  contain: layout paint;
+  transform: translateZ(0);
+  will-change: scroll-position;
 }
 
 .tier-guide-header {
@@ -9512,6 +9547,7 @@ body.compare-page-body {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+  contain: content;
 }
 
 .tgc-top {
@@ -9620,6 +9656,17 @@ body.compare-page-body {
   color: #ffffff;
 }
 
+.tgc-preview-btn.is-hecate-btn {
+  border-color: rgba(249, 115, 22, 0.85);
+  background: linear-gradient(90deg, #180502, #3b1206 55%, #180502);
+  color: #fdba74;
+}
+.tgc-preview-btn.is-hecate-btn:hover {
+  background: linear-gradient(90deg, #c2410c, #ea580c);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.6);
+}
+
 .summon-screen-flash.is-abyss-flash {
   background: radial-gradient(circle, #c084fc 0%, #6b21a8 45%, #02000d 100%);
 }
@@ -9666,4 +9713,772 @@ body.compare-page-body {
   .tier-guide-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==================== SUMMON VOLUME CONTROLLER ==================== */
+.summon-volume-ctrl-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.2rem 0.6rem 0.2rem 0.35rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-surface-2, rgba(15, 23, 42, 0.65));
+  border: 1px solid var(--border-gold, rgba(217, 119, 6, 0.35));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.summon-volume-ctrl-group:hover,
+.summon-volume-ctrl-group:focus-within {
+  border-color: var(--accent-gold, #f59e0b);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+}
+
+.summon-vol-mute-btn {
+  padding: 0.3rem 0.55rem !important;
+  font-size: 0.85rem !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.summon-vol-mute-btn:hover {
+  filter: brightness(1.2);
+}
+
+.summon-vol-quick-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary, #cbd5e1);
+}
+
+.summon-vol-slider-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.summon-vol-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 78px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.summon-vol-slider:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.summon-vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-gold, #f59e0b);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.summon-vol-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  background: #fbbf24;
+}
+
+.summon-vol-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-gold, #f59e0b);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+  border: none;
+  cursor: pointer;
+}
+
+.summon-vol-label {
+  display: inline-block;
+  min-width: 36px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: monospace, var(--font-family);
+  color: var(--accent-gold, #f59e0b);
+  text-align: right;
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .summon-vol-slider {
+    width: 60px;
+  }
+  .summon-vol-quick-text {
+    display: none;
+  }
+}
+
+
+/* ==================== 黑卡蒂 拉普拉斯 專屬召喚演出：死亡・橘黑冥焰・命運絲線 (is-hecate-death) ==================== */
+/* 完全移除所有通用光柱 / 藍黃光環 / 通用法陣，只保留黑卡蒂專屬畫面 */
+.summon-stage-viewport.is-hecate-death .cinematic-pillar-beam,
+.summon-stage-viewport.is-hecate-death .cinematic-sky-glow,
+.summon-stage-viewport.is-hecate-death .cinematic-floor-halo,
+.summon-stage-viewport.is-hecate-death .cinematic-abyss-overlay,
+.summon-stage-viewport.is-hecate-death .ritual-shockwave,
+.summon-stage-viewport.is-hecate-death .ritual-svg {
+  display: none !important;
+  animation: none !important;
+}
+
+.summon-stage-viewport.is-hecate-death {
+  border-color: rgba(249, 115, 22, 0.75);
+  box-shadow: 0 0 32px rgba(234, 88, 12, 0.35), inset 0 0 60px rgba(0, 0, 0, 0.9);
+}
+
+/* 大字上下的線條改為「命運絲線」：細、淡橘白、帶黑邊 */
+.summon-stage-viewport.is-hecate-death .impact-slash-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(251, 146, 60, 0.2) 10%,
+    #fed7aa 50%,
+    rgba(251, 146, 60, 0.2) 90%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.9), 0 0 2px #000000;
+}
+
+.summon-stage-viewport.is-hecate-death .impact-big-text {
+  color: #fff7ed;
+  text-shadow:
+    0 0 4px #000000,
+    0 0 16px #f97316,
+    0 0 34px #c2410c,
+    0 0 62px #000000,
+    0 5px 18px #000000;
+}
+
+/* 中央卡牌：漆黑卡身 + 橘焰邊框 */
+.summon-stage-viewport.is-hecate-death .card-3d-inner {
+  border-color: #f97316;
+  background: radial-gradient(circle at 50% 38%, #3b1206 0%, #0c0402 62%, #000000 100%);
+  box-shadow: 0 0 26px rgba(249, 115, 22, 0.8), 0 0 60px rgba(0, 0, 0, 0.95), inset 0 0 20px rgba(0, 0, 0, 0.95);
+}
+
+.summon-stage-viewport.is-hecate-death .card-3d-emblem {
+  color: #fdba74;
+  text-shadow: 0 0 10px #f97316, 0 0 22px #000000;
+}
+
+.summon-stage-viewport.is-hecate-death .card-3d-tier {
+  color: #fed7aa;
+  text-shadow: 0 0 8px #ea580c;
+}
+
+/* 揭曉閃光：橘焰 → 漆黑 */
+.summon-screen-flash.is-hecate-flash {
+  background: radial-gradient(circle, #fed7aa 0%, #f97316 28%, #431407 55%, #000000 100%);
+}
+
+
+/* ==================== 暗 斯卡奇 專屬召喚演出：霸王之暗・黑色暴君・萬影臣服 (is-skadi-darkness) ==================== */
+/* 徹底移除所有通用光柱 / 藍黃光環 / 通用法陣，完全由霸王之暗領域主宰 */
+.summon-stage-viewport.is-skadi-darkness .cinematic-pillar-beam,
+.summon-stage-viewport.is-skadi-darkness .cinematic-sky-glow,
+.summon-stage-viewport.is-skadi-darkness .cinematic-floor-halo,
+.summon-stage-viewport.is-skadi-darkness .cinematic-abyss-overlay,
+.summon-stage-viewport.is-skadi-darkness .ritual-shockwave,
+.summon-stage-viewport.is-skadi-darkness .ritual-svg {
+  display: none !important;
+  animation: none !important;
+}
+
+.summon-stage-viewport.is-skadi-darkness {
+  border-color: rgba(147, 51, 234, 0.85);
+  box-shadow: 0 0 36px rgba(107, 33, 168, 0.45), inset 0 0 70px rgba(0, 0, 0, 0.95);
+  background: #010003 !important;
+}
+
+/* 霸王威壓大字上下線條：深紫黑耀金屬質感，蘊含黑雷跳動 */
+.summon-stage-viewport.is-skadi-darkness .impact-slash-line {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(147, 51, 234, 0.3) 12%,
+    #d8b4fe 50%,
+    rgba(147, 51, 234, 0.3) 88%,
+    transparent 100%
+  );
+  box-shadow: 0 0 12px rgba(147, 51, 234, 0.9), 0 0 4px #000000;
+}
+
+.summon-stage-viewport.is-skadi-darkness .impact-big-text {
+  color: #faf5ff;
+  text-shadow:
+    0 0 4px #000000,
+    0 0 18px #a855f7,
+    0 0 38px #7e22ce,
+    0 0 70px #000000,
+    0 5px 20px #000000;
+}
+
+/* 中央卡牌：霸王黑曜石卡身 + 暴君紫金邊框 */
+.summon-stage-viewport.is-skadi-darkness .card-3d-inner {
+  border-color: #a855f7;
+  background: radial-gradient(circle at 50% 35%, #2e1065 0%, #090114 65%, #000000 100%);
+  box-shadow: 0 0 32px rgba(147, 51, 234, 0.85), 0 0 70px rgba(0, 0, 0, 0.95), inset 0 0 24px rgba(0, 0, 0, 0.95);
+}
+
+.summon-stage-viewport.is-skadi-darkness .card-3d-emblem {
+  color: #e9d5ff;
+  text-shadow: 0 0 14px #a855f7, 0 0 24px #000000;
+}
+
+.summon-stage-viewport.is-skadi-darkness .card-3d-tier {
+  color: #c084fc;
+  text-shadow: 0 0 10px #7e22ce;
+}
+
+/* 揭曉閃光：暴君黑紫脈衝 → 漆黑 */
+.summon-screen-flash.is-skadi-flash {
+  background: radial-gradient(circle, #f3e8ff 0%, #9333ea 32%, #1e082b 62%, #000000 100%);
+}
+
+.tgc-preview-btn.is-skadi-btn {
+  border-color: rgba(168, 85, 247, 0.85);
+  background: linear-gradient(90deg, #13031f, #2e1065 55%, #13031f);
+  color: #e9d5ff;
+}
+.tgc-preview-btn.is-skadi-btn:hover {
+  background: linear-gradient(90deg, #581c87, #7e22ce);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.65);
+}
+
+/* ==================== Legend 稀有度星星：六顆黑星（深邃黑曜金屬星 ＋ 滅世深紅熾焰外輪廓） ==================== */
+.legend-black-stars,
+.tier-card-lv-7 .scr-stars,
+.tier-card-lv-7 .tgc-stars-span,
+.summon-reveal-card.tier-card-lv-7 .scr-stars {
+  color: #030303 !important;
+  text-shadow:
+    0 0 2px #ef4444,
+    0 0 7px rgba(239, 68, 68, 0.95),
+    0 0 14px rgba(245, 158, 11, 0.8),
+    0 0 22px rgba(185, 28, 28, 0.65) !important;
+  -webkit-text-stroke: 1.3px #dc2626;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+/* ==================== 伊格那利昂 加拉爾 專屬召喚演出：熊熊聖火與帝國 (is-ignalion-holyfire) ==================== */
+/* 徹底移除所有通用光柱 / 藍黃光環 / 通用法陣，完全由聖火與加拉爾帝國王道主宰 */
+.summon-stage-viewport.is-ignalion-holyfire .cinematic-pillar-beam,
+.summon-stage-viewport.is-ignalion-holyfire .cinematic-sky-glow,
+.summon-stage-viewport.is-ignalion-holyfire .cinematic-floor-halo,
+.summon-stage-viewport.is-ignalion-holyfire .cinematic-abyss-overlay,
+.summon-stage-viewport.is-ignalion-holyfire .ritual-shockwave,
+.summon-stage-viewport.is-ignalion-holyfire .ritual-svg {
+  display: none !important;
+  animation: none !important;
+}
+
+.summon-stage-viewport.is-ignalion-holyfire {
+  border-color: rgba(245, 158, 11, 0.9);
+  box-shadow: 0 0 42px rgba(220, 38, 38, 0.58), inset 0 0 75px rgba(25, 6, 2, 0.98);
+  background: radial-gradient(circle at 50% 50%, #200802 0%, #0d0301 60%, #020100 100%) !important;
+}
+
+/* 帝國大字橫線：聖火白金色與帝國軍旗赤金色 */
+.summon-stage-viewport.is-ignalion-holyfire .impact-slash-line {
+  height: 2.5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(220, 38, 38, 0.4) 12%,
+    #fef08a 45%,
+    #ffffff 50%,
+    #fef08a 55%,
+    rgba(220, 38, 38, 0.4) 88%,
+    transparent 100%
+  );
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.95), 0 0 6px #ffffff;
+}
+
+.summon-stage-viewport.is-ignalion-holyfire .impact-big-text {
+  color: #fffbeb;
+  text-shadow:
+    0 0 6px #ffffff,
+    0 0 18px #f59e0b,
+    0 0 38px #dc2626,
+    0 0 70px #7f1d1d,
+    0 6px 24px rgba(0, 0, 0, 0.95);
+}
+
+/* 中央卡牌：加拉爾帝國赤金軍裝質感 + 聖火燃紋 */
+.summon-stage-viewport.is-ignalion-holyfire .card-3d-inner {
+  border-color: #f59e0b;
+  background: radial-gradient(circle at 50% 30%, #450a0a 0%, #1c0502 65%, #050100 100%);
+  box-shadow: 0 0 34px rgba(245, 158, 11, 0.88), 0 0 68px rgba(220, 38, 38, 0.75), inset 0 0 22px rgba(254, 240, 138, 0.25);
+}
+
+.summon-stage-viewport.is-ignalion-holyfire .card-3d-emblem {
+  color: #fef08a;
+  text-shadow: 0 0 14px #f59e0b, 0 0 28px #dc2626;
+}
+
+.summon-stage-viewport.is-ignalion-holyfire .card-3d-tier {
+  color: #fbbf24;
+  text-shadow: 0 0 12px #ea580c;
+}
+
+/* 揭曉爆閃：帝國聖火純白灼熱 → 金紅聖炎 */
+.summon-screen-flash.is-ignalion-flash {
+  background: radial-gradient(circle, #ffffff 0%, #fef08a 25%, #f59e0b 55%, #7f1d1d 85%, #0a0201 100%);
+}
+
+.tgc-preview-btn.is-ignalion-btn {
+  border-color: rgba(245, 158, 11, 0.9);
+  background: linear-gradient(90deg, #240904, #450a0a 55%, #240904);
+  color: #fef08a;
+}
+.tgc-preview-btn.is-ignalion-btn:hover {
+  background: linear-gradient(90deg, #7f1d1d, #b45309);
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.7);
+}
+
+/* ==================== 沃利爾 德瑪 專屬召喚演出：戰爭與競技場 (is-warrior-arena) ==================== */
+/* 徹底移除所有通用光柱 / 藍黃光環 / 通用法陣，完全由古羅馬血沙競技場與戰神之器主宰 */
+.summon-stage-viewport.is-warrior-arena .cinematic-pillar-beam,
+.summon-stage-viewport.is-warrior-arena .cinematic-sky-glow,
+.summon-stage-viewport.is-warrior-arena .cinematic-floor-halo,
+.summon-stage-viewport.is-warrior-arena .cinematic-abyss-overlay,
+.summon-stage-viewport.is-warrior-arena .ritual-shockwave,
+.summon-stage-viewport.is-warrior-arena .ritual-svg {
+  display: none !important;
+  animation: none !important;
+}
+
+.summon-stage-viewport.is-warrior-arena {
+  border-color: rgba(234, 88, 12, 0.9);
+  box-shadow: 0 0 42px rgba(185, 28, 28, 0.65), inset 0 0 80px rgba(20, 4, 2, 0.98);
+  background: radial-gradient(circle at 50% 50%, #2a0b05 0%, #170502 58%, #080100 100%) !important;
+}
+
+/* 競技場戰意大字橫線：冷血鋼刃與血漬古銅光澤 */
+.summon-stage-viewport.is-warrior-arena .impact-slash-line {
+  height: 2.5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(185, 28, 28, 0.4) 10%,
+    #fdba74 42%,
+    #ffffff 50%,
+    #fdba74 58%,
+    rgba(185, 28, 28, 0.4) 90%,
+    transparent 100%
+  );
+  box-shadow: 0 0 18px rgba(234, 88, 12, 0.95), 0 0 5px #ffffff;
+}
+
+.summon-stage-viewport.is-warrior-arena .impact-big-text {
+  color: #fff7ed;
+  text-shadow:
+    0 0 6px #ffffff,
+    0 0 18px #ea580c,
+    0 0 38px #b91c1c,
+    0 0 75px #7f1d1d,
+    0 6px 24px rgba(0, 0, 0, 0.96);
+}
+
+/* 中央卡牌：古銅與血銹戰鎧鋼甲 + 阿瑞斯紅蓮戰刃印記 */
+.summon-stage-viewport.is-warrior-arena .card-3d-inner {
+  border-color: #ea580c;
+  background: radial-gradient(circle at 50% 28%, #4a1205 0%, #1f0702 65%, #050100 100%);
+  box-shadow: 0 0 36px rgba(234, 88, 12, 0.88), 0 0 70px rgba(185, 28, 28, 0.78), inset 0 0 24px rgba(253, 186, 116, 0.25);
+}
+
+.summon-stage-viewport.is-warrior-arena .card-3d-emblem {
+  color: #fdba74;
+  text-shadow: 0 0 14px #ea580c, 0 0 30px #b91c1c;
+}
+
+.summon-stage-viewport.is-warrior-arena .card-3d-tier {
+  color: #fb923c;
+  text-shadow: 0 0 12px #c2410c;
+}
+
+/* 揭曉爆閃：競技場血戰衝天火光 → 戰神紅蓮血霧 */
+.summon-screen-flash.is-warrior-flash {
+  background: radial-gradient(circle, #ffffff 0%, #fed7aa 25%, #ea580c 52%, #7f1d1d 82%, #180301 100%);
+}
+
+.tgc-preview-btn.is-warrior-btn {
+  border-color: rgba(234, 88, 12, 0.9);
+  background: linear-gradient(90deg, #260a04, #4a1306 55%, #260a04);
+  color: #fdba74;
+}
+.tgc-preview-btn.is-warrior-btn:hover {
+  background: linear-gradient(90deg, #9a3412, #c2410c);
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(234, 88, 12, 0.7);
+}
+
+/* ==================== 別西卜 阿斯拉 撒旦 專屬召喚演出：群蠅與血紅暴虐 (is-beelzebub-swarm) ==================== */
+/* 徹底移除所有通用光柱 / 藍黃光環 / 通用法陣，完全由萬千群蠅與血紅暴虐魔神之域主宰 */
+.summon-stage-viewport.is-beelzebub-swarm .cinematic-pillar-beam,
+.summon-stage-viewport.is-beelzebub-swarm .cinematic-sky-glow,
+.summon-stage-viewport.is-beelzebub-swarm .cinematic-floor-halo,
+.summon-stage-viewport.is-beelzebub-swarm .cinematic-abyss-overlay,
+.summon-stage-viewport.is-beelzebub-swarm .ritual-shockwave,
+.summon-stage-viewport.is-beelzebub-swarm .ritual-svg {
+  display: none !important;
+  animation: none !important;
+}
+
+.summon-stage-viewport.is-beelzebub-swarm {
+  border-color: rgba(220, 38, 38, 0.95);
+  box-shadow: 0 0 46px rgba(185, 28, 28, 0.85), inset 0 0 90px rgba(69, 10, 10, 0.98);
+  background: radial-gradient(circle at 50% 50%, #380608 0%, #1a0304 55%, #050001 100%) !important;
+}
+
+/* 暴食魔神大字橫線：猩紅撕裂血槽與暴虐刀芒 */
+.summon-stage-viewport.is-beelzebub-swarm .impact-slash-line {
+  height: 2.8px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(220, 38, 38, 0.5) 12%,
+    #fca5a5 42%,
+    #ffffff 50%,
+    #fca5a5 58%,
+    rgba(220, 38, 38, 0.5) 88%,
+    transparent 100%
+  );
+  box-shadow: 0 0 22px rgba(239, 68, 68, 0.95), 0 0 6px #ffffff;
+}
+
+.summon-stage-viewport.is-beelzebub-swarm .impact-big-text {
+  color: #fff1f2;
+  text-shadow:
+    0 0 6px #ffffff,
+    0 0 18px #ef4444,
+    0 0 42px #dc2626,
+    0 0 85px #7f1d1d,
+    0 6px 26px rgba(0, 0, 0, 0.98);
+}
+
+/* 中央卡牌：血紅屠戮魔神之刃 + 蒼蠅之王印記 */
+.summon-stage-viewport.is-beelzebub-swarm .card-3d-inner {
+  border-color: #dc2626;
+  background: radial-gradient(circle at 50% 28%, #5a0c0e 0%, #220305 65%, #080001 100%);
+  box-shadow: 0 0 42px rgba(239, 68, 68, 0.92), 0 0 80px rgba(185, 28, 28, 0.85), inset 0 0 26px rgba(254, 202, 202, 0.28);
+}
+
+.summon-stage-viewport.is-beelzebub-swarm .card-3d-emblem {
+  color: #fca5a5;
+  text-shadow: 0 0 16px #ef4444, 0 0 35px #991b1b;
+}
+
+.summon-stage-viewport.is-beelzebub-swarm .card-3d-tier {
+  color: #f87171;
+  text-shadow: 0 0 14px #b91c1c;
+}
+
+/* 揭曉爆閃：暴食血紅衝天暴虐爆閃 */
+.summon-screen-flash.is-beelzebub-flash {
+  background: radial-gradient(circle, #ffffff 0%, #fecaca 20%, #ef4444 50%, #7f1d1d 80%, #1a0204 100%);
+}
+
+.tgc-preview-btn.is-beelzebub-btn {
+  border-color: rgba(220, 38, 38, 0.92);
+  background: linear-gradient(90deg, #2b0507, #5c0b10 55%, #2b0507);
+  color: #fecaca;
+}
+.tgc-preview-btn.is-beelzebub-btn:hover {
+  background: linear-gradient(90deg, #991b1b, #dc2626);
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.7);
+}
+
+/* ==================== 降臨級 尤諾拉 倪克斯 專屬獨立演出：月亮與星空風 (is-nyx-moon-stars) ==================== */
+.summon-stage-viewport.is-nyx-moon-stars .cinematic-pillar-beam,
+.summon-stage-viewport.is-nyx-moon-stars .cinematic-sky-glow,
+.summon-stage-viewport.is-nyx-moon-stars .cinematic-floor-halo,
+.summon-stage-viewport.is-nyx-moon-stars .cinematic-abyss-overlay,
+.summon-stage-viewport.is-nyx-moon-stars .ritual-shockwave,
+.summon-stage-viewport.is-nyx-moon-stars .ritual-svg {
+  display: none !important;
+  animation: none !important;
+}
+
+.summon-stage-viewport.is-nyx-moon-stars {
+  border-color: rgba(56, 189, 248, 0.92);
+  box-shadow: 0 0 48px rgba(56, 189, 248, 0.75), 0 0 90px rgba(99, 102, 241, 0.5), inset 0 0 90px rgba(15, 23, 42, 0.98);
+  background: radial-gradient(circle at 50% 35%, #1e1b4b 0%, #0f172a 50%, #020617 100%) !important;
+}
+
+.summon-stage-viewport.is-nyx-moon-stars .impact-slash-line {
+  height: 2.8px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(56, 189, 248, 0.5) 12%,
+    #bae6fd 40%,
+    #ffffff 50%,
+    #c7d2fe 60%,
+    rgba(99, 102, 241, 0.5) 88%,
+    transparent 100%
+  );
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.95), 0 0 8px #ffffff;
+}
+
+.summon-stage-viewport.is-nyx-moon-stars .impact-big-text {
+  color: #f0f9ff;
+  text-shadow:
+    0 0 6px #ffffff,
+    0 0 20px #38bdf8,
+    0 0 45px #6366f1,
+    0 0 90px #1e1b4b,
+    0 6px 26px rgba(0, 0, 0, 0.98);
+}
+
+.summon-stage-viewport.is-nyx-moon-stars .card-3d-inner {
+  border-color: #38bdf8;
+  background: radial-gradient(circle at 50% 28%, #1e1b4b 0%, #090e1f 65%, #020617 100%);
+  box-shadow: 0 0 42px rgba(56, 189, 248, 0.9), 0 0 85px rgba(99, 102, 241, 0.75), inset 0 0 30px rgba(186, 230, 253, 0.35);
+}
+
+.summon-stage-viewport.is-nyx-moon-stars .card-3d-emblem {
+  color: #bae6fd;
+  text-shadow: 0 0 16px #38bdf8, 0 0 38px #6366f1;
+}
+
+.summon-stage-viewport.is-nyx-moon-stars .card-3d-tier {
+  color: #93c5fd;
+  text-shadow: 0 0 15px #3b82f6;
+}
+
+.summon-screen-flash.is-nyx-flash {
+  background: radial-gradient(circle, #ffffff 0%, #e0f2fe 25%, #38bdf8 55%, #1e1b4b 82%, #020617 100%);
+}
+
+.tgc-preview-btn.is-nyx-btn {
+  border-color: rgba(56, 189, 248, 0.92);
+  background: linear-gradient(90deg, #090e1f, #1e1b4b 55%, #090e1f);
+  color: #e0f2fe;
+}
+.tgc-preview-btn.is-nyx-btn:hover {
+  background: linear-gradient(90deg, #1e1b4b, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.75);
+}
+
+/* ==================== 降臨級 迪米諾拉 赫墨拉 專屬獨立演出：烈陽風格 (is-hemera-sun) ==================== */
+.summon-stage-viewport.is-hemera-sun .cinematic-pillar-beam,
+.summon-stage-viewport.is-hemera-sun .cinematic-sky-glow,
+.summon-stage-viewport.is-hemera-sun .cinematic-floor-halo,
+.summon-stage-viewport.is-hemera-sun .cinematic-abyss-overlay,
+.summon-stage-viewport.is-hemera-sun .ritual-shockwave,
+.summon-stage-viewport.is-hemera-sun .ritual-svg {
+  display: none !important;
+  animation: none !important;
+}
+
+.summon-stage-viewport.is-hemera-sun {
+  border-color: rgba(245, 158, 11, 0.95);
+  box-shadow: 0 0 52px rgba(245, 158, 11, 0.8), 0 0 95px rgba(234, 88, 12, 0.6), inset 0 0 95px rgba(69, 26, 3, 0.98);
+  background: radial-gradient(circle at 50% 35%, #7c2d12 0%, #451a03 50%, #1a0500 100%) !important;
+}
+
+.summon-stage-viewport.is-hemera-sun .impact-slash-line {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 158, 11, 0.5) 10%,
+    #fef08a 38%,
+    #ffffff 50%,
+    #fed7aa 62%,
+    rgba(234, 88, 12, 0.5) 90%,
+    transparent 100%
+  );
+  box-shadow: 0 0 26px rgba(245, 158, 11, 0.98), 0 0 8px #ffffff;
+}
+
+.summon-stage-viewport.is-hemera-sun .impact-big-text {
+  color: #fffbeb;
+  text-shadow:
+    0 0 6px #ffffff,
+    0 0 22px #f59e0b,
+    0 0 48px #ea580c,
+    0 0 95px #7c2d12,
+    0 6px 28px rgba(0, 0, 0, 0.98);
+}
+
+.summon-stage-viewport.is-hemera-sun .card-3d-inner {
+  border-color: #f59e0b;
+  background: radial-gradient(circle at 50% 28%, #7c2d12 0%, #431407 65%, #1a0500 100%);
+  box-shadow: 0 0 46px rgba(245, 158, 11, 0.95), 0 0 88px rgba(234, 88, 12, 0.75), inset 0 0 32px rgba(254, 240, 138, 0.35);
+}
+
+.summon-stage-viewport.is-hemera-sun .card-3d-emblem {
+  color: #fef08a;
+  text-shadow: 0 0 18px #f59e0b, 0 0 40px #dc2626;
+}
+
+.summon-stage-viewport.is-hemera-sun .card-3d-tier {
+  color: #fde047;
+  text-shadow: 0 0 16px #ea580c;
+}
+
+.summon-screen-flash.is-hemera-flash {
+  background: radial-gradient(circle, #ffffff 0%, #fef08a 25%, #f59e0b 55%, #b45309 80%, #451a03 100%);
+}
+
+.tgc-preview-btn.is-hemera-btn {
+  border-color: rgba(245, 158, 11, 0.92);
+  background: linear-gradient(90deg, #451a03, #7c2d12 55%, #451a03);
+  color: #fef3c7;
+}
+.tgc-preview-btn.is-hemera-btn:hover {
+  background: linear-gradient(90deg, #b45309, #f59e0b);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+}
+
+/* ==================== 機率與分級說明視窗：開關選單式試播控制器 ==================== */
+.tgc-menu-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.tgc-preview-select-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.tgc-select-wrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+.tgc-tier-select {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.92);
+  color: #f1f5f9;
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  border-radius: 8px;
+  padding: 8px 32px 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.tgc-tier-select:hover,
+.tgc-tier-select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  background: rgba(15, 23, 42, 0.98);
+}
+
+.tgc-select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #94a3b8;
+  font-size: 0.72rem;
+}
+
+.tgc-run-select-btn {
+  flex-shrink: 0;
+  padding: 8px 16px !important;
+  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  border: 1.5px solid #38bdf8 !important;
+  color: #ffffff !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+}
+
+.tgc-run-select-btn:hover {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.65) !important;
+  transform: translateY(-1px);
+}
+
+/* 摺疊開關選單 (Accordion) */
+.tgc-preview-accordion {
+  width: 100%;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px dashed rgba(148, 163, 184, 0.25);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.tgc-preview-accordion[open] {
+  border-style: solid;
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.tgc-preview-accordion-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  cursor: pointer;
+  user-select: none;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  transition: color 0.2s ease;
+}
+
+.tgc-preview-accordion-summary:hover {
+  color: #e2e8f0;
+}
+
+.tgc-accordion-chevron {
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+}
+
+.tgc-preview-accordion[open] .tgc-accordion-chevron {
+  transform: rotate(180deg);
+}
+
+.tgc-special-previews.is-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 8px;
 }

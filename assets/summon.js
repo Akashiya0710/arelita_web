@@ -149,7 +149,7 @@
   }
 
   // ==================== CLEAN RARITY TIERS & PROBABILITY WEIGHT SYSTEM ====================
-  // 7 個稀有度等級（N / R / SR / SSR / UR / EX / ？），越強的角色抽取機率越低
+  // 8 個稀有度等級（N / R / SR / SSR / UR / EX / Legend / ？），越強的角色抽取機率越低
   const SUMMON_TIERS = {
     1: {
       level: 1,
@@ -157,7 +157,7 @@
       stars: "★☆☆☆☆",
       name: "一般",
       fullTitle: "N（一般稀有度）",
-      tierTargetRate: 0.36, // 36.0% 基礎池綜合機率
+      tierTargetRate: 0.356, // 35.6% 基礎池綜合機率
       powerRangeText: "精靈（一～三級）／ 魔導（一～三級）／ 騎士（一～三級）／ 魔獸（一～三級）／ 猛獸（一～三級）／ 凡人 ／ 未標註",
       colorPrimary: "#34d399",
       colorSecondary: "#94a3b8",
@@ -230,7 +230,7 @@
       name: "神話",
       fullTitle: "UR（神話稀有度）",
       tierTargetRate: 0.025, // 2.5% 基礎池綜合機率
-      powerRangeText: "古神三級 ／ 神王（一～三級）／ 特例收錄：阿撒托斯、赤夜風竹、索亞德",
+      powerRangeText: "神王二級 ／ 神王一級（除黑卡蒂） ／ 古神三級 ／ 特例收錄：阿撒托斯、赤夜風竹、索亞德",
       colorPrimary: "#f43f5e",
       colorSecondary: "#fde047",
       colorGlow: "rgba(244, 63, 94, 0.98)",
@@ -248,19 +248,37 @@
       name: "規格外",
       fullTitle: "EX（規格外稀有度）",
       tierTargetRate: 0.008, // 0.8% 基礎池綜合機率
-      powerRangeText: "神座級 ／ 降臨級 ／ 終世級（赤夜終焉龍具備專屬【滅世龍吼】特殊動畫）",
+      powerRangeText: "神座級 ／ 降臨級 ／ 神王三級 ／ 黑卡蒂",
       colorPrimary: "#fde047",
       colorSecondary: "#38bdf8",
       colorGlow: "rgba(254, 240, 138, 1)",
       coreSymbol: "EX",
       finaleMs: 3400,
       chargeKicker: "SUPREME GENESIS // EX",
-      chargeHeadline: "EX 規格外降臨！神聖創世奇點與滅世終焉龍威",
-      chargeSub: "神座級／降臨級／終世級確認",
-      animDesc: "神座／降臨級展開【神聖創世白金虹彩奇點】；終世級【赤夜 終焉龍】則觸發專屬【滅世龍皇特殊動畫】：漫天煉獄隕石火雨、巨大金紅龍瞳與滅世龍息洪流，並伴隨震撼巨龍咆哮聲！"
+      chargeHeadline: "EX 規格外降臨！神聖創世奇點與諸神共鳴",
+      chargeSub: "神座級／降臨級／神王三級／黑卡蒂確認",
+      animDesc: "神座級／降臨級／神王三級／黑卡蒂展開【神聖創世白金虹彩奇點】，金光與天青交織之神聖宏大召喚！"
     },
     7: {
       level: 7,
+      code: "Legend",
+      stars: "★★★★★★", // 六顆星（黑色）
+      name: "傳奇",
+      fullTitle: "Legend（傳奇稀有度）",
+      tierTargetRate: 0.004, // 0.4% 基礎池綜合機率（比 ？ 的 0.2% 高，但比 EX 的 0.8% 更稀有）
+      powerRangeText: "終世級（赤夜終焉龍具備專屬【滅世龍吼】特殊動畫）",
+      colorPrimary: "#ef4444",
+      colorSecondary: "#fbbf24",
+      colorGlow: "rgba(239, 68, 68, 1)",
+      coreSymbol: "LEGEND",
+      finaleMs: 3500,
+      chargeKicker: "APOCALYPSE DRAGON // LEGEND",
+      chargeHeadline: "Legend 傳奇階級降臨！漫天煉獄與滅世終焉龍威",
+      chargeSub: "終世級【赤夜 終焉龍】真名解鎖",
+      animDesc: "終世級【赤夜 終焉龍】專屬【滅世龍皇特殊動畫】：漫天煉獄隕石火雨、巨大金紅龍瞳與滅世龍息洪流，並伴隨震撼巨龍咆哮聲！"
+    },
+    8: {
+      level: 8,
       code: "？",
       stars: "？？？",
       name: "現象級",
@@ -289,6 +307,23 @@
     return /赤夜風竹|阿撒托斯|索亞德/.test(nm);
   }
 
+  function isHecateCharacter(c) {
+    if (!c) return false;
+    if (c.id === "char-106") return true;
+    const nm = String(c.name || "");
+    return /黑卡蒂/.test(nm);
+  }
+
+  function isExTierCharacter(score, c) {
+    if (!c) return false;
+    if (isHecateCharacter(c)) return true;
+    // 降臨級(2)、神座級(3)、神王三級(4)
+    if (score >= 2 && score <= 4) return true;
+    const p = String(c.power || "");
+    if (/降臨|神座|神王三/.test(p)) return true;
+    return false;
+  }
+
   function getSpecialAnimVariant(c) {
     if (!c) return "";
     const nm = String(c.name || "");
@@ -296,26 +331,35 @@
     if (c.id === "char-19" || /Abyss/i.test(nm)) return "phenom-the-abyss";
     if (c.id === "char-15" || /莉琪雅|利棋雅|神隱/.test(nm)) return "phenom-lycia-void";
     if (c.id === "char-37" || /終焉龍/.test(nm)) return "apocalypse-dragon";
+    if (c.id === "char-106" || /黑卡蒂/.test(nm)) return "hecate-death";
+    if (c.id === "char-10" || /斯卡奇/.test(nm)) return "skadi-darkness";
+    if (c.id === "char-7" || /伊格那利昂|加拉爾/.test(nm)) return "ignalion-holyfire";
+    if (c.id === "char-25" || /沃利爾|德瑪/.test(nm)) return "warrior-arena";
+    if (c.id === "char-32" || /別西卜|撒旦|阿斯拉/.test(nm)) return "beelzebub-swarm";
+    if (c.id === "char-12" || /尤諾拉|倪克斯/.test(nm)) return "nyx-moon-stars";
+    if (c.id === "char-13" || /迪米諾拉|赫墨拉/.test(nm)) return "hemera-sun";
     return "";
   }
 
-  // 依據指定規則精準對應 7 個稀有度等級：
-  // ？ (lvl 7): 現象級 (score === 0)
-  // EX (lvl 6): 終世級(1)、降臨級(2)、神座級(3)
-  // UR (lvl 5): 神王三～一級(4..6)、古神三級(7)，以及特例指定之【阿撒托斯、赤夜風竹、索亞德】
+  // 依據指定規則精準對應 8 個稀有度等級：
+  // ？ (lvl 8): 現象級 (score === 0)
+  // Legend (lvl 7): 終世級 (score === 1: 赤夜 終焉龍)
+  // EX (lvl 6): 神座級(3)、降臨級(2)、神王三級(4)、黑卡蒂
+  // UR (lvl 5): 神王二級(5)、神王一級(6，除黑卡蒂)、古神三級(7)，以及特例指定之【阿撒托斯、赤夜風竹、索亞德】
   // SSR (lvl 4): 古神二級(8)、古神一級(9)、神明三～一級(10..12)
   // SR (lvl 3): 準神三～一級(13..15)、魔王三～一級(16..18)、英雄三～一級(19..21)
   // R (lvl 2): 龍獸三～一級(22..24)、天罰三～一級(25..27)、猛鬼三～一級(28..30)
   // N (lvl 1): 精靈(31..33)、魔導(34..36)、騎士(37..39)、魔獸(40..42)、猛獸(43..45)、凡人(46)、未標註(-1)
   function getSummonTierByScore(score, c) {
-    if (c && isSpecialUrCharacter(c)) return SUMMON_TIERS[5];
-    if (score === 0) return SUMMON_TIERS[7];
-    if (score >= 1 && score <= 3) return SUMMON_TIERS[6];
-    if (score >= 4 && score <= 7) return SUMMON_TIERS[5];
-    if (score >= 8 && score <= 12) return SUMMON_TIERS[4];
-    if (score >= 13 && score <= 21) return SUMMON_TIERS[3];
-    if (score >= 22 && score <= 30) return SUMMON_TIERS[2];
-    return SUMMON_TIERS[1];
+    if (score === 0) return SUMMON_TIERS[8]; // ？ (現象級)
+    if (score === 1) return SUMMON_TIERS[7]; // Legend (終世級: 赤夜 終焉龍)
+    if (isExTierCharacter(score, c)) return SUMMON_TIERS[6]; // EX (神座級、降臨級、神王三級、黑卡蒂)
+    if (c && isSpecialUrCharacter(c)) return SUMMON_TIERS[5]; // UR (阿撒托斯、赤夜風竹、索亞德)
+    if (score >= 5 && score <= 7) return SUMMON_TIERS[5]; // UR (神王二、神王一、古神三)
+    if (score >= 8 && score <= 12) return SUMMON_TIERS[4]; // SSR
+    if (score >= 13 && score <= 21) return SUMMON_TIERS[3]; // SR
+    if (score >= 22 && score <= 30) return SUMMON_TIERS[2]; // R
+    return SUMMON_TIERS[1]; // N
   }
 
   // Enrich all characters
@@ -351,7 +395,7 @@
   // 1. Each tier's total weight matches SUMMON_TIERS[lvl].tierTargetRate
   // 2. Within the same tier, stronger characters (smaller powerScore) have lower weight than weaker ones!
   function computeCharacterBaseWeights() {
-    const tierGroups = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
+    const tierGroups = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [] };
     characters.forEach((c) => {
       const lvl = c.summonTier ? c.summonTier.level : 1;
       tierGroups[lvl].push(c);
@@ -766,17 +810,63 @@
 
   // ==================== PROCEDURAL WEB AUDIO SYNTHESIZER (7 TIERS + 4 BESPOKE CHARACTER SOUNDSCAPES) ====================
   let audioCtx = null;
+  let masterGainNode = null;
+
   function getAudioCtx() {
-    if (!summonState.sfxEnabled) return null;
+    if (!summonState.sfxEnabled || summonState.sfxVolume <= 0) return null;
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return null;
-      if (!audioCtx) audioCtx = new AC();
-      if (audioCtx.state === "suspended") audioCtx.resume();
+      if (!audioCtx) {
+        audioCtx = new AC();
+      }
+      if (!masterGainNode && audioCtx) {
+        masterGainNode = audioCtx.createGain();
+        masterGainNode.gain.setValueAtTime(summonState.sfxVolume, audioCtx.currentTime);
+        masterGainNode.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
       return audioCtx;
     } catch (e) {
       return null;
     }
+  }
+
+  function getMasterAudioOutput(ctx) {
+    if (!ctx) return null;
+    if (!masterGainNode) {
+      try {
+        masterGainNode = ctx.createGain();
+        masterGainNode.gain.setValueAtTime(summonState.sfxVolume, ctx.currentTime);
+        masterGainNode.connect(ctx.destination);
+      } catch (e) {
+        return ctx.destination;
+      }
+    }
+    return masterGainNode;
+  }
+
+  // Play a soft pleasant tone when player adjusts the volume slider
+  let previewToneTimeout = null;
+  function playVolumePreviewTone() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.08); // E5
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(gain);
+      gain.connect(getMasterAudioOutput(ctx));
+      osc.start(now);
+      osc.stop(now + 0.13);
+    } catch (e) {}
   }
 
   // Distinct scale & waveform signature per rarity tier (1..7)
@@ -824,6 +914,13 @@
       chord: [261.63, 329.63, 392.0, 523.25, 659.25, 783.99, 987.77, 1046.5, 1318.5, 1567.98, 2093.0]
     },
     7: {
+      // Legend: Apocalyptic Dragon Roar & Volcanic War Symphony (Heavy Sawtooth + Brass)
+      wave: "sawtooth",
+      subWave: "sawtooth",
+      scale: [146.83, 174.61, 220.0, 261.63, 293.66, 349.23, 440.0, 523.25, 587.33],
+      chord: [146.83, 220.0, 293.66, 440.0, 587.33, 880.0]
+    },
+    8: {
       // ？: Evil Abyssal Phenomenon (Forbidden Demonic Tritone + Phrygian Dark Organ + Blood-Thunder)
       wave: "sawtooth",
       subWave: "sawtooth",
@@ -840,7 +937,7 @@
       const now = ctx.currentTime;
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.34 * volumeMult, now);
-      master.connect(ctx.destination);
+      master.connect(getMasterAudioOutput(ctx));
 
       // Nonlinear distortion waveshaper for ferocious draconic vocal growl
       const shaper = ctx.createWaveShaper();
@@ -945,6 +1042,1505 @@
   }
 
   // 1. Background Ritual Charge SFX (Tailored to each of the 7 tiers + 4 bespoke character variants)
+  // ==================== 黑卡蒂 專屬音效：邪惡詭異的死亡搖籃曲 ====================
+  let hecateNoiseBuf = null;
+  function getHecateNoiseBuffer(ctx) {
+    if (hecateNoiseBuf && hecateNoiseBuf.sampleRate === ctx.sampleRate) return hecateNoiseBuf;
+    const len = Math.floor(ctx.sampleRate * 2);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    hecateNoiseBuf = buf;
+    return buf;
+  }
+
+  // 低語：帶通濾波噪音掃頻，模擬「嘶——哈——」的耳邊細語
+  function hecateWhisper(ctx, out, start, dur, vol) {
+    const src = ctx.createBufferSource();
+    src.buffer = getHecateNoiseBuffer(ctx);
+    src.loop = true;
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.Q.value = 9;
+    bp.frequency.setValueAtTime(2400 + Math.random() * 1200, start);
+    bp.frequency.linearRampToValueAtTime(700 + Math.random() * 500, start + dur * 0.6);
+    bp.frequency.linearRampToValueAtTime(1800 + Math.random() * 1500, start + dur);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.linearRampToValueAtTime(vol, start + dur * 0.3);
+    g.gain.linearRampToValueAtTime(vol * 0.4, start + dur * 0.7);
+    g.gain.linearRampToValueAtTime(0.0001, start + dur);
+    src.connect(bp);
+    bp.connect(g);
+    g.connect(out);
+    src.start(start, Math.random() * 1.5);
+    src.stop(start + dur + 0.05);
+  }
+
+  // 絲線撥動：緊繃的命運絲線被撥響（兩條略為走音的弦 → 詭異感）
+  function hecateThreadPluck(ctx, out, start, freq, vol) {
+    [1, 1.013].forEach((det) => {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(freq * det, start);
+      o.frequency.exponentialRampToValueAtTime(freq * det * 0.985, start + 1.2);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.Q.value = 6;
+      lp.frequency.setValueAtTime(freq * 14, start);
+      lp.frequency.exponentialRampToValueAtTime(freq * 1.2, start + 0.6);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(vol, start);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + 1.3);
+      o.connect(lp);
+      lp.connect(g);
+      g.connect(out);
+      o.start(start);
+      o.stop(start + 1.35);
+    });
+  }
+
+  // 走音音樂盒音色
+  function hecateMusicBox(ctx, out, start, freq, vol) {
+    [[1, 1], [2.76, 0.35], [5.4, 0.12]].forEach(([ratio, amp]) => {
+      const o = ctx.createOscillator();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq * ratio, start);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(vol * amp, start);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + 1.6 / ratio + 0.2);
+      o.connect(g);
+      g.connect(out);
+      o.start(start);
+      o.stop(start + 1.9);
+    });
+  }
+
+  // 喪鐘：非諧波鐘聲泛音
+  function hecateDeathBell(ctx, out, start, freq, vol, dur) {
+    [[0.5, 0.6], [1, 1], [1.183, 0.5], [1.506, 0.45], [2.0, 0.35], [2.514, 0.25], [3.011, 0.15]].forEach(([r, a]) => {
+      const o = ctx.createOscillator();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq * r, start);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.linearRampToValueAtTime(vol * a, start + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + dur / (0.6 + r * 0.4));
+      o.connect(g);
+      g.connect(out);
+      o.start(start);
+      o.stop(start + dur + 0.1);
+    });
+  }
+
+  // 冥焰燃燒的低沉轟鳴（低通噪音）
+  function hecateFlameNoise(ctx, out, start, dur, vol, fFrom, fTo, swell) {
+    const src = ctx.createBufferSource();
+    src.buffer = getHecateNoiseBuffer(ctx);
+    src.loop = true;
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.Q.value = 1.2;
+    lp.frequency.setValueAtTime(fFrom, start);
+    lp.frequency.exponentialRampToValueAtTime(fTo, start + dur * 0.85);
+    const g = ctx.createGain();
+    if (swell) {
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.linearRampToValueAtTime(vol, start + dur * 0.75);
+    } else {
+      g.gain.setValueAtTime(vol, start);
+    }
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    src.connect(lp);
+    lp.connect(g);
+    g.connect(out);
+    src.start(start);
+    src.stop(start + dur + 0.05);
+  }
+
+  function playHecateChargeSfx(ctx, out, now, dur) {
+    // 1. 低沉拍頻的恐懼持續音（A1 + 三全音 D#2）
+    [[55, "sawtooth", 0.16], [55.7, "sawtooth", 0.16], [77.78, "triangle", 0.12]].forEach(([f, type, v]) => {
+      const o = ctx.createOscillator();
+      o.type = type;
+      o.frequency.setValueAtTime(f, now);
+      o.frequency.linearRampToValueAtTime(f * 0.94, now + dur);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(220, now);
+      lp.frequency.linearRampToValueAtTime(520, now + dur);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(v, now + 1.2);
+      g.gain.setValueAtTime(v, Math.max(now + 1.3, now + dur - 0.6));
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      o.connect(lp);
+      lp.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + dur + 0.05);
+    });
+
+    // 2. 扭曲的音樂盒搖籃曲（小調 + 降二級 / 三全音），發條越轉越慢、越來越走音
+    const melody = [880, 1046.5, 987.77, 932.33, 880, 659.25, 622.25, 880, 1244.5, 1174.66, 880, 466.16];
+    const step = 0.42;
+    const n = Math.max(0, Math.floor((dur - 0.5) / step));
+    for (let i = 0; i < n; i++) {
+      const detune = 1 - (i / Math.max(1, n)) * 0.035;
+      const swing = i % 3 === 2 ? 0.08 : 0;
+      hecateMusicBox(ctx, out, now + 0.3 + i * step + swing, melody[i % melody.length] * detune, 0.12);
+    }
+
+    // 3. 耳邊低語
+    for (let t = 0.6; t < dur - 0.8; t += 1.3 + Math.random() * 0.8) {
+      hecateWhisper(ctx, out, now + t, 0.9 + Math.random() * 0.6, 0.22);
+    }
+
+    // 4. 絲線被拉緊的吱嘎聲
+    for (let t = 1.0; t < dur - 0.5; t += 2.1) {
+      const st = now + t;
+      const o = ctx.createOscillator();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(1900, st);
+      o.frequency.exponentialRampToValueAtTime(2600, st + 0.5);
+      o.frequency.exponentialRampToValueAtTime(1500, st + 0.9);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, st);
+      g.gain.linearRampToValueAtTime(0.035, st + 0.2);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.95);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 1);
+    }
+  }
+
+  function playHecateImpactSfx(ctx, out, now, stepIdx) {
+    // 沉重的低頻撞擊
+    const sub = ctx.createOscillator();
+    const sg = ctx.createGain();
+    sub.type = "sine";
+    sub.frequency.setValueAtTime(70, now);
+    sub.frequency.exponentialRampToValueAtTime(22, now + 0.42);
+    sg.gain.setValueAtTime(0.5, now);
+    sg.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    sub.connect(sg);
+    sg.connect(out);
+    sub.start(now);
+    sub.stop(now + 0.47);
+
+    // 不協和小二度 + 三全音刺擊
+    [110, 116.54, 155.56].forEach((f) => {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(f, now);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(1400, now);
+      lp.frequency.exponentialRampToValueAtTime(260, now + 0.8);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.13, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+      o.connect(lp);
+      lp.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + 0.95);
+    });
+
+    // 每一步撥響的絲線音高逐步下沉
+    const pluckFreqs = [392, 349.23, 311.13, 293.66];
+    hecateThreadPluck(ctx, out, now, pluckFreqs[(Math.max(1, stepIdx) - 1) % 4], 0.12);
+    hecateWhisper(ctx, out, now + 0.05, 0.7, 0.18);
+  }
+
+  function playHecateClimaxSfx(ctx, out, now, dur) {
+    // 下沉的黑暗合唱（減和弦，雙重走音鋸齒波 + 「啊」母音共振峰）
+    [110, 130.81, 155.56, 185.0, 220].forEach((f) => {
+      [0.996, 1.004].forEach((det) => {
+        const o = ctx.createOscillator();
+        o.type = "sawtooth";
+        o.frequency.setValueAtTime(f * det, now);
+        o.frequency.linearRampToValueAtTime(f * det * 0.89, now + dur);
+        const bp = ctx.createBiquadFilter();
+        bp.type = "bandpass";
+        bp.frequency.value = 760;
+        bp.Q.value = 3.5;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.linearRampToValueAtTime(0.075, now + dur * 0.4);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+        o.connect(bp);
+        bp.connect(g);
+        g.connect(out);
+        o.start(now);
+        o.stop(now + dur + 0.05);
+      });
+    });
+
+    // 逐漸變慢、即將停止的心跳
+    let t = 0.1;
+    let gap = 0.42;
+    while (t < dur - 0.2) {
+      [0, 0.16].forEach((off, k) => {
+        const st = now + t + off;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.setValueAtTime(62, st);
+        o.frequency.exponentialRampToValueAtTime(30, st + 0.22);
+        g.gain.setValueAtTime(k === 0 ? 0.42 : 0.26, st);
+        g.gain.exponentialRampToValueAtTime(0.001, st + 0.25);
+        o.connect(g);
+        g.connect(out);
+        o.start(st);
+        o.stop(st + 0.27);
+      });
+      t += gap;
+      gap *= 1.2;
+    }
+
+    // 冥焰逐漸升騰的轟鳴
+    hecateFlameNoise(ctx, out, now, dur, 0.32, 240, 900, true);
+
+    // 多重低語合聲
+    for (let i = 0; i < 5; i++) {
+      hecateWhisper(ctx, out, now + (i * dur) / 6, dur * 0.45, 0.16);
+    }
+
+    // 揭曉前絲線越拉越緊的尖鳴
+    const scr = ctx.createOscillator();
+    const scg = ctx.createGain();
+    scr.type = "triangle";
+    scr.frequency.setValueAtTime(600, now);
+    scr.frequency.exponentialRampToValueAtTime(2400, now + dur);
+    scg.gain.setValueAtTime(0.0001, now);
+    scg.gain.linearRampToValueAtTime(0.04, now + dur * 0.9);
+    scg.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    scr.connect(scg);
+    scg.connect(out);
+    scr.start(now);
+    scr.stop(now + dur + 0.05);
+  }
+
+  function playHecateRevealSfx(ctx, out, now) {
+    // 兩聲喪鐘（第二聲略為走低）
+    hecateDeathBell(ctx, out, now, 196, 0.32, 4.2);
+    hecateDeathBell(ctx, out, now + 1.4, 185, 0.18, 3.5);
+
+    // 邪惡的減和弦（含降九音）
+    [55, 110, 130.81, 155.56, 185.0, 233.08].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      o.type = i % 2 === 0 ? "sawtooth" : "triangle";
+      o.frequency.setValueAtTime(f, now);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(1800, now);
+      lp.frequency.exponentialRampToValueAtTime(400, now + 2.4);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(0.12, now + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 2.6);
+      o.connect(lp);
+      lp.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + 2.7);
+    });
+
+    // 黑焰爆燃
+    hecateFlameNoise(ctx, out, now, 1.3, 0.45, 1400, 180, false);
+
+    // 斷續的低語「笑聲」
+    for (let i = 0; i < 4; i++) {
+      hecateWhisper(ctx, out, now + 0.9 + i * 0.17, 0.14, 0.26);
+    }
+
+    // 尾聲：音樂盒最後兩個走音的音
+    hecateMusicBox(ctx, out, now + 2.2, 1244.5 * 0.97, 0.1);
+    hecateMusicBox(ctx, out, now + 2.65, 880 * 0.95, 0.08);
+  }
+
+  // ==================== 暗 斯卡奇 專屬音效：霸王之暗・黑色暴君・萬鈞重槌 ====================
+  function playSkadiChargeSfx(ctx, out, now, dur) {
+    // 1. 霸王重力低頻蜂鳴（38.89Hz Eb1 + 58.27Hz Bb1 + 116.54Hz Bb2）
+    [[38.89, "sawtooth", 0.22], [58.27, "triangle", 0.28], [116.54, "sawtooth", 0.15]].forEach(([f, type, v]) => {
+      const o = ctx.createOscillator();
+      o.type = type;
+      o.frequency.setValueAtTime(f, now);
+      o.frequency.linearRampToValueAtTime(f * 0.92, now + dur);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.Q.value = 4.5;
+      lp.frequency.setValueAtTime(140, now);
+      lp.frequency.linearRampToValueAtTime(320, now + dur);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(v, now + 1.2);
+      g.gain.setValueAtTime(v, Math.max(now + 1.3, now + dur - 0.5));
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      o.connect(lp);
+      lp.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + dur + 0.05);
+    });
+
+    // 2. 空間抽吸真空脈衝（每 1.4 秒一次霸者吞噬脈動）
+    const suckCount = Math.floor(dur / 1.4);
+    for (let i = 0; i < suckCount; i++) {
+      const st = now + i * 1.4 + 0.2;
+      const o = ctx.createOscillator();
+      const bp = ctx.createBiquadFilter();
+      const g = ctx.createGain();
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(45, st);
+      o.frequency.exponentialRampToValueAtTime(120, st + 0.35);
+      o.frequency.exponentialRampToValueAtTime(35, st + 0.85);
+      bp.type = "bandpass";
+      bp.Q.value = 5.0;
+      bp.frequency.setValueAtTime(600, st);
+      bp.frequency.exponentialRampToValueAtTime(140, st + 0.85);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.18, st + 0.25);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.9);
+      o.connect(bp);
+      bp.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 0.95);
+    }
+
+    // 3. 霸王黑雷電弧炸響（隨機高壓雷火裂隙）
+    for (let t = 0.5; t < dur - 0.4; t += 1.1 + Math.random() * 0.9) {
+      const st = now + t;
+      const lOsc = ctx.createOscillator();
+      const lGain = ctx.createGain();
+      lOsc.type = "sawtooth";
+      lOsc.frequency.setValueAtTime(800 + Math.random() * 600, st);
+      lOsc.frequency.exponentialRampToValueAtTime(60, st + 0.16);
+      lGain.gain.setValueAtTime(0.2, st);
+      lGain.gain.exponentialRampToValueAtTime(0.001, st + 0.18);
+      lOsc.connect(lGain);
+      lGain.connect(out);
+      lOsc.start(st);
+      lOsc.stop(st + 0.2);
+    }
+  }
+
+  function playSkadiImpactSfx(ctx, out, now, stepIdx) {
+    // 1. 暗王之錘・索狄亞洛 萬鈞重擊（145Hz 下滑至 18Hz）
+    const hammer = ctx.createOscillator();
+    const hGain = ctx.createGain();
+    hammer.type = "sawtooth";
+    hammer.frequency.setValueAtTime(145, now);
+    hammer.frequency.exponentialRampToValueAtTime(18, now + 0.48);
+    hGain.gain.setValueAtTime(0.55, now);
+    hGain.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
+    hammer.connect(hGain);
+    hGain.connect(out);
+    hammer.start(now);
+    hammer.stop(now + 0.55);
+
+    // 2. 重槌金屬暗曜鏗鏘與黑雷炸裂
+    [220, 311.13, 440].forEach((freq) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + 0.35);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(900, now);
+      lp.frequency.exponentialRampToValueAtTime(180, now + 0.4);
+      g.gain.setValueAtTime(0.18, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      osc.connect(lp);
+      lp.connect(g);
+      g.connect(out);
+      osc.start(now);
+      osc.stop(now + 0.45);
+    });
+
+    // 3. 空間行動延遲顫音（模擬暗王之錘的重力延遲效果）
+    const flutter = ctx.createOscillator();
+    const fGain = ctx.createGain();
+    flutter.type = "triangle";
+    flutter.frequency.setValueAtTime(85, now + 0.08);
+    flutter.frequency.linearRampToValueAtTime(35, now + 0.7);
+    fGain.gain.setValueAtTime(0.001, now + 0.08);
+    fGain.gain.linearRampToValueAtTime(0.14, now + 0.2);
+    fGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.75);
+    flutter.connect(fGain);
+    fGain.connect(out);
+    flutter.start(now + 0.08);
+    flutter.stop(now + 0.8);
+  }
+
+  function playSkadiClimaxSfx(ctx, out, now, dur) {
+    // 1. 萬影臣服朝拜嘯鳴（深沉暴虐和弦升騰）
+    [58.27, 87.31, 116.54, 155.56, 233.08].forEach((f) => {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(f, now);
+      o.frequency.exponentialRampToValueAtTime(f * 1.35, now + dur * 0.8);
+      o.frequency.linearRampToValueAtTime(f * 0.85, now + dur);
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(320, now);
+      lp.frequency.linearRampToValueAtTime(1200, now + dur);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(0.12, now + dur * 0.7);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      o.connect(lp);
+      lp.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + dur + 0.05);
+    });
+
+    // 2. 加速度重槌心跳衝擊（暴君王權降臨步步逼近）
+    let t = 0.1;
+    let gap = 0.55;
+    while (t < dur - 0.2) {
+      const st = now + t;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(95, st);
+      o.frequency.exponentialRampToValueAtTime(24, st + 0.28);
+      g.gain.setValueAtTime(0.42, st);
+      g.gain.exponentialRampToValueAtTime(0.001, st + 0.3);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 0.32);
+      t += gap;
+      gap = Math.max(0.18, gap * 0.82);
+    }
+
+    // 3. 連續霸王黑雷狂暴轟擊
+    for (let i = 0; i < 7; i++) {
+      const st = now + (dur * 0.3) + (i * dur * 0.6) / 7;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "square";
+      o.frequency.setValueAtTime(720 - i * 40, st);
+      o.frequency.exponentialRampToValueAtTime(45, st + 0.22);
+      g.gain.setValueAtTime(0.24, st);
+      g.gain.exponentialRampToValueAtTime(0.001, st + 0.24);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 0.26);
+    }
+  }
+
+  function playSkadiRevealSfx(ctx, out, now) {
+    // 1. 暴君破滅重槌砸定與黑雷巨爆
+    const boom = ctx.createOscillator();
+    const bg = ctx.createGain();
+    boom.type = "sawtooth";
+    boom.frequency.setValueAtTime(165, now);
+    boom.frequency.exponentialRampToValueAtTime(20, now + 1.2);
+    bg.gain.setValueAtTime(0.65, now);
+    bg.gain.exponentialRampToValueAtTime(0.001, now + 1.25);
+    boom.connect(bg);
+    bg.connect(out);
+    boom.start(now);
+    boom.stop(now + 1.3);
+
+    // 2. 霸王神座莊嚴巨鐘（帶超低頻王權共振）
+    [[58.27, 0.45], [116.54, 0.35], [174.81, 0.25], [233.08, 0.2], [349.62, 0.15]].forEach(([freq, vol]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(freq, now);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(vol, now + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
+      o.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + 3.9);
+    });
+
+    // 3. 威嚴深紫黑曜霸主和弦（D小調霸主和弦）
+    [146.83, 174.61, 220.0, 293.66, 349.23, 440.0].forEach((f, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = idx % 2 === 0 ? "sawtooth" : "sine";
+      const st = now + idx * 0.035;
+      o.frequency.setValueAtTime(f, st);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.18, st + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 2.5);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 2.6);
+    });
+  }
+
+  // ==================== 伊格那利昂 加拉爾 專屬音效合成器：熊熊聖火與帝國王道 ====================
+  function playIgnalionChargeSfx(ctx, out, now, dur) {
+    // 1. 加拉爾帝國聖火熔爐巨響（雙振盪器低頻共振）
+    const furnace1 = ctx.createOscillator();
+    const furnace2 = ctx.createOscillator();
+    const fg = ctx.createGain();
+    const fFilter = ctx.createBiquadFilter();
+    furnace1.type = "sawtooth";
+    furnace2.type = "triangle";
+    furnace1.frequency.setValueAtTime(65.41, now); // C2
+    furnace2.frequency.setValueAtTime(98.0, now);  // G2
+    furnace1.frequency.exponentialRampToValueAtTime(73.42, now + dur); // D2
+    furnace2.frequency.exponentialRampToValueAtTime(110.0, now + dur); // A2
+
+    fFilter.type = "lowpass";
+    fFilter.frequency.setValueAtTime(180, now);
+    fFilter.frequency.exponentialRampToValueAtTime(420, now + dur);
+    fFilter.Q.setValueAtTime(3.5, now);
+
+    fg.gain.setValueAtTime(0.001, now);
+    fg.gain.linearRampToValueAtTime(0.35, now + 0.6);
+    fg.gain.linearRampToValueAtTime(0.42, now + dur - 0.4);
+    fg.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    furnace1.connect(fFilter);
+    furnace2.connect(fFilter);
+    fFilter.connect(fg);
+    fg.connect(out);
+    furnace1.start(now);
+    furnace2.start(now);
+    furnace1.stop(now + dur);
+    furnace2.stop(now + dur);
+
+    // 2. 熊熊聖火翻騰與餘燼爆裂（帶通濾波燃燒噪聲）
+    const bufLen = Math.floor(ctx.sampleRate * Math.min(dur, 10));
+    const noiseBuf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < bufLen; i++) {
+      const white = Math.random() * 2 - 1;
+      last = (last + 0.04 * white) / 1.04;
+      data[i] = last * 2.8;
+    }
+    const noiseSrc = ctx.createBufferSource();
+    noiseSrc.buffer = noiseBuf;
+    const nFilter = ctx.createBiquadFilter();
+    nFilter.type = "bandpass";
+    nFilter.frequency.setValueAtTime(380, now);
+    nFilter.frequency.linearRampToValueAtTime(650, now + dur * 0.7);
+    nFilter.Q.setValueAtTime(2.2, now);
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.01, now);
+    ng.gain.linearRampToValueAtTime(0.24, now + 0.8);
+    ng.gain.linearRampToValueAtTime(0.28, now + dur - 0.5);
+    ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    noiseSrc.connect(nFilter);
+    nFilter.connect(ng);
+    ng.connect(out);
+    noiseSrc.start(now);
+    noiseSrc.stop(now + dur);
+
+    // 3. 帝國軍團莊嚴號角三度音（每隔 1.8 秒湧現一次王道意志）
+    const chordNotes = [130.81, 196.0, 261.63, 329.63]; // C3, G3, C4, E4
+    const pulseCount = Math.floor(dur / 1.8);
+    for (let p = 0; p < pulseCount; p++) {
+      const pt = now + p * 1.8 + 0.2;
+      chordNotes.forEach((f, idx) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(f, pt);
+        g.gain.setValueAtTime(0.0001, pt);
+        g.gain.linearRampToValueAtTime(0.07 / (idx + 1), pt + 0.25);
+        g.gain.exponentialRampToValueAtTime(0.0001, pt + 1.4);
+        osc.connect(g);
+        g.connect(out);
+        osc.start(pt);
+        osc.stop(pt + 1.45);
+      });
+    }
+  }
+
+  function playIgnalionImpactSfx(ctx, out, now, stepIdx) {
+    // 1. 火神之罰・帝國戰鼓踏陣（140Hz -> 28Hz 雄渾重擊）
+    const thud = ctx.createOscillator();
+    const tg = ctx.createGain();
+    thud.type = "triangle";
+    thud.frequency.setValueAtTime(140 + stepIdx * 15, now);
+    thud.frequency.exponentialRampToValueAtTime(28, now + 0.65);
+    tg.gain.setValueAtTime(0.72, now);
+    tg.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    thud.connect(tg);
+    tg.connect(out);
+    thud.start(now);
+    thud.stop(now + 0.72);
+
+    // 2. 聖火白焰烈斬破空呼嘯
+    const whooshLen = Math.floor(ctx.sampleRate * 0.45);
+    const wBuf = ctx.createBuffer(1, whooshLen, ctx.sampleRate);
+    const wData = wBuf.getChannelData(0);
+    for (let i = 0; i < whooshLen; i++) wData[i] = (Math.random() * 2 - 1) * Math.sin((i / whooshLen) * Math.PI);
+    const wSrc = ctx.createBufferSource();
+    wSrc.buffer = wBuf;
+    const wFilt = ctx.createBiquadFilter();
+    wFilt.type = "highpass";
+    wFilt.frequency.setValueAtTime(800, now);
+    wFilt.frequency.exponentialRampToValueAtTime(2200, now + 0.4);
+    const wg = ctx.createGain();
+    wg.gain.setValueAtTime(0.38, now);
+    wg.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    wSrc.connect(wFilt);
+    wFilt.connect(wg);
+    wg.connect(out);
+    wSrc.start(now);
+
+    // 3. 帝國神火金屬拔劍與戰鎧鏗鏘響聲（880Hz / 1760Hz）
+    [880, 1760].forEach((freq) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq, now + 0.02);
+      g.gain.setValueAtTime(0.18, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+      o.connect(g);
+      g.connect(out);
+      o.start(now + 0.02);
+      o.stop(now + 0.58);
+    });
+  }
+
+  function playIgnalionClimaxSfx(ctx, out, now, dur) {
+    // 1. 聖火王道燎原與萬火共主暴鳴（連續四重爆裂火球轟鳴）
+    for (let i = 0; i < 4; i++) {
+      const t = now + i * 0.45;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(110, t);
+      osc.frequency.exponentialRampToValueAtTime(32, t + 0.55);
+      g.gain.setValueAtTime(0.48, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(t);
+      osc.stop(t + 0.62);
+    }
+
+    // 2. 加拉爾帝國輝煌進行曲（D大調高昂軍樂三和弦）
+    const imperialChords = [146.83, 185.0, 220.0, 293.66, 369.99, 440.0, 587.33]; // D3, F#3, A3, D4, F#4, A4, D5
+    imperialChords.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = idx % 2 === 0 ? "sawtooth" : "triangle";
+      const startT = now + idx * 0.035;
+      osc.frequency.setValueAtTime(freq, startT);
+      g.gain.setValueAtTime(0.001, startT);
+      g.gain.linearRampToValueAtTime(0.24, startT + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.001, startT + dur * 0.88);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(startT);
+      osc.stop(startT + dur * 0.9);
+    });
+  }
+
+  function playIgnalionRevealSfx(ctx, out, now) {
+    // 1. 火神王降世帝國加冕大爆鳴
+    const boom = ctx.createOscillator();
+    const bg = ctx.createGain();
+    boom.type = "sawtooth";
+    boom.frequency.setValueAtTime(180, now);
+    boom.frequency.exponentialRampToValueAtTime(25, now + 1.4);
+    bg.gain.setValueAtTime(0.72, now);
+    bg.gain.exponentialRampToValueAtTime(0.001, now + 1.45);
+    boom.connect(bg);
+    bg.connect(out);
+    boom.start(now);
+    boom.stop(now + 1.5);
+
+    // 2. 凱旋號角三重音（D4 -> F#4 -> A4 -> D5）
+    [293.66, 369.99, 440.0, 587.33].forEach((f, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      const st = now + idx * 0.08;
+      o.frequency.setValueAtTime(f, st);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.32, st + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 2.8);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 2.9);
+    });
+
+    // 3. 聖火淨化餘韻鐘鳴
+    [[220.0, 0.3], [440.0, 0.22], [880.0, 0.14]].forEach(([freq, vol]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq, now + 0.2);
+      g.gain.setValueAtTime(0.001, now + 0.2);
+      g.gain.linearRampToValueAtTime(vol, now + 0.25);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 3.6);
+      o.connect(g);
+      g.connect(out);
+      o.start(now + 0.2);
+      o.stop(now + 3.7);
+    });
+  }
+
+  // ==================== 沃利爾 德瑪 專屬音效合成器：戰爭與古羅馬競技場 ====================
+  function playWarriorChargeSfx(ctx, out, now, dur) {
+    // 1. 競技場千軍萬馬呼嘯與低頻戰神戰鼓脈動（55Hz / 82.4Hz）
+    const drum1 = ctx.createOscillator();
+    const drum2 = ctx.createOscillator();
+    const dg = ctx.createGain();
+    const dFilter = ctx.createBiquadFilter();
+    drum1.type = "sawtooth";
+    drum2.type = "triangle";
+    drum1.frequency.setValueAtTime(55.0, now);
+    drum2.frequency.setValueAtTime(82.41, now);
+    drum1.frequency.exponentialRampToValueAtTime(65.41, now + dur);
+    drum2.frequency.exponentialRampToValueAtTime(98.0, now + dur);
+
+    dFilter.type = "lowpass";
+    dFilter.frequency.setValueAtTime(160, now);
+    dFilter.frequency.exponentialRampToValueAtTime(380, now + dur);
+    dFilter.Q.setValueAtTime(4.0, now);
+
+    dg.gain.setValueAtTime(0.001, now);
+    dg.gain.linearRampToValueAtTime(0.36, now + 0.5);
+    dg.gain.linearRampToValueAtTime(0.44, now + dur - 0.4);
+    dg.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    drum1.connect(dFilter);
+    drum2.connect(dFilter);
+    dFilter.connect(dg);
+    dg.connect(out);
+    drum1.start(now);
+    drum2.start(now);
+    drum1.stop(now + dur);
+    drum2.stop(now + dur);
+
+    // 2. 競技場角鬥士狂暴戰吼與萬眾呼喊（帶通噪聲模擬海嘯戰意）
+    const bufLen = Math.floor(ctx.sampleRate * Math.min(dur, 10));
+    const noiseBuf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < bufLen; i++) {
+      const white = Math.random() * 2 - 1;
+      last = (last + 0.05 * white) / 1.05;
+      data[i] = last * 3.0;
+    }
+    const noiseSrc = ctx.createBufferSource();
+    noiseSrc.buffer = noiseBuf;
+    const nFilter = ctx.createBiquadFilter();
+    nFilter.type = "bandpass";
+    nFilter.frequency.setValueAtTime(320, now);
+    nFilter.frequency.linearRampToValueAtTime(580, now + dur * 0.75);
+    nFilter.Q.setValueAtTime(2.0, now);
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.01, now);
+    ng.gain.linearRampToValueAtTime(0.25, now + 0.8);
+    ng.gain.linearRampToValueAtTime(0.30, now + dur - 0.5);
+    ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    noiseSrc.connect(nFilter);
+    nFilter.connect(ng);
+    ng.connect(out);
+    noiseSrc.start(now);
+    noiseSrc.stop(now + dur);
+
+    // 3. 戰神阿瑞斯古銅號角（E小調肅殺戰樂：82.41, 123.47, 164.81, 246.94Hz）
+    const warHornNotes = [82.41, 123.47, 164.81, 246.94];
+    const hornCount = Math.floor(dur / 1.6);
+    for (let p = 0; p < hornCount; p++) {
+      const pt = now + p * 1.6 + 0.15;
+      warHornNotes.forEach((f, idx) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = idx % 2 === 0 ? "sawtooth" : "triangle";
+        osc.frequency.setValueAtTime(f, pt);
+        g.gain.setValueAtTime(0.0001, pt);
+        g.gain.linearRampToValueAtTime(0.08 / (idx + 1), pt + 0.2);
+        g.gain.exponentialRampToValueAtTime(0.0001, pt + 1.3);
+        osc.connect(g);
+        g.connect(out);
+        osc.start(pt);
+        osc.stop(pt + 1.35);
+      });
+    }
+  }
+
+  function playWarriorImpactSfx(ctx, out, now, stepIdx) {
+    // 1. 戰神之器・盾牌戰槌重撼（170Hz -> 26Hz 沉重金屬鈍擊）
+    const thud = ctx.createOscillator();
+    const tg = ctx.createGain();
+    thud.type = "triangle";
+    thud.frequency.setValueAtTime(170 + stepIdx * 18, now);
+    thud.frequency.exponentialRampToValueAtTime(26, now + 0.65);
+    tg.gain.setValueAtTime(0.75, now);
+    tg.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    thud.connect(tg);
+    tg.connect(out);
+    thud.start(now);
+    thud.stop(now + 0.72);
+
+    // 2. 阿瑞斯角鬥長刃劇烈格擋鏗鏘火星音（1200Hz / 2400Hz 銳利刀劍火花）
+    [1200, 2400].forEach((freq) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(freq, now + 0.01);
+      g.gain.setValueAtTime(0.24, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+      o.connect(g);
+      g.connect(out);
+      o.start(now + 0.01);
+      o.stop(now + 0.48);
+    });
+  }
+
+  function playWarriorClimaxSfx(ctx, out, now, dur) {
+    // 1. 競技場萬眾狂熱沸騰（連續金屬撞擊戰陣）
+    for (let i = 0; i < 5; i++) {
+      const t = now + i * 0.38;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(130, t);
+      osc.frequency.exponentialRampToValueAtTime(28, t + 0.48);
+      g.gain.setValueAtTime(0.52, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.52);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(t);
+      osc.stop(t + 0.55);
+    }
+
+    // 2. 戰神王勝者為王進行曲（E小調剛勁銅管和弦）
+    const battleChords = [82.41, 123.47, 164.81, 196.0, 246.94, 329.63, 392.0, 493.88];
+    battleChords.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = idx % 2 === 0 ? "sawtooth" : "triangle";
+      const startT = now + idx * 0.035;
+      osc.frequency.setValueAtTime(freq, startT);
+      g.gain.setValueAtTime(0.001, startT);
+      g.gain.linearRampToValueAtTime(0.26, startT + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.001, startT + dur * 0.88);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(startT);
+      osc.stop(startT + dur * 0.9);
+    });
+  }
+
+  function playWarriorRevealSfx(ctx, out, now) {
+    // 1. 競技場角鬥霸主登頂大重擊
+    const boom = ctx.createOscillator();
+    const bg = ctx.createGain();
+    boom.type = "sawtooth";
+    boom.frequency.setValueAtTime(190, now);
+    boom.frequency.exponentialRampToValueAtTime(22, now + 1.35);
+    bg.gain.setValueAtTime(0.74, now);
+    bg.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+    boom.connect(bg);
+    bg.connect(out);
+    boom.start(now);
+    boom.stop(now + 1.45);
+
+    // 2. 戰神凱旋戰號四重奏（E4 -> G4 -> B4 -> E5）
+    [329.63, 392.0, 493.88, 659.25].forEach((f, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      const st = now + idx * 0.075;
+      o.frequency.setValueAtTime(f, st);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.35, st + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 2.7);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 2.8);
+    });
+
+    // 3. 角鬥場青銅鐘鳴
+    [[164.81, 0.32], [329.63, 0.22], [659.25, 0.12]].forEach(([freq, vol]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq, now + 0.2);
+      g.gain.setValueAtTime(0.001, now + 0.2);
+      g.gain.linearRampToValueAtTime(vol, now + 0.25);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 3.5);
+      o.connect(g);
+      g.connect(out);
+      o.start(now + 0.2);
+      o.stop(now + 3.6);
+    });
+  }
+
+  // ==================== 別西卜 阿斯拉 撒旦 專屬音效合成：群蠅狂鳴與暴虐血戮 ====================
+  function playBeelzebubChargeSfx(ctx, out, now, dur) {
+    // 1. 群蠅之王萬千蒼蠅高頻震翅嗡鳴（4 聲道非和諧失諧鋸齒波 + 55~85Hz AM 翅膀振頻）
+    const flyFreqs = [135, 162, 198, 235];
+    flyFreqs.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      const amOsc = ctx.createOscillator();
+      const amGain = ctx.createGain();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.linearRampToValueAtTime(freq * 1.15, now + dur * 0.5);
+      osc.frequency.linearRampToValueAtTime(freq * 0.95, now + dur);
+
+      amOsc.type = "sine";
+      amOsc.frequency.setValueAtTime(58 + idx * 9, now);
+      amOsc.frequency.linearRampToValueAtTime(75 + idx * 9, now + dur);
+
+      amGain.gain.setValueAtTime(0.55, now);
+      amOsc.connect(amGain.gain);
+
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(0.22, now + 0.6);
+      g.gain.linearRampToValueAtTime(0.32, now + dur * 0.85);
+      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      osc.connect(g);
+      g.connect(out);
+
+      osc.start(now);
+      amOsc.start(now);
+      osc.stop(now + dur);
+      amOsc.stop(now + dur);
+    });
+
+    // 2. 原初屠掠魔神暴虐深淵低鳴（38Hz 極低頻殘暴鋸齒波震顫）
+    const drone = ctx.createOscillator();
+    const dg = ctx.createGain();
+    drone.type = "sawtooth";
+    drone.frequency.setValueAtTime(42, now);
+    drone.frequency.linearRampToValueAtTime(36, now + dur);
+    dg.gain.setValueAtTime(0.001, now);
+    dg.gain.linearRampToValueAtTime(0.48, now + 0.4);
+    dg.gain.linearRampToValueAtTime(0.58, now + dur * 0.8);
+    dg.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    drone.connect(dg);
+    dg.connect(out);
+    drone.start(now);
+    drone.stop(now + dur);
+
+    // 3. 猩紅撕裂血腥氣流噪音脈衝
+    const bufSize = Math.floor(ctx.sampleRate * Math.min(dur, 4.5));
+    const noiseBuf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 1.8));
+    }
+    const nSrc = ctx.createBufferSource();
+    nSrc.buffer = noiseBuf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(750, now);
+    filter.Q.setValueAtTime(3.8, now);
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.001, now);
+    ng.gain.linearRampToValueAtTime(0.18, now + 0.5);
+    ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    nSrc.connect(filter);
+    filter.connect(ng);
+    ng.connect(out);
+    nSrc.start(now);
+  }
+
+  function playBeelzebubImpactSfx(ctx, out, now, stepIdx) {
+    // 1. 暴力骨肉碎裂血戮重擊（130Hz -> 18Hz 殘暴下潛重擊）
+    const sub = ctx.createOscillator();
+    const sg = ctx.createGain();
+    sub.type = "sawtooth";
+    sub.frequency.setValueAtTime(140 + stepIdx * 20, now);
+    sub.frequency.exponentialRampToValueAtTime(18, now + 0.65);
+    sg.gain.setValueAtTime(0.85, now);
+    sg.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    sub.connect(sg);
+    sg.connect(out);
+    sub.start(now);
+    sub.stop(now + 0.72);
+
+    // 2. 「惡魔的屠掠」巨劍暴力割裂金屬撕扯聲
+    const rip = ctx.createOscillator();
+    const rg = ctx.createGain();
+    rip.type = "triangle";
+    rip.frequency.setValueAtTime(1200 + stepIdx * 250, now);
+    rip.frequency.exponentialRampToValueAtTime(180, now + 0.38);
+    rg.gain.setValueAtTime(0.48, now);
+    rg.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    rip.connect(rg);
+    rg.connect(out);
+    rip.start(now);
+    rip.stop(now + 0.42);
+
+    // 3. 蒼蠅群驚飛狂暴嗡聲爆衝
+    const flyBurst = ctx.createOscillator();
+    const fbg = ctx.createGain();
+    flyBurst.type = "sawtooth";
+    flyBurst.frequency.setValueAtTime(260 + (stepIdx % 3) * 60, now);
+    flyBurst.frequency.linearRampToValueAtTime(340, now + 0.25);
+    fbg.gain.setValueAtTime(0.35, now);
+    fbg.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    flyBurst.connect(fbg);
+    fbg.connect(out);
+    flyBurst.start(now);
+    flyBurst.stop(now + 0.38);
+  }
+
+  function playBeelzebubClimaxSfx(ctx, out, now, dur) {
+    // 1. 萬千蒼蠅暴風圈黑血龍捲
+    [155, 185, 220, 280, 340].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      const am = ctx.createOscillator();
+      const amG = ctx.createGain();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.linearRampToValueAtTime(freq * 1.3, now + dur * 0.85);
+
+      am.type = "sine";
+      am.frequency.setValueAtTime(70 + idx * 12, now);
+      amG.gain.setValueAtTime(0.7, now);
+      am.connect(amG.gain);
+
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(0.28, now + 0.4);
+      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      osc.connect(g);
+      g.connect(out);
+
+      osc.start(now);
+      am.start(now);
+      osc.stop(now + dur);
+      am.stop(now + dur);
+    });
+
+    // 2. 暴虐原初屠掠魔神毀滅不協和弦群（極度暴力、血腥壓迫）
+    [55.0, 77.78, 92.5, 110.0, 155.56, 185.0].forEach((freq, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = idx % 2 === 0 ? "sawtooth" : "square";
+      const startT = now + idx * 0.05;
+      o.frequency.setValueAtTime(freq, startT);
+      g.gain.setValueAtTime(0.001, startT);
+      g.gain.linearRampToValueAtTime(0.32, startT + 0.08);
+      g.gain.exponentialRampToValueAtTime(0.001, startT + dur * 0.9);
+      o.connect(g);
+      g.connect(out);
+      o.start(startT);
+      o.stop(startT + dur * 0.92);
+    });
+  }
+
+  function playBeelzebubRevealSfx(ctx, out, now) {
+    // 1. 暴虐魔神之刃終焉立地重響
+    const boom = ctx.createOscillator();
+    const bg = ctx.createGain();
+    boom.type = "sawtooth";
+    boom.frequency.setValueAtTime(210, now);
+    boom.frequency.exponentialRampToValueAtTime(20, now + 1.4);
+    bg.gain.setValueAtTime(0.85, now);
+    bg.gain.exponentialRampToValueAtTime(0.001, now + 1.45);
+    boom.connect(bg);
+    bg.connect(out);
+    boom.start(now);
+    boom.stop(now + 1.5);
+
+    // 2. 蒼蠅群四散狂舞長鳴
+    [260, 330, 415, 520].forEach((freq, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      const st = now + idx * 0.06;
+      o.frequency.setValueAtTime(freq, st);
+      o.frequency.exponentialRampToValueAtTime(freq * 1.8, st + 2.4);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.3, st + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 2.6);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 2.7);
+    });
+  }
+
+  // ==================== 降臨級 尤諾拉 倪克斯 專屬音效合成：月夜空靈與星辰交響 ====================
+  function playNyxChargeSfx(ctx, out, now, dur) {
+    // 1. 星辰琶音水滴風鈴群（Lydian 璀璨星鈴：D5, F#5, A5, C#6, E6, A6）
+    const starNotes = [587.33, 739.99, 880.0, 1108.73, 1318.51, 1760.0];
+    const chimeCount = Math.floor(dur / 0.32);
+    for (let i = 0; i < chimeCount; i++) {
+      const st = now + i * 0.32 + Math.random() * 0.08;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sine";
+      const f = starNotes[i % starNotes.length] * (Math.random() < 0.3 ? 2 : 1);
+      osc.frequency.setValueAtTime(f, st);
+      osc.frequency.exponentialRampToValueAtTime(f * 1.02, st + 0.38);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.22, st + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.42);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(st);
+      osc.stop(st + 0.45);
+    }
+
+    // 2. 黑夜女神深邃月華以太長音（110Hz / 164.81Hz 柔和深邃正弦長音）
+    [110.0, 164.81, 220.0].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.linearRampToValueAtTime(freq * 1.02, now + dur);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(0.24, now + 0.8);
+      g.gain.linearRampToValueAtTime(0.3, now + dur * 0.85);
+      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(now);
+      osc.stop(now + dur);
+    });
+
+    // 3. 銀河星塵微風光暈（高通濾波星粉流動）
+    const bufSize = Math.floor(ctx.sampleRate * Math.min(dur, 4.5));
+    const noiseBuf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.2;
+    }
+    const nSrc = ctx.createBufferSource();
+    nSrc.buffer = noiseBuf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(2400, now);
+    filter.frequency.linearRampToValueAtTime(3600, now + dur);
+    filter.Q.setValueAtTime(6.0, now);
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.001, now);
+    ng.gain.linearRampToValueAtTime(0.12, now + 0.6);
+    ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    nSrc.connect(filter);
+    filter.connect(ng);
+    ng.connect(out);
+    nSrc.start(now);
+  }
+
+  function playNyxImpactSfx(ctx, out, now, stepIdx) {
+    // 1. -星輝浮光－月之劍- 靈空斬擊與星辰光屑音
+    const rip = ctx.createOscillator();
+    const rg = ctx.createGain();
+    rip.type = "triangle";
+    rip.frequency.setValueAtTime(1400 + stepIdx * 220, now);
+    rip.frequency.exponentialRampToValueAtTime(320, now + 0.35);
+    rg.gain.setValueAtTime(0.42, now);
+    rg.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+    rip.connect(rg);
+    rg.connect(out);
+    rip.start(now);
+    rip.stop(now + 0.4);
+
+    // 2. 皎潔月宮水晶編鐘雙和弦
+    const moonChords = [
+      [880.0, 1318.51],
+      [1046.5, 1567.98],
+      [1174.66, 1760.0],
+      [1318.51, 1975.53]
+    ];
+    const pair = moonChords[stepIdx % moonChords.length];
+    pair.forEach((f, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      const t = now + idx * 0.035;
+      o.frequency.setValueAtTime(f, t);
+      o.frequency.exponentialRampToValueAtTime(f * 0.98, t + 0.65);
+      g.gain.setValueAtTime(0.3, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+      o.connect(g);
+      g.connect(out);
+      o.start(t);
+      o.stop(t + 0.72);
+    });
+
+    // 3. 夜之低沉空靈重響（深邃幽夜震撼）
+    const sub = ctx.createOscillator();
+    const sg = ctx.createGain();
+    sub.type = "sine";
+    sub.frequency.setValueAtTime(95 + stepIdx * 10, now);
+    sub.frequency.exponentialRampToValueAtTime(28, now + 0.55);
+    sg.gain.setValueAtTime(0.65, now);
+    sg.gain.exponentialRampToValueAtTime(0.001, now + 0.58);
+    sub.connect(sg);
+    sg.connect(out);
+    sub.start(now);
+    sub.stop(now + 0.6);
+  }
+
+  function playNyxClimaxSfx(ctx, out, now, dur) {
+    // 1. 滿月生輝聖潔星詠和弦（Dmaj9 夢幻空靈天籟）
+    [293.66, 369.99, 440.0, 554.37, 659.25, 880.0, 1108.73].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = idx % 2 === 0 ? "sine" : "triangle";
+      const st = now + idx * 0.05;
+      osc.frequency.setValueAtTime(freq, st);
+      osc.frequency.linearRampToValueAtTime(freq * 1.01, st + dur * 0.8);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.28, st + 0.12);
+      g.gain.exponentialRampToValueAtTime(0.001, st + dur * 0.95);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(st);
+      osc.stop(st + dur);
+    });
+
+    // 2. 銀河群星閃爍百鳥朝鳳般璀璨瀑布
+    const sparkleCount = 20;
+    const interval = (dur * 0.85) / sparkleCount;
+    for (let i = 0; i < sparkleCount; i++) {
+      const st = now + i * interval;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sine";
+      const f = 1174.66 + ((i * 137) % 1800);
+      osc.frequency.setValueAtTime(f, st);
+      osc.frequency.exponentialRampToValueAtTime(f * 1.25, st + 0.22);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.2, st + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, st + 0.25);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(st);
+      osc.stop(st + 0.26);
+    }
+  }
+
+  function playNyxRevealSfx(ctx, out, now) {
+    // 1. 滿月月華如瀑深幽長鐘（月之王宣告）
+    [[110.0, 0.45], [220.0, 0.38], [440.0, 0.3], [880.0, 0.25], [1760.0, 0.15]].forEach(([freq, vol]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq, now);
+      o.frequency.exponentialRampToValueAtTime(freq * 0.99, now + 3.8);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(vol, now + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
+      o.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + 3.9);
+    });
+
+    // 2. 星華飄墜水晶琶音
+    [880.0, 1108.73, 1318.51, 1661.22, 1760.0, 2217.46].forEach((freq, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      const st = now + 0.1 + idx * 0.08;
+      o.frequency.setValueAtTime(freq, st);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.24, st + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 2.2);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 2.3);
+    });
+  }
+
+  // ==================== 降臨級 迪米諾拉 赫墨拉 專屬音效合成：烈陽風暴與終焉日冕 ====================
+  function playHemeraChargeSfx(ctx, out, now, dur) {
+    // 1. 烈陽電漿太陽風暴呼嘯（高頻帶通濾波高溫耀斑氣流）
+    const bufSize = Math.floor(ctx.sampleRate * Math.min(dur, 4.5));
+    const noiseBuf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.28;
+    }
+    const nSrc = ctx.createBufferSource();
+    nSrc.buffer = noiseBuf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(650, now);
+    filter.frequency.exponentialRampToValueAtTime(3200, now + dur);
+    filter.Q.setValueAtTime(5.5, now);
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.001, now);
+    ng.gain.linearRampToValueAtTime(0.24, now + 0.6);
+    ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    nSrc.connect(filter);
+    filter.connect(ng);
+    ng.connect(out);
+    nSrc.start(now);
+
+    // 2. 日耀女神聖潔金陽銅管和弦群（Gmaj9 燦爛烈陽：G4, B4, D5, F#5, A5, D6）
+    const sunNotes = [392.0, 493.88, 587.33, 739.99, 880.0, 1174.66];
+    const chimeCount = Math.floor(dur / 0.36);
+    for (let i = 0; i < chimeCount; i++) {
+      const st = now + i * 0.36 + Math.random() * 0.05;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sawtooth";
+      const f = sunNotes[i % sunNotes.length];
+      osc.frequency.setValueAtTime(f, st);
+      osc.frequency.exponentialRampToValueAtTime(f * 1.05, st + 0.4);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.18, st + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.44);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(st);
+      osc.stop(st + 0.46);
+    }
+
+    // 3. 太陽核聚變灼熱低頻脈動（52Hz 熾熱深核脈衝）
+    const drone = ctx.createOscillator();
+    const dg = ctx.createGain();
+    drone.type = "triangle";
+    drone.frequency.setValueAtTime(52, now);
+    drone.frequency.linearRampToValueAtTime(58, now + dur);
+    dg.gain.setValueAtTime(0.001, now);
+    dg.gain.linearRampToValueAtTime(0.35, now + 0.6);
+    dg.gain.linearRampToValueAtTime(0.42, now + dur * 0.85);
+    dg.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    drone.connect(dg);
+    dg.connect(out);
+    drone.start(now);
+    drone.stop(now + dur);
+  }
+
+  function playHemeraImpactSfx(ctx, out, now, stepIdx) {
+    // 1. -天輝浮光－日之矛- 金陽貫穿烈焰重擊
+    const spear = ctx.createOscillator();
+    const spg = ctx.createGain();
+    spear.type = "sawtooth";
+    spear.frequency.setValueAtTime(1750 + stepIdx * 250, now);
+    spear.frequency.exponentialRampToValueAtTime(260, now + 0.38);
+    spg.gain.setValueAtTime(0.48, now);
+    spg.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    spear.connect(spg);
+    spg.connect(out);
+    spear.start(now);
+    spear.stop(now + 0.42);
+
+    // 2. 烈陽耀斑熱浪超重低音重響（110Hz -> 20Hz 灼耀爆破）
+    const sub = ctx.createOscillator();
+    const sg = ctx.createGain();
+    sub.type = "sine";
+    sub.frequency.setValueAtTime(115 + stepIdx * 15, now);
+    sub.frequency.exponentialRampToValueAtTime(20, now + 0.55);
+    sg.gain.setValueAtTime(0.72, now);
+    sg.gain.exponentialRampToValueAtTime(0.001, now + 0.58);
+    sub.connect(sg);
+    sg.connect(out);
+    sub.start(now);
+    sub.stop(now + 0.6);
+
+    // 3. 耀斑晶燦金光共鳴鐘
+    const ch = ctx.createOscillator();
+    const cg = ctx.createGain();
+    ch.type = "triangle";
+    ch.frequency.setValueAtTime(987.77 + stepIdx * 120, now);
+    ch.frequency.exponentialRampToValueAtTime(783.99, now + 0.5);
+    cg.gain.setValueAtTime(0.32, now);
+    cg.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+    ch.connect(cg);
+    cg.connect(out);
+    ch.start(now);
+    ch.stop(now + 0.58);
+  }
+
+  function playHemeraClimaxSfx(ctx, out, now, dur) {
+    // 1. 「終焉日冕」灼耀之日超新星引爆！輝煌太陽交響銅管高潮
+    [196.0, 246.94, 293.66, 392.0, 493.88, 587.33, 783.99, 987.77].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = idx % 2 === 0 ? "sawtooth" : "triangle";
+      const st = now + idx * 0.045;
+      osc.frequency.setValueAtTime(freq, st);
+      osc.frequency.linearRampToValueAtTime(freq * 1.03, st + dur * 0.85);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.26, st + 0.1);
+      g.gain.exponentialRampToValueAtTime(0.001, st + dur * 0.95);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(st);
+      osc.stop(st + dur);
+    });
+
+    // 2. 日冕耀斑連續熱核能量浪湧
+    const pulseCount = 7;
+    const interval = (dur * 0.82) / pulseCount;
+    for (let p = 0; p < pulseCount; p++) {
+      const st = now + p * interval;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(800 + p * 150, st);
+      o.frequency.exponentialRampToValueAtTime(140, st + 0.28);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.3, st + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, st + 0.3);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 0.32);
+    }
+  }
+
+  function playHemeraRevealSfx(ctx, out, now) {
+    // 1. 太陽之主天耀長鐘（G大調金光萬道神聖和音，餘音繚繞 4 秒）
+    [[98.0, 0.45], [196.0, 0.4], [293.66, 0.32], [493.88, 0.28], [783.99, 0.22], [1174.66, 0.14]].forEach(([freq, vol]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(freq, now);
+      o.frequency.exponentialRampToValueAtTime(freq * 0.99, now + 3.8);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(vol, now + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
+      o.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + 3.9);
+    });
+
+    // 2. 萬道金芒日耀光屑晶燦琶音
+    [587.33, 739.99, 880.0, 987.77, 1174.66, 1479.98, 1760.0].forEach((freq, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      const st = now + 0.08 + idx * 0.075;
+      o.frequency.setValueAtTime(freq, st);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.24, st + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 2.3);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 2.4);
+    });
+  }
+
   function playSummonChargeSfx(tierLevel, durationSec, specialVariant = null) {
     const ctx = getAudioCtx();
     if (!ctx) return;
@@ -953,7 +2549,49 @@
       const sig = TIER_AUDIO_SIGNATURES[tierLevel] || TIER_AUDIO_SIGNATURES[1];
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.15, now);
-      master.connect(ctx.destination);
+      master.connect(getMasterAudioOutput(ctx));
+
+      if (specialVariant === "hecate-death") {
+        master.gain.setValueAtTime(0.34, now);
+        playHecateChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
+
+      if (specialVariant === "skadi-darkness") {
+        master.gain.setValueAtTime(0.35, now);
+        playSkadiChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
+
+      if (specialVariant === "ignalion-holyfire") {
+        master.gain.setValueAtTime(0.35, now);
+        playIgnalionChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
+
+      if (specialVariant === "warrior-arena") {
+        master.gain.setValueAtTime(0.36, now);
+        playWarriorChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
+
+      if (specialVariant === "beelzebub-swarm") {
+        master.gain.setValueAtTime(0.38, now);
+        playBeelzebubChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
+
+      if (specialVariant === "nyx-moon-stars") {
+        master.gain.setValueAtTime(0.36, now);
+        playNyxChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
+
+      if (specialVariant === "hemera-sun") {
+        master.gain.setValueAtTime(0.38, now);
+        playHemeraChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
 
       if (specialVariant === "phenom-the-abyss") {
         // THE ABYSS (深淵風格): Crushing Deep-Trench Oceanic Sub-Drone + Echoing Abyssal Pressure Pulses
@@ -1051,7 +2689,7 @@
         return;
       }
 
-      if (tierLevel === 7) {
+      if (tierLevel === 8 || specialVariant === "phenom-seth-evil") {
         // 賽特 伊斐爾 / Default ？ Tier (邪惡風格): Evil Abyssal Drone + Sinister Heartbeat Pulse
         const drone1 = ctx.createOscillator();
         const drone2 = ctx.createOscillator();
@@ -1124,17 +2762,54 @@
       const sig = TIER_AUDIO_SIGNATURES[tierLevel] || TIER_AUDIO_SIGNATURES[1];
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.26, now);
-      master.connect(ctx.destination);
+      master.connect(getMasterAudioOutput(ctx));
+
+      if (specialVariant === "hecate-death") {
+        playHecateImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
+
+      if (specialVariant === "skadi-darkness") {
+        playSkadiImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
+
+      if (specialVariant === "ignalion-holyfire") {
+        playIgnalionImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
+
+      if (specialVariant === "warrior-arena") {
+        playWarriorImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
+
+      if (specialVariant === "beelzebub-swarm") {
+        playBeelzebubImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
+
+      if (specialVariant === "nyx-moon-stars") {
+        playNyxImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
+
+      if (specialVariant === "hemera-sun") {
+        playHemeraImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
 
       // Heavy Sub-Bass Impact Thud on every big text slam
       const sub = ctx.createOscillator();
       const subGain = ctx.createGain();
-      sub.type = tierLevel === 7 || specialVariant === "apocalypse-dragon" ? "sawtooth" : "sine";
+      sub.type = tierLevel >= 7 || specialVariant === "apocalypse-dragon" ? "sawtooth" : "sine";
       const impactStartFreq =
         specialVariant === "phenom-the-abyss"
           ? 72
-          : tierLevel === 7
+          : tierLevel === 8 || specialVariant === "phenom-seth-evil"
           ? 92
+          : tierLevel === 7 || specialVariant === "apocalypse-dragon"
+          ? 110
           : 110 + stepIdx * 12;
       sub.frequency.setValueAtTime(impactStartFreq, now);
       sub.frequency.exponentialRampToValueAtTime(24, now + 0.36);
@@ -1221,7 +2896,7 @@
         return;
       }
 
-      if (tierLevel === 7) {
+      if (tierLevel === 8 || specialVariant === "phenom-seth-evil") {
         // 賽特 伊斐爾 / Default ？ (邪惡風格): Sinister Demonic Bell Toll + Tritone Screech
         const evilFreqs =
           stepIdx === 1
@@ -1306,7 +2981,42 @@
       const sig = TIER_AUDIO_SIGNATURES[tierLevel] || TIER_AUDIO_SIGNATURES[1];
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.26, now);
-      master.connect(ctx.destination);
+      master.connect(getMasterAudioOutput(ctx));
+
+      if (specialVariant === "hecate-death") {
+        playHecateClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
+
+      if (specialVariant === "skadi-darkness") {
+        playSkadiClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
+
+      if (specialVariant === "ignalion-holyfire") {
+        playIgnalionClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
+
+      if (specialVariant === "warrior-arena") {
+        playWarriorClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
+
+      if (specialVariant === "beelzebub-swarm") {
+        playBeelzebubClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
+
+      if (specialVariant === "nyx-moon-stars") {
+        playNyxClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
+
+      if (specialVariant === "hemera-sun") {
+        playHemeraClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
 
       if (specialVariant === "apocalypse-dragon") {
         // 赤夜 終焉龍 (滅世風格終極演出): Ferocious Apocalyptic Dragon Roar + World-Ending Magma Bombardment!
@@ -1405,7 +3115,7 @@
         return;
       }
 
-      if (tierLevel === 7) {
+      if (tierLevel === 8 || specialVariant === "phenom-seth-evil") {
         // 賽特 伊斐爾 / Default ？ (邪惡風格終極演出):
         // Ominous Blood-Eclipse Vacuum Roar + 8 Rapid Blood-Lightning Slashes + Demonic Tritone Climax!
         const abyssSweep = ctx.createOscillator();
@@ -1530,7 +3240,42 @@
       const sig = TIER_AUDIO_SIGNATURES[tierLevel] || TIER_AUDIO_SIGNATURES[1];
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.26, now);
-      master.connect(ctx.destination);
+      master.connect(getMasterAudioOutput(ctx));
+
+      if (specialVariant === "hecate-death") {
+        playHecateRevealSfx(ctx, master, now);
+        return;
+      }
+
+      if (specialVariant === "skadi-darkness") {
+        playSkadiRevealSfx(ctx, master, now);
+        return;
+      }
+
+      if (specialVariant === "ignalion-holyfire") {
+        playIgnalionRevealSfx(ctx, master, now);
+        return;
+      }
+
+      if (specialVariant === "warrior-arena") {
+        playWarriorRevealSfx(ctx, master, now);
+        return;
+      }
+
+      if (specialVariant === "beelzebub-swarm") {
+        playBeelzebubRevealSfx(ctx, master, now);
+        return;
+      }
+
+      if (specialVariant === "nyx-moon-stars") {
+        playNyxRevealSfx(ctx, master, now);
+        return;
+      }
+
+      if (specialVariant === "hemera-sun") {
+        playHemeraRevealSfx(ctx, master, now);
+        return;
+      }
 
       if (specialVariant === "apocalypse-dragon") {
         // 赤夜 終焉龍登場：震天滅世龍吼 + 赤金毀滅和弦！
@@ -1618,7 +3363,7 @@
         return;
       }
 
-      if (tierLevel === 7) {
+      if (tierLevel === 8 || specialVariant === "phenom-seth-evil") {
         // 賽特 伊斐爾 / Default ？ (邪惡風格登場):
         // Reality-Crushing Dark Sub Impact + Forbidden Abyssal Organ & Blood-Bell Chord!
         const darkImpact = ctx.createOscillator();
@@ -1708,6 +3453,2678 @@
   }
   window.addEventListener("resize", resizeFxCanvas);
 
+  // ==================== 黑卡蒂 專屬畫面：死亡・橘黑冥焰・命運絲線 ====================
+  let hecateSprites = null;
+
+  function makeHecateFlameSprite(isBlack) {
+    const s = document.createElement("canvas");
+    s.width = 64;
+    s.height = 64;
+    const g = s.getContext("2d");
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    if (isBlack) {
+      // 黑焰：漆黑焰心 + 橘色焰緣
+      grad.addColorStop(0, "rgba(0, 0, 0, 1)");
+      grad.addColorStop(0.42, "rgba(10, 3, 0, 0.96)");
+      grad.addColorStop(0.68, "rgba(194, 65, 12, 0.6)");
+      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+    } else {
+      // 橘焰：淡金白焰心 → 橘 → 暗紅
+      grad.addColorStop(0, "rgba(255, 237, 190, 1)");
+      grad.addColorStop(0.28, "rgba(251, 146, 60, 0.92)");
+      grad.addColorStop(0.62, "rgba(194, 65, 12, 0.45)");
+      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+    }
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 64, 64);
+    return s;
+  }
+
+  function spawnHecateFlame(w, h, scatter) {
+    return {
+      x: Math.random() * w,
+      y: scatter ? h * (0.35 + Math.random() * 0.75) : h + 20 + Math.random() * 40,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: 0.8 + Math.random() * 1.8,
+      size: 18 + Math.random() * 34,
+      life: scatter ? 0.3 + Math.random() * 0.7 : 1,
+      decay: 0.004 + Math.random() * 0.006,
+      black: Math.random() < 0.45,
+      phase: Math.random() * Math.PI * 2
+    };
+  }
+
+  function createHecateFxState(w, h) {
+    if (!hecateSprites) {
+      hecateSprites = { orange: makeHecateFlameSprite(false), black: makeHecateFlameSprite(true) };
+    }
+    const threads = [];
+    const threadCount = 28;
+    for (let i = 0; i < threadCount; i++) {
+      threads.push({
+        angle: (i / threadCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.12,
+        phase: Math.random() * Math.PI * 2,
+        freq: 0.0015 + Math.random() * 0.002,
+        sag: 20 + Math.random() * 40,
+        width: 0.6 + Math.random() * 1.0
+      });
+    }
+    const puppets = [];
+    for (let i = 0; i < 5; i++) {
+      puppets.push({
+        xr: 0.12 + i * 0.19,
+        len: 0.2 + Math.random() * 0.18,
+        phase: Math.random() * Math.PI * 2,
+        swing: 0.12 + Math.random() * 0.08,
+        size: 18 + Math.random() * 8,
+        jawDrop: 0.25 + Math.random() * 0.35
+      });
+    }
+    const flames = [];
+    for (let i = 0; i < 90; i++) flames.push(spawnHecateFlame(w, h, true));
+    const souls = [];
+    for (let i = 0; i < 16; i++) {
+      souls.push({
+        x: Math.random() * w,
+        y: h * 0.3 + Math.random() * h * 0.7,
+        vy: 0.6 + Math.random() * 1.1,
+        phase: Math.random() * Math.PI * 2,
+        size: 22 + Math.random() * 18,
+        tailLength: 38 + Math.random() * 32,
+        mouthOpen: 0.35 + Math.random() * 0.5,
+        alpha: 0.45 + Math.random() * 0.35
+      });
+    }
+    return { threads, puppets, flames, souls, twang: 0 };
+  }
+
+  // 寫實恐怖死神骷髏頭：解剖學顱骨結構、頭骨骨縫裂紋、深陷空洞眼窩、齶骨與尖銳殘缺獠牙、開合下顎
+  function drawRealisticTerrifyingSkull(c, x, y, s, alpha, eyeGlow = 1, jawDrop = 0.25, isGiant = false) {
+    if (alpha <= 0.01) return;
+    c.save();
+    c.translate(x, y);
+    c.globalAlpha = alpha;
+
+    // 1. 巨大死靈暗影氣場 (Giant Aura)
+    if (isGiant) {
+      const aura = c.createRadialGradient(0, 0, s * 0.3, 0, 0, s * 1.6);
+      aura.addColorStop(0, "rgba(234, 88, 12, 0.45)");
+      aura.addColorStop(0.5, "rgba(28, 10, 4, 0.7)");
+      aura.addColorStop(1, "rgba(0, 0, 0, 0)");
+      c.fillStyle = aura;
+      c.fillRect(-s * 1.7, -s * 1.7, s * 3.4, s * 3.4);
+    }
+
+    // 2. 顱骨輪廓 (Neurocranium & Zygomatic Arches)
+    c.fillStyle = isGiant ? "#d6d3d1" : "#e7e5e4";
+    c.beginPath();
+    c.moveTo(-s * 0.72, -s * 0.2);
+    c.bezierCurveTo(-s * 0.78, -s * 0.95, s * 0.78, -s * 0.95, s * 0.72, -s * 0.2);
+    c.bezierCurveTo(s * 0.88, s * 0.05, s * 0.85, s * 0.35, s * 0.58, s * 0.48);
+    c.bezierCurveTo(s * 0.48, s * 0.65, s * 0.35, s * 0.75, 0, s * 0.75);
+    c.bezierCurveTo(-s * 0.35, s * 0.75, -s * 0.48, s * 0.65, -s * 0.58, s * 0.48);
+    c.bezierCurveTo(-s * 0.85, s * 0.35, -s * 0.88, s * 0.05, -s * 0.72, -s * 0.2);
+    c.closePath();
+    c.shadowColor = isGiant ? "#ea580c" : "rgba(0,0,0,0.85)";
+    c.shadowBlur = isGiant ? 35 : 12;
+    c.fill();
+    c.shadowBlur = 0;
+
+    // 3. 顱骨骨質老化漸層與陰影 (Bone Shading & Decay)
+    const boneShade = c.createRadialGradient(0, -s * 0.2, s * 0.1, 0, s * 0.2, s * 0.85);
+    boneShade.addColorStop(0, "rgba(255, 255, 255, 0.35)");
+    boneShade.addColorStop(0.55, "rgba(168, 162, 158, 0.2)");
+    boneShade.addColorStop(0.85, "rgba(68, 64, 60, 0.75)");
+    boneShade.addColorStop(1, "rgba(28, 25, 23, 0.95)");
+    c.fillStyle = boneShade;
+    c.fill();
+
+    // 4. 頭骨骨縫裂痕 (Cranial Sutures & Fractures)
+    c.strokeStyle = "rgba(41, 37, 36, 0.75)";
+    c.lineWidth = Math.max(1, s * 0.025);
+    c.beginPath();
+    c.moveTo(0, -s * 0.88);
+    c.lineTo(-s * 0.06, -s * 0.72);
+    c.lineTo(s * 0.05, -s * 0.58);
+    c.lineTo(-s * 0.04, -s * 0.44);
+    c.lineTo(s * 0.02, -s * 0.3);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(-s * 0.32, -s * 0.65);
+    c.lineTo(-s * 0.48, -s * 0.48);
+    c.lineTo(-s * 0.42, -s * 0.35);
+    c.stroke();
+
+    // 5. 顳骨下凹暗影 (Temporal Cavities)
+    c.fillStyle = "rgba(28, 25, 23, 0.85)";
+    c.beginPath();
+    c.ellipse(-s * 0.62, s * 0.25, s * 0.12, s * 0.22, 0.2, 0, Math.PI * 2);
+    c.ellipse(s * 0.62, s * 0.25, s * 0.12, s * 0.22, -0.2, 0, Math.PI * 2);
+    c.fill();
+
+    // 6. 深陷恐懼眼窩 (Cavernous Sunken Eye Sockets)
+    [-1, 1].forEach((dir) => {
+      c.save();
+      c.translate(dir * s * 0.28, -s * 0.06);
+      c.rotate(dir * 0.12);
+      c.fillStyle = "#0c0a09";
+      c.beginPath();
+      c.moveTo(-s * 0.2, -s * 0.15);
+      c.bezierCurveTo(0, -s * 0.24, s * 0.2, -s * 0.18, s * 0.22, 0.05);
+      c.bezierCurveTo(s * 0.2, s * 0.26, -s * 0.05, s * 0.28, -s * 0.18, s * 0.18);
+      c.closePath();
+      c.fill();
+
+      if (eyeGlow > 0.01) {
+        c.fillStyle = "#f97316";
+        c.shadowColor = "#ea580c";
+        c.shadowBlur = 18 * eyeGlow;
+        c.beginPath();
+        c.arc(dir * -s * 0.02, s * 0.02, s * 0.065 * eyeGlow, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = "#ffffff";
+        c.beginPath();
+        c.arc(dir * -s * 0.02, s * 0.02, s * 0.028 * eyeGlow, 0, Math.PI * 2);
+        c.fill();
+        c.shadowBlur = 0;
+      }
+      c.restore();
+    });
+
+    // 7. 鼻腔空洞 (Pyriform Aperture)
+    c.fillStyle = "#0a0908";
+    c.beginPath();
+    c.moveTo(0, s * 0.14);
+    c.lineTo(s * 0.09, s * 0.38);
+    c.lineTo(0, s * 0.44);
+    c.lineTo(-s * 0.09, s * 0.38);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = "#44403c";
+    c.lineWidth = Math.max(1, s * 0.02);
+    c.beginPath();
+    c.moveTo(0, s * 0.16);
+    c.lineTo(0, s * 0.38);
+    c.stroke();
+
+    // 8. 上頜牙齒 (Maxillary Teeth)
+    const toothCount = 6;
+    for (let t = -toothCount / 2; t < toothCount / 2; t++) {
+      const tx = (t + 0.5) * (s * 0.09);
+      const ty = s * 0.62;
+      const th = s * (0.13 + (Math.abs(t) === 1 ? 0.04 : 0));
+      c.fillStyle = "#f5f5f4";
+      c.strokeStyle = "#292524";
+      c.lineWidth = Math.max(0.8, s * 0.016);
+      c.beginPath();
+      c.rect(tx - s * 0.038, ty, s * 0.076, th);
+      c.fill();
+      c.stroke();
+    }
+
+    // 9. 脫臼大張下顎骨 (Unhinged Gaping Mandible)
+    const jawY = s * (0.68 + jawDrop * 0.55);
+    if (jawDrop > 0.05) {
+      c.fillStyle = "#030202";
+      c.beginPath();
+      c.rect(-s * 0.34, s * 0.68, s * 0.68, jawY - s * 0.64);
+      c.fill();
+      if (eyeGlow > 0.2) {
+        const throatGlow = c.createRadialGradient(0, (s * 0.68 + jawY) / 2, 2, 0, (s * 0.68 + jawY) / 2, s * 0.32);
+        throatGlow.addColorStop(0, "rgba(249, 115, 22, 0.7)");
+        throatGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        c.fillStyle = throatGlow;
+        c.fillRect(-s * 0.32, s * 0.68, s * 0.64, jawY - s * 0.64);
+      }
+    }
+
+    c.fillStyle = "#d6d3d1";
+    c.strokeStyle = "#44403c";
+    c.lineWidth = Math.max(1, s * 0.02);
+    c.beginPath();
+    c.moveTo(-s * 0.42, jawY - s * 0.06);
+    c.lineTo(-s * 0.28, jawY + s * 0.18);
+    c.lineTo(s * 0.28, jawY + s * 0.18);
+    c.lineTo(s * 0.42, jawY - s * 0.06);
+    c.bezierCurveTo(s * 0.26, jawY + s * 0.02, -s * 0.26, jawY + s * 0.02, -s * 0.42, jawY - s * 0.06);
+    c.fill();
+    c.stroke();
+
+    for (let t = -toothCount / 2; t < toothCount / 2; t++) {
+      const tx = (t + 0.5) * (s * 0.085);
+      const ty = jawY - s * 0.09;
+      const th = s * 0.1;
+      c.fillStyle = "#e7e5e4";
+      c.strokeStyle = "#292524";
+      c.lineWidth = Math.max(0.8, s * 0.016);
+      c.beginPath();
+      c.rect(tx - s * 0.035, ty, s * 0.07, th);
+      c.fill();
+      c.stroke();
+    }
+
+    c.restore();
+  }
+
+  // 寫實恐怖哀嚎怨魂：扭曲長袍幽靈煙霧、絕望尖叫面孔、深陷哀號黑洞雙眼與張大嘶吼黑口、抓扒利爪
+  function drawRealisticScreamingWraith(c, w, elapsed, isClimax, alpha) {
+    if (!w || alpha <= 0.01) return;
+    c.save();
+    c.translate(w.x, w.y);
+    c.globalAlpha = w.alpha * alpha;
+
+    const tailWave = Math.sin(elapsed * 0.003 + w.phase) * (w.size * 0.4);
+    const s = w.size;
+
+    // 1. 幽魂流動拖尾長袍 (Ethereal Flowing Shroud Tail)
+    const tailGrad = c.createLinearGradient(0, -s * 0.5, 0, w.tailLength * 1.5);
+    tailGrad.addColorStop(0, "rgba(226, 232, 240, 0.75)");
+    tailGrad.addColorStop(0.4, "rgba(148, 163, 184, 0.45)");
+    tailGrad.addColorStop(0.75, "rgba(234, 88, 12, 0.25)");
+    tailGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+    c.fillStyle = tailGrad;
+
+    c.beginPath();
+    c.moveTo(-s * 0.5, 0);
+    c.bezierCurveTo(-s * 0.7, s * 0.8, -s * 0.3 + tailWave, s * 1.8, 0 + tailWave * 1.3, w.tailLength * 1.5);
+    c.bezierCurveTo(s * 0.3 + tailWave, s * 1.8, s * 0.7, s * 0.8, s * 0.5, 0);
+    c.closePath();
+    c.fill();
+
+    // 2. 怨靈頭顱 (Spectral Skull Head)
+    c.fillStyle = "rgba(241, 245, 249, 0.9)";
+    c.shadowColor = "#ea580c";
+    c.shadowBlur = 14;
+    c.beginPath();
+    c.ellipse(0, -s * 0.45, s * 0.45, s * 0.55, 0, 0, Math.PI * 2);
+    c.fill();
+    c.shadowBlur = 0;
+
+    // 3. 哀嚎空洞黑眼 (Agonized Sunken Eye Voids with Weeping Streams)
+    c.fillStyle = "#050203";
+    [-1, 1].forEach((dir) => {
+      c.beginPath();
+      c.ellipse(dir * s * 0.18, -s * 0.52, s * 0.1, s * 0.16, dir * 0.15, 0, Math.PI * 2);
+      c.fill();
+
+      c.strokeStyle = "rgba(10, 4, 2, 0.6)";
+      c.lineWidth = 1.2;
+      c.beginPath();
+      c.moveTo(dir * s * 0.18, -s * 0.4);
+      c.lineTo(dir * s * 0.2, -s * 0.22);
+      c.stroke();
+
+      c.fillStyle = "#fb923c";
+      c.beginPath();
+      c.arc(dir * s * 0.18, -s * 0.5, s * 0.035, 0, Math.PI * 2);
+      c.fill();
+    });
+
+    // 4. 扭曲絕望張大哀嚎之口 (Stretched Screaming Mouth Void)
+    const mouthHeight = s * (0.28 + w.mouthOpen * 0.25);
+    c.fillStyle = "#000000";
+    c.beginPath();
+    c.ellipse(0, -s * 0.22 + mouthHeight * 0.35, s * 0.16, mouthHeight * 0.55, 0, 0, Math.PI * 2);
+    c.fill();
+
+    c.strokeStyle = "rgba(234, 88, 12, 0.5)";
+    c.lineWidth = 1;
+    c.beginPath();
+    c.moveTo(0, -s * 0.22);
+    c.lineTo(0, -s * 0.22 + mouthHeight * 0.8);
+    c.stroke();
+
+    // 5. 怨靈前伸骨爪 (Reaching Phantom Arms / Skeletal Claws)
+    c.strokeStyle = "rgba(226, 232, 240, 0.7)";
+    c.lineWidth = 1.4;
+    [-1, 1].forEach((dir) => {
+      c.beginPath();
+      c.moveTo(dir * s * 0.35, -s * 0.15);
+      c.quadraticCurveTo(dir * s * 0.7, -s * 0.05, dir * s * 0.85, s * 0.2);
+      c.lineTo(dir * s * 0.98, s * 0.18);
+      c.moveTo(dir * s * 0.85, s * 0.2);
+      c.lineTo(dir * s * 0.95, s * 0.28);
+      c.stroke();
+    });
+
+    c.restore();
+  }
+
+  function drawHecateSkull(c, x, y, s, alpha, eyeGlow) {
+    drawRealisticTerrifyingSkull(c, x, y, s, alpha, eyeGlow, 0.22, false);
+  }
+
+  function drawHecateCrescentLeft(c, x, m) {
+    c.beginPath();
+    c.arc(x, 0, m, Math.PI * 0.5, Math.PI * 1.5);
+    c.ellipse(x, 0, m * 0.45, m, 0, Math.PI * 1.5, Math.PI * 0.5, true);
+    c.closePath();
+    c.fill();
+  }
+
+  // 黑卡蒂三相月死亡法印
+  function drawHecateSigil(c, cx, cy, R, rot, alpha) {
+    c.save();
+    c.translate(cx, cy);
+    c.globalAlpha = alpha;
+    c.rotate(rot);
+    c.strokeStyle = "#f97316";
+    c.lineWidth = 1.6;
+    c.beginPath();
+    c.arc(0, 0, R, 0, Math.PI * 2);
+    c.stroke();
+    c.setLineDash([4, 7]);
+    c.beginPath();
+    c.arc(0, 0, R * 0.84, 0, Math.PI * 2);
+    c.stroke();
+    c.setLineDash([]);
+    c.beginPath();
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2;
+      const r2 = R * (i % 3 === 0 ? 0.98 : 0.92);
+      c.moveTo(Math.cos(a) * R * 0.86, Math.sin(a) * R * 0.86);
+      c.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+    }
+    c.stroke();
+    // 倒三角
+    c.strokeStyle = "rgba(253, 186, 116, 0.7)";
+    c.beginPath();
+    for (let i = 0; i < 3; i++) {
+      const a = Math.PI / 2 + (i / 3) * Math.PI * 2;
+      const px = Math.cos(a) * R * 0.8;
+      const py = Math.sin(a) * R * 0.8;
+      if (i === 0) c.moveTo(px, py);
+      else c.lineTo(px, py);
+    }
+    c.closePath();
+    c.stroke();
+    c.rotate(-rot);
+    // 三相月 ☽○☾
+    const m = R * 0.16;
+    c.fillStyle = "#fb923c";
+    c.beginPath();
+    c.arc(0, 0, m, 0, Math.PI * 2);
+    c.fill();
+    drawHecateCrescentLeft(c, -m * 2.2, m);
+    c.scale(-1, 1);
+    drawHecateCrescentLeft(c, -m * 2.2, m);
+    c.restore();
+  }
+
+  function renderHecateFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const hs = st.hecate;
+    const cx = w / 2;
+    const cy = h / 2;
+    const intensity = isClimax ? 1.6 : isUp ? 1.15 : 0.75;
+    hs.twang *= 0.94;
+
+    // 0. 漆黑背景 + 底部冥焰餘燼光
+    const bg = c.createRadialGradient(cx, cy * 1.1, 10, cx, cy, Math.max(w, h) * 0.8);
+    bg.addColorStop(0, isClimax ? "rgba(67, 20, 7, 0.95)" : "rgba(30, 10, 4, 0.94)");
+    bg.addColorStop(0.5, "rgba(10, 4, 2, 0.97)");
+    bg.addColorStop(1, "rgba(0, 0, 0, 1)");
+    c.fillStyle = bg;
+    c.fillRect(0, 0, w, h);
+    const eg = c.createLinearGradient(0, h, 0, h * 0.4);
+    eg.addColorStop(0, `rgba(234, 88, 12, ${0.32 * intensity})`);
+    eg.addColorStop(1, "rgba(0, 0, 0, 0)");
+    c.fillStyle = eg;
+    c.fillRect(0, 0, w, h);
+
+    // 1. 三相月死亡法印
+    drawHecateSigil(
+      c,
+      cx,
+      cy,
+      Math.min(w, h) * (isClimax ? 0.37 : 0.32),
+      elapsed * 0.00025 * (isClimax ? 3 : 1),
+      isUp ? 0.55 : 0.3
+    );
+
+    // 2. 由四面八方收束至中心的命運絲線 + 蛛網
+    const outerR = Math.hypot(w, h) * 0.55;
+    const innerR = isClimax ? Math.max(12, 70 - climaxElapsed * 0.03) : 70;
+    c.save();
+    c.lineCap = "round";
+    for (let i = 0; i < hs.threads.length; i++) {
+      const t = hs.threads[i];
+      const sway = Math.sin(elapsed * t.freq + t.phase) * t.sag;
+      const vib = hs.twang * Math.sin(elapsed * 0.09 + t.phase) * 16;
+      const ca = Math.cos(t.angle);
+      const sa = Math.sin(t.angle);
+      const ox = cx + ca * outerR;
+      const oy = cy + sa * outerR;
+      const ix = cx + ca * innerR;
+      const iy = cy + sa * innerR;
+      const off = sway * 0.4 + vib;
+      const mx = (ox + ix) / 2 - sa * off;
+      const my = (oy + iy) / 2 + ca * off + 16;
+      c.strokeStyle = i % 4 === 0 ? "rgba(255, 237, 213, 0.6)" : "rgba(249, 115, 22, 0.42)";
+      c.lineWidth = t.width * (isClimax ? 1.5 : 1);
+      c.beginPath();
+      c.moveTo(ox, oy);
+      c.quadraticCurveTo(mx, my, ix, iy);
+      c.stroke();
+    }
+    c.strokeStyle = "rgba(253, 186, 116, 0.22)";
+    c.lineWidth = 0.8;
+    const n = hs.threads.length;
+    for (let k = 0; k < 4; k++) {
+      const r = innerR + 26 + k * 36;
+      c.beginPath();
+      for (let i = 0; i <= n; i++) {
+        const a = hs.threads[i % n].angle;
+        const px = cx + Math.cos(a) * r;
+        const py = cy + Math.sin(a) * r;
+        if (i === 0) {
+          c.moveTo(px, py);
+        } else {
+          const pa = hs.threads[(i - 1) % n].angle;
+          const ma = (pa + a + (i === n ? Math.PI * 2 : 0)) / 2;
+          c.quadraticCurveTo(cx + Math.cos(ma) * r * 0.9, cy + Math.sin(ma) * r * 0.9, px, py);
+        }
+      }
+      c.stroke();
+    }
+    c.restore();
+
+    // 3. 由天頂絲線懸吊、搖晃的死亡骷髏人偶
+    for (let i = 0; i < hs.puppets.length; i++) {
+      const p = hs.puppets[i];
+      const ax = w * p.xr;
+      const len = h * p.len * (isUp ? 1 : 0.8) + (isClimax ? Math.min(60, climaxElapsed * 0.04) : 0);
+      const ang =
+        Math.sin(elapsed * 0.0016 + p.phase) * p.swing + hs.twang * 0.25 * Math.sin(elapsed * 0.02 + p.phase);
+      const sx = ax + Math.sin(ang) * len;
+      const sy = Math.cos(ang) * len;
+      c.save();
+      c.globalAlpha = 0.6;
+      c.strokeStyle = "#fed7aa";
+      c.lineWidth = 0.9;
+      c.beginPath();
+      c.moveTo(ax, 0);
+      c.lineTo(sx, sy - p.size * 1.1);
+      c.stroke();
+      c.restore();
+      drawRealisticTerrifyingSkull(c, sx, sy, p.size, isUp ? 0.95 : 0.65, isUp ? 0.85 : 0.3, p.jawDrop || 0.25, false);
+    }
+
+    // 4. 被絲線牽引、淒厲哀號的寫實恐怖怨魂
+    for (let i = 0; i < hs.souls.length; i++) {
+      const s = hs.souls[i];
+      s.y -= s.vy * intensity;
+      s.x += Math.sin(elapsed * 0.002 + s.phase) * 0.8;
+      if (isClimax) {
+        s.x += (cx - s.x) * 0.035;
+        s.y += (cy - s.y) * 0.035;
+      }
+      if (s.y < -40 || (isClimax && Math.abs(s.x - cx) + Math.abs(s.y - cy) < 28)) {
+        s.y = h + 15 + Math.random() * 50;
+        s.x = Math.random() * w;
+      }
+      drawRealisticScreamingWraith(c, s, elapsed, isClimax, isUp ? 1 : 0.6);
+    }
+
+    // 5. 橘焰與黑焰
+    c.save();
+    for (let i = 0; i < hs.flames.length; i++) {
+      const f = hs.flames[i];
+      f.y -= f.vy * intensity;
+      f.x += f.vx + Math.sin(elapsed * 0.004 + f.phase) * 0.5;
+      f.life -= f.decay * (isClimax ? 1.6 : 1);
+      if (isClimax) f.x += (cx - f.x) * 0.004;
+      if (f.life <= 0 || f.y < -60) {
+        Object.assign(f, spawnHecateFlame(w, h, false));
+      }
+      const sz = f.size * (0.5 + f.life * 0.7) * (isClimax ? 1.3 : 1);
+      c.globalCompositeOperation = f.black ? "source-over" : "lighter";
+      c.globalAlpha = Math.max(0, Math.min(1, f.life)) * (f.black ? 0.85 : 0.75);
+      c.drawImage(f.black ? hecateSprites.black : hecateSprites.orange, f.x - sz / 2, f.y - sz * 0.65, sz, sz * 1.3);
+    }
+    c.restore();
+
+    // 6. 終極演出：橘黑冥焰漩渦 + 絲線繭 + 巨大寫實恐怖死靈骷髏真身
+    if (isClimax && !st.burstTriggered) {
+      const t = climaxElapsed;
+      const ringR = 60 + Math.min(1, t / 900) * 120;
+      c.save();
+      for (let i = 0; i < 36; i++) {
+        const a = (i / 36) * Math.PI * 2 + t * 0.004;
+        const r = ringR + Math.sin(t * 0.01 + i) * 12;
+        const sz = 34 + (i % 3) * 10;
+        const isBlack = i % 2 === 0;
+        c.globalCompositeOperation = isBlack ? "source-over" : "lighter";
+        c.globalAlpha = 0.85;
+        c.drawImage(isBlack ? hecateSprites.black : hecateSprites.orange, cx + Math.cos(a) * r - sz / 2, cy + Math.sin(a) * r - sz / 2, sz, sz);
+      }
+      c.restore();
+
+      c.save();
+      c.strokeStyle = "rgba(255, 237, 213, 0.55)";
+      c.lineWidth = 1;
+      const tighten = 1 - Math.min(1, t / 2400) * 0.6;
+      c.beginPath();
+      for (let k = 0; k < 160; k++) {
+        const a = k * 0.35 + t * 0.006;
+        const r = (30 + k * 0.9) * tighten;
+        const px = cx + Math.cos(a) * r;
+        const py = cy + Math.sin(a) * r * 0.85;
+        if (k === 0) c.moveTo(px, py);
+        else c.lineTo(px, py);
+      }
+      c.stroke();
+      c.restore();
+
+      // 震撼巨大寫實死靈骷髏狂暴咆哮
+      const sk = Math.min(1, t / 1100);
+      const jawAnim = 0.35 + 0.32 * Math.sin(t * 0.006);
+      drawRealisticTerrifyingSkull(c, cx, cy - 18, 120 + sk * 25, sk * 0.95, 1.0, jawAnim, true);
+
+      // 高潮暴走環繞的淒厲怨魂狂潮
+      for (let wIdx = 0; wIdx < 6; wIdx++) {
+        const wAngle = (wIdx / 6) * Math.PI * 2 + t * 0.005;
+        const wDist = 180 + Math.sin(t * 0.008 + wIdx) * 35;
+        const tempW = {
+          x: cx + Math.cos(wAngle) * wDist,
+          y: cy + Math.sin(wAngle) * (wDist * 0.7),
+          size: 28,
+          tailLength: 45,
+          mouthOpen: 0.8,
+          phase: t * 0.01 + wIdx,
+          alpha: 0.75
+        };
+        drawRealisticScreamingWraith(c, tempW, elapsed, true, sk);
+      }
+    }
+
+    // 7. 衝擊波與火星（改為橘 / 淡橘白配色）
+    for (let i = st.burstSparks.length - 1; i >= 0; i--) {
+      const sp = st.burstSparks[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.vy -= 0.04; // 火星向上飄
+      sp.alpha *= 0.95;
+      if (sp.alpha <= 0.02) {
+        st.burstSparks.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sp.alpha;
+      c.fillStyle = i % 3 === 0 ? "#fff7ed" : "#fb923c";
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      c.fill();
+    }
+    for (let i = st.shockwaves.length - 1; i >= 0; i--) {
+      const sw = st.shockwaves[i];
+      sw.r += sw.speed;
+      sw.alpha *= 0.93;
+      if (sw.alpha <= 0.02) {
+        st.shockwaves.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sw.alpha;
+      c.strokeStyle = i % 2 === 0 ? "#f97316" : "#fed7aa";
+      c.lineWidth = sw.lineWidth;
+      c.beginPath();
+      c.arc(cx, cy, sw.r, 0, Math.PI * 2);
+      c.stroke();
+    }
+
+    // 8. 四角暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.35, cx, cy, Math.max(w, h) * 0.75);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(0, 0, 0, 0.75)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
+  // ==================== 暗 斯卡奇 專屬畫面：霸王之暗・黑色暴君・萬影臣服 ====================
+  function createSkadiFxState(w, h) {
+    // 1. 臣服萬影 (Subservient Shadows) — 38 道朝中央王座緩緩爬動、盤旋匯聚的深淵暗影
+    const wisps = [];
+    for (let i = 0; i < 38; i++) {
+      const angle = (i / 38) * Math.PI * 2 + (Math.random() - 0.5) * 0.2;
+      wisps.push({
+        angle,
+        dist: Math.max(w, h) * (0.35 + Math.random() * 0.35),
+        speed: 0.65 + Math.random() * 1.1,
+        amp: 14 + Math.random() * 22,
+        freq: 0.002 + Math.random() * 0.003,
+        phase: Math.random() * Math.PI * 2,
+        size: 8 + Math.random() * 12,
+        alpha: 0.4 + Math.random() * 0.45,
+        history: []
+      });
+    }
+
+    // 2. 霸王黑雷電弧 (Black Lightning Arcs)
+    const lightnings = [];
+    for (let i = 0; i < 6; i++) {
+      lightnings.push({
+        fromAngle: Math.random() * Math.PI * 2,
+        targetAngle: Math.random() * Math.PI * 2,
+        timer: Math.random() * 100,
+        active: false,
+        segments: []
+      });
+    }
+
+    // 3. 萬鈞重力震盪環 (Gravity Shockwaves)
+    const gravRings = [];
+    for (let r = 0; r < 4; r++) {
+      gravRings.push({
+        r: r * 80,
+        speed: 1.2,
+        maxR: 380,
+        alpha: 0.6
+      });
+    }
+
+    return {
+      wisps,
+      lightnings,
+      gravRings,
+      hammerImpact: 0,
+      shockwaves: []
+    };
+  }
+
+  // 繪製暴君王冠法印（幾何暗冠 + 8道暗曜刺針）
+  function drawSkadiTyrantCrown(c, cx, cy, R, rot, alpha, pulse) {
+    if (alpha <= 0.01) return;
+    c.save();
+    c.translate(cx, cy);
+    c.rotate(rot);
+    c.globalAlpha = alpha;
+
+    // 外環符文暗曜軌道
+    c.strokeStyle = "rgba(147, 51, 234, 0.75)";
+    c.lineWidth = 1.8;
+    c.beginPath();
+    c.arc(0, 0, R, 0, Math.PI * 2);
+    c.stroke();
+
+    c.setLineDash([6, 8]);
+    c.strokeStyle = "rgba(192, 132, 252, 0.45)";
+    c.beginPath();
+    c.arc(0, 0, R * 0.88, 0, Math.PI * 2);
+    c.stroke();
+    c.setLineDash([]);
+
+    // 8 道霸王尖刺（王權之冠放射尖稜）
+    const spikes = 8;
+    for (let i = 0; i < spikes; i++) {
+      const a = (i / spikes) * Math.PI * 2;
+      const rOuter = R * (i % 2 === 0 ? 1.28 : 1.12) * (1 + pulse * 0.08);
+      const rInner = R * 0.76;
+      const wSide = 0.12;
+
+      c.fillStyle = i % 2 === 0 ? "rgba(46, 16, 101, 0.85)" : "rgba(10, 0, 20, 0.95)";
+      c.strokeStyle = "#a855f7";
+      c.lineWidth = 1.5;
+
+      c.beginPath();
+      c.moveTo(Math.cos(a - wSide) * rInner, Math.sin(a - wSide) * rInner);
+      c.lineTo(Math.cos(a) * rOuter, Math.sin(a) * rOuter);
+      c.lineTo(Math.cos(a + wSide) * rInner, Math.sin(a + wSide) * rInner);
+      c.closePath();
+      c.fill();
+      c.stroke();
+
+      // 尖端暗紫晶芒
+      c.fillStyle = "#e9d5ff";
+      c.beginPath();
+      c.arc(Math.cos(a) * rOuter, Math.sin(a) * rOuter, 2.5, 0, Math.PI * 2);
+      c.fill();
+    }
+
+    // 核心雙重反向八角星
+    c.strokeStyle = "rgba(233, 213, 255, 0.65)";
+    c.lineWidth = 1.6;
+    for (let k = 0; k < 2; k++) {
+      c.beginPath();
+      const offset = (k * Math.PI) / 4;
+      for (let s = 0; s < 4; s++) {
+        const ang = offset + (s * Math.PI) / 2;
+        const px = Math.cos(ang) * R * 0.62;
+        const py = Math.sin(ang) * R * 0.62;
+        if (s === 0) c.moveTo(px, py);
+        else c.lineTo(px, py);
+      }
+      c.closePath();
+      c.stroke();
+    }
+
+    c.restore();
+  }
+
+  // 繪製霸王黑雷電弧
+  function drawSkadiBlackBolt(c, x1, y1, x2, y2, isThick) {
+    const segs = 9;
+    let lx = x1;
+    let ly = y1;
+    const pts = [{ x: lx, y: ly }];
+    for (let s = 1; s < segs; s++) {
+      const t = s / segs;
+      const nx = x1 + (x2 - x1) * t + (Math.random() - 0.5) * (isThick ? 45 : 25);
+      const ny = y1 + (y2 - y1) * t + (Math.random() - 0.5) * (isThick ? 45 : 25);
+      pts.push({ x: nx, y: ny });
+    }
+    pts.push({ x: x2, y: y2 });
+
+    // 黑雷：黑邊外廓
+    c.save();
+    c.lineCap = "round";
+    c.lineJoin = "round";
+
+    c.strokeStyle = "#000000";
+    c.lineWidth = isThick ? 7 : 4.5;
+    c.globalAlpha = 0.95;
+    c.beginPath();
+    c.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) c.lineTo(pts[i].x, pts[i].y);
+    c.stroke();
+
+    // 紫電核心
+    c.strokeStyle = isThick ? "#e9d5ff" : "#c084fc";
+    c.lineWidth = isThick ? 3.2 : 1.8;
+    c.globalAlpha = 1;
+    c.beginPath();
+    c.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) c.lineTo(pts[i].x, pts[i].y);
+    c.stroke();
+
+    c.restore();
+  }
+
+  // 繪製巨槌剪影 (暗王之錘・索狄亞洛)
+  function drawSkadiHammerSilhouette(c, cx, cy, scale, alpha, glowColor) {
+    if (alpha <= 0.01) return;
+    c.save();
+    c.translate(cx, cy);
+    c.scale(scale, scale);
+    c.globalAlpha = alpha;
+
+    // 槌頭深紫黑金光影
+    c.fillStyle = "#0c0214";
+    c.strokeStyle = glowColor || "#a855f7";
+    c.lineWidth = 4;
+
+    // 巨大槌頭箱體 (兩側帶有倒角與重力法印)
+    const hw = 130;
+    const hh = 75;
+    c.beginPath();
+    c.moveTo(-hw, -hh);
+    c.lineTo(hw, -hh);
+    c.lineTo(hw + 18, -hh + 24);
+    c.lineTo(hw + 18, hh - 24);
+    c.lineTo(hw, hh);
+    c.lineTo(-hw, hh);
+    c.lineTo(-hw - 18, hh - 24);
+    c.lineTo(-hw - 18, -hh + 24);
+    c.closePath();
+    c.fill();
+    c.stroke();
+
+    // 槌身符文雕刻
+    c.strokeStyle = "rgba(233, 213, 255, 0.75)";
+    c.lineWidth = 2;
+    c.strokeRect(-hw * 0.7, -hh * 0.65, hw * 1.4, hh * 1.3);
+
+    // 槌柄
+    c.fillStyle = "#1e082b";
+    c.strokeStyle = "#9333ea";
+    c.lineWidth = 3;
+    c.fillRect(-14, hh, 28, 160);
+    c.strokeRect(-14, hh, 28, 160);
+
+    // 槌頂重力寶石
+    c.fillStyle = "#c084fc";
+    c.beginPath();
+    c.arc(0, -hh, 16, 0, Math.PI * 2);
+    c.fill();
+
+    c.restore();
+  }
+
+  function renderSkadiFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const ss = st.skadi;
+    const cx = w / 2;
+    const cy = h / 2;
+    const intensity = isClimax ? 1.7 : isUp ? 1.2 : 0.85;
+    if (ss.hammerImpact > 0.01) ss.hammerImpact *= 0.91;
+
+    // 0. 深邃霸王之暗底色（純黑向中心深紫擴散）
+    const bg = c.createRadialGradient(cx, cy, 20, cx, cy, Math.max(w, h) * 0.78);
+    bg.addColorStop(0, isClimax ? "rgba(59, 7, 100, 0.95)" : "rgba(30, 8, 43, 0.92)");
+    bg.addColorStop(0.38, "rgba(15, 2, 24, 0.96)");
+    bg.addColorStop(0.75, "rgba(5, 0, 8, 0.99)");
+    bg.addColorStop(1, "rgba(0, 0, 0, 1)");
+    c.fillStyle = bg;
+    c.fillRect(0, 0, w, h);
+
+    // 1. 萬鈞重力震盪環（向外擴散的重力脈衝）
+    c.save();
+    for (let i = 0; i < ss.gravRings.length; i++) {
+      const ring = ss.gravRings[i];
+      ring.r += ring.speed * (isClimax ? 2.2 : 1.2);
+      if (ring.r > ring.maxR) ring.r = 20;
+      const ringAlpha = (1 - ring.r / ring.maxR) * 0.45 * (isUp ? 1 : 0.6);
+      c.strokeStyle = i % 2 === 0 ? "rgba(147, 51, 234, " + ringAlpha + ")" : "rgba(10, 0, 20, " + ringAlpha * 1.5 + ")";
+      c.lineWidth = i % 2 === 0 ? 3.5 : 6;
+      c.beginPath();
+      c.arc(cx, cy, ring.r, 0, Math.PI * 2);
+      c.stroke();
+    }
+    c.restore();
+
+    // 2. 旋轉霸王暗冠神座法印（8角王權尖刺）
+    const crownR = Math.min(w, h) * (isClimax ? 0.38 : 0.32);
+    const pulseVal = Math.sin(elapsed * 0.003) * 0.5 + 0.5;
+    drawSkadiTyrantCrown(c, cx, cy, crownR, elapsed * 0.00032 * (isClimax ? 2.5 : 1), isUp ? 0.7 : 0.4, pulseVal);
+
+    // 3. 臣服萬影（向中央王座爬行盤旋的群臣暗影）
+    c.save();
+    for (let i = 0; i < ss.wisps.length; i++) {
+      const wisp = ss.wisps[i];
+      wisp.dist -= wisp.speed * intensity;
+      if (wisp.dist < (isClimax ? 15 : 45)) {
+        wisp.dist = Math.max(w, h) * (0.35 + Math.random() * 0.35);
+        wisp.history = [];
+      }
+      wisp.angle += (isClimax ? 0.015 : 0.007) * (i % 2 === 0 ? 1 : -1);
+      const wave = Math.sin(elapsed * wisp.freq + wisp.phase) * wisp.amp;
+      const wx = cx + Math.cos(wisp.angle) * (wisp.dist + wave);
+      const wy = cy + Math.sin(wisp.angle) * (wisp.dist * 0.75 + wave);
+
+      wisp.history.push({ x: wx, y: wy });
+      if (wisp.history.length > 7) wisp.history.shift();
+
+      // 繪製暗影軌跡
+      if (wisp.history.length > 1) {
+        c.beginPath();
+        c.moveTo(wisp.history[0].x, wisp.history[0].y);
+        for (let k = 1; k < wisp.history.length; k++) {
+          c.lineTo(wisp.history[k].x, wisp.history[k].y);
+        }
+        c.strokeStyle = i % 3 === 0 ? "#7e22ce" : "#1a0329";
+        c.lineWidth = wisp.size * 0.65;
+        c.lineCap = "round";
+        c.globalAlpha = wisp.alpha * (isUp ? 0.75 : 0.45);
+        c.stroke();
+      }
+
+      // 暗影頭部核心
+      c.globalAlpha = wisp.alpha * (isUp ? 0.85 : 0.5);
+      c.fillStyle = i % 2 === 0 ? "#9333ea" : "#000000";
+      c.beginPath();
+      c.arc(wx, wy, wisp.size * 0.5, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.restore();
+
+    // 4. 霸王黑雷電弧（空間黑雷裂空轟擊）
+    c.save();
+    const shouldBolt = Math.random() < (isClimax ? 0.65 : isUp ? 0.35 : 0.15) || ss.hammerImpact > 0.3;
+    if (shouldBolt) {
+      const bAng = Math.random() * Math.PI * 2;
+      const bDist = Math.max(w, h) * 0.48;
+      const bx1 = cx + Math.cos(bAng) * bDist;
+      const by1 = cy + Math.sin(bAng) * bDist;
+      const bx2 = cx + (Math.random() - 0.5) * 80;
+      const by2 = cy + (Math.random() - 0.5) * 80;
+      drawSkadiBlackBolt(c, bx1, by1, bx2, by2, isClimax || ss.hammerImpact > 0.4);
+    }
+    c.restore();
+
+    // 5. 終極高潮演出：暗王之錘・索狄亞洛 萬鈞虛影轟臨 + 巨大暴君王冠
+    if (isClimax && !st.burstTriggered) {
+      const t = climaxElapsed;
+      const scaleProg = Math.min(1, t / 1100);
+      const hammerY = cy - 24 - (1 - scaleProg) * 120;
+      drawSkadiHammerSilhouette(c, cx, hammerY, 0.72 + scaleProg * 0.28, Math.min(0.85, scaleProg * 0.95), "#c084fc");
+
+      // 狂暴黑雷圍繞中央核心狂轟
+      for (let i = 0; i < 3; i++) {
+        const a1 = (i / 3) * Math.PI * 2 + t * 0.005;
+        const a2 = a1 + Math.PI;
+        const r = 110 + Math.sin(t * 0.01 + i) * 35;
+        drawSkadiBlackBolt(c, cx + Math.cos(a1) * r, cy + Math.sin(a1) * r, cx + Math.cos(a2) * (r * 0.4), cy + Math.sin(a2) * (r * 0.4), true);
+      }
+    }
+
+    // 6. 重槌震波與碎裂紫黑粒子
+    for (let i = st.burstSparks.length - 1; i >= 0; i--) {
+      const sp = st.burstSparks[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.vy += 0.06;
+      sp.alpha *= 0.95;
+      if (sp.alpha <= 0.02) {
+        st.burstSparks.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sp.alpha;
+      c.fillStyle = sp.color || "#a855f7";
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      c.fill();
+    }
+    for (let i = st.shockwaves.length - 1; i >= 0; i--) {
+      const sw = st.shockwaves[i];
+      sw.r += sw.speed;
+      sw.alpha *= 0.93;
+      if (sw.alpha <= 0.02) {
+        st.shockwaves.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sw.alpha;
+      c.strokeStyle = sw.color || "#9333ea";
+      c.lineWidth = sw.lineWidth || 3;
+      c.beginPath();
+      c.arc(cx, cy, sw.r, 0, Math.PI * 2);
+      c.stroke();
+    }
+
+    // 7. 四角極致壓制暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.28, cx, cy, Math.max(w, h) * 0.76);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(0, 0, 0, 0.88)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
+  // ==================== 伊格那利昂 加拉爾 專屬畫面：熊熊聖火與加拉爾帝國王道 ====================
+  function createIgnalionFxState(w, h) {
+    // 1. 熊熊聖火粒子與升騰灰燼 (Holy Flames & Ascending Ash Embers)
+    const flames = [];
+    for (let i = 0; i < 52; i++) {
+      flames.push({
+        x: w * 0.08 + Math.random() * w * 0.84,
+        y: h + Math.random() * 120,
+        vx: (Math.random() - 0.5) * 1.8,
+        vy: -2.4 - Math.random() * 4.2,
+        size: 3.5 + Math.random() * 8.5,
+        alpha: 0.55 + Math.random() * 0.45,
+        swayPhase: Math.random() * Math.PI * 2,
+        swaySpeed: 0.0025 + Math.random() * 0.004,
+        isWhiteHoly: i % 3 === 0, // 聖火白焰
+        isAsh: i % 5 === 1        // 灰燼加冕
+      });
+    }
+
+    return {
+      flames,
+      swordImpact: 0,
+      shockwaves: []
+    };
+  }
+
+  // 繪製加拉爾帝國雙翼火神皇徽（雙翼金鷹 + 12道聖火耀芒 + 帝王月桂冠）
+  function drawIgnalionEmpireCrest(c, cx, cy, R, rot, alpha, pulse) {
+    if (alpha <= 0.01) return;
+    c.save();
+    c.translate(cx, cy);
+
+    // 1. 12 道帝國聖火太陽神芒
+    const rays = 12;
+    for (let i = 0; i < rays; i++) {
+      const ang = (i / rays) * Math.PI * 2 + rot;
+      const rayLen = R * (1.18 + (i % 2 === 0 ? 0.35 : 0.15) * pulse);
+      c.save();
+      c.rotate(ang);
+      c.beginPath();
+      c.moveTo(0, -rayLen);
+      c.lineTo(R * 0.08, -R * 0.25);
+      c.lineTo(-R * 0.08, -R * 0.25);
+      c.closePath();
+      c.fillStyle = i % 2 === 0 ? "rgba(254, 240, 138, " + (alpha * 0.65) + ")" : "rgba(245, 158, 11, " + (alpha * 0.5) + ")";
+      c.fill();
+      c.restore();
+    }
+
+    // 2. 帝國金鷹展翅雙翼（左翼與右翼）
+    [-1, 1].forEach((dir) => {
+      c.save();
+      c.scale(dir, 1);
+      // 主翼羽毛
+      for (let wIdx = 0; wIdx < 5; wIdx++) {
+        const wingScale = 0.75 + wIdx * 0.12;
+        const wingAng = -0.32 + wIdx * 0.14 + Math.sin(rot * 2) * 0.05;
+        c.save();
+        c.translate(R * 0.28, -R * 0.15);
+        c.rotate(wingAng);
+        c.beginPath();
+        c.moveTo(0, 0);
+        c.quadraticCurveTo(R * 0.7 * wingScale, -R * 0.55 * wingScale, R * 1.25 * wingScale, -R * 0.2 * wingScale);
+        c.quadraticCurveTo(R * 0.8 * wingScale, R * 0.15 * wingScale, 0, 0);
+        c.closePath();
+        c.fillStyle = wIdx % 2 === 0 ? "rgba(251, 191, 36, " + (alpha * 0.7) + ")" : "rgba(220, 38, 38, " + (alpha * 0.55) + ")";
+        c.fill();
+        c.strokeStyle = "rgba(254, 240, 138, " + (alpha * 0.85) + ")";
+        c.lineWidth = 2;
+        c.stroke();
+        c.restore();
+      }
+      c.restore();
+    });
+
+    // 3. 中央火神王冕（三叉皇冠）
+    c.save();
+    c.translate(0, -R * 0.55);
+    c.beginPath();
+    c.moveTo(-R * 0.35, 0);
+    c.lineTo(-R * 0.45, -R * 0.45);
+    c.lineTo(-R * 0.18, -R * 0.2);
+    c.lineTo(0, -R * 0.65 * pulse);
+    c.lineTo(R * 0.18, -R * 0.2);
+    c.lineTo(R * 0.45, -R * 0.45);
+    c.lineTo(R * 0.35, 0);
+    c.closePath();
+    c.fillStyle = "rgba(254, 240, 138, " + (alpha * 0.85) + ")";
+    c.fill();
+    c.strokeStyle = "#b45309";
+    c.lineWidth = 2.5;
+    c.stroke();
+    c.restore();
+
+    // 4. 中央萬火同心圓環
+    c.beginPath();
+    c.arc(0, 0, R * 0.38, 0, Math.PI * 2);
+    c.strokeStyle = "rgba(254, 240, 138, " + alpha + ")";
+    c.lineWidth = 3;
+    c.stroke();
+
+    c.beginPath();
+    c.arc(0, 0, R * 0.22, 0, Math.PI * 2);
+    c.fillStyle = "rgba(245, 158, 11, " + (alpha * 0.65) + ")";
+    c.fill();
+    c.restore();
+  }
+
+  // 繪製「加拉爾帝國王道」（縱使前路已成灰燼，只要汝仍未言棄——吾便為汝焚出一條王道）
+  function drawIgnalionKingRoad(c, cx, cy, w, h, elapsed, isClimax, alpha) {
+    if (alpha <= 0.01) return;
+    c.save();
+
+    // 梯形透視聖火王道
+    const topY = cy + 45;
+    const topW = 60;
+    const btmY = h + 20;
+    const btmW = 340;
+
+    const roadGrad = c.createLinearGradient(0, topY, 0, btmY);
+    roadGrad.addColorStop(0, "rgba(255, 255, 255, " + (alpha * 0.95) + ")");
+    roadGrad.addColorStop(0.3, "rgba(254, 240, 138, " + (alpha * 0.8) + ")");
+    roadGrad.addColorStop(0.7, "rgba(245, 158, 11, " + (alpha * 0.65) + ")");
+    roadGrad.addColorStop(1, "rgba(185, 28, 28, " + (alpha * 0.4) + ")");
+
+    c.beginPath();
+    c.moveTo(cx - topW / 2, topY);
+    c.lineTo(cx + topW / 2, topY);
+    c.lineTo(cx + btmW / 2, btmY);
+    c.lineTo(cx - btmW / 2, btmY);
+    c.closePath();
+    c.fillStyle = roadGrad;
+    c.fill();
+
+    // 王道兩側熾烈聖火金邊
+    c.lineWidth = isClimax ? 4.5 : 3;
+    c.strokeStyle = "rgba(255, 255, 255, " + (alpha * 0.95) + ")";
+    c.beginPath();
+    c.moveTo(cx - topW / 2, topY);
+    c.lineTo(cx - btmW / 2, btmY);
+    c.moveTo(cx + topW / 2, topY);
+    c.lineTo(cx + btmW / 2, btmY);
+    c.stroke();
+
+    // 王道中軸向前奔湧的聖火符文光帶
+    const dashOffset = (elapsed * 0.18) % 40;
+    c.setLineDash([24, 16]);
+    c.lineDashOffset = -dashOffset;
+    c.lineWidth = 2.5;
+    c.strokeStyle = "rgba(255, 255, 255, 0.85)";
+    c.beginPath();
+    c.moveTo(cx, topY);
+    c.lineTo(cx, btmY);
+    c.stroke();
+    c.setLineDash([]);
+
+    // 兩側燃燒火炬節點 (6 對聖火柱)
+    for (let p = 0; p < 6; p++) {
+      const t = p / 5;
+      const py = topY + (btmY - topY) * t;
+      const pw = topW + (btmW - topW) * t;
+      const pScale = 0.5 + t * 0.8;
+      [-1, 1].forEach((dir) => {
+        const px = cx + dir * (pw / 2);
+        const fR = (8 + 5 * Math.sin(elapsed * 0.01 + p)) * pScale;
+        c.beginPath();
+        c.arc(px, py, fR, 0, Math.PI * 2);
+        c.fillStyle = "rgba(254, 240, 138, 0.85)";
+        c.fill();
+        c.beginPath();
+        c.arc(px, py - fR * 0.6, fR * 0.7, 0, Math.PI * 2);
+        c.fillStyle = "rgba(255, 255, 255, 0.95)";
+        c.fill();
+      });
+    }
+
+    c.restore();
+  }
+
+  // 繪製火神之罰巨劍虛影
+  function drawIgnalionSwordSilhouette(c, cx, swordY, scale, alpha) {
+    if (alpha <= 0.01) return;
+    c.save();
+    c.translate(cx, swordY);
+    c.scale(scale, scale);
+
+    // 劍刃發光輪廓
+    c.shadowColor = "#f59e0b";
+    c.shadowBlur = 32;
+
+    // 雙刃大劍劍身
+    c.beginPath();
+    c.moveTo(0, 140); // 劍尖朝下
+    c.lineTo(16, 110);
+    c.lineTo(20, -110);
+    c.lineTo(34, -115); // 護手
+    c.lineTo(38, -132);
+    c.lineTo(8, -132);
+    c.lineTo(6, -175);  // 劍柄
+    c.lineTo(12, -180); // 劍首
+    c.lineTo(0, -192);
+    c.lineTo(-12, -180);
+    c.lineTo(-6, -175);
+    c.lineTo(-8, -132);
+    c.lineTo(-38, -132);
+    c.lineTo(-34, -115);
+    c.lineTo(-20, -110);
+    c.lineTo(-16, 110);
+    c.closePath();
+
+    c.fillStyle = "rgba(255, 255, 255, " + (alpha * 0.92) + ")";
+    c.fill();
+    c.strokeStyle = "rgba(245, 158, 11, " + (alpha * 0.95) + ")";
+    c.lineWidth = 4;
+    c.stroke();
+
+    // 劍身中心燃燒聖火凹槽
+    c.beginPath();
+    c.moveTo(0, 115);
+    c.lineTo(0, -100);
+    c.strokeStyle = "#dc2626";
+    c.lineWidth = 3;
+    c.stroke();
+
+    c.restore();
+  }
+
+  // 伊格那利昂 每幀專屬渲染循環
+  function renderIgnalionFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const is = st.ignalion;
+    if (!is) return;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // 1. 帝國聖火深邃金紅背景
+    const bgGrad = c.createRadialGradient(cx, cy, 20, cx, cy, Math.max(w, h) * 0.78);
+    bgGrad.addColorStop(0, "rgba(55, 10, 3, 0.95)");
+    bgGrad.addColorStop(0.45, "rgba(28, 5, 2, 0.98)");
+    bgGrad.addColorStop(0.85, "rgba(10, 2, 1, 0.99)");
+    bgGrad.addColorStop(1, "#020100");
+    c.fillStyle = bgGrad;
+    c.fillRect(0, 0, w, h);
+
+    // 2. 聖火王道（縱使前路已成灰燼，吾便為汝焚出一條王道）
+    drawIgnalionKingRoad(c, cx, cy, w, h, elapsed, isClimax, isUp ? 0.92 : 0.65);
+
+    // 3. 帝國雙翼火神皇徽
+    const crestPulse = 0.9 + 0.18 * Math.sin(elapsed * 0.005);
+    const crestR = 145 * (isClimax ? 1.25 : 1);
+    drawIgnalionEmpireCrest(c, cx, cy - 25, crestR, elapsed * 0.0003, isUp ? 0.85 : 0.55, crestPulse);
+
+    // 4. 熊熊聖火與升騰灰燼粒子
+    const flameSpeed = isClimax ? 2.2 : isUp ? 1.4 : 1;
+    for (let i = 0; i < is.flames.length; i++) {
+      const fl = is.flames[i];
+      fl.y += fl.vy * flameSpeed;
+      fl.x += Math.sin(elapsed * fl.swaySpeed + fl.swayPhase) * 1.8;
+      if (fl.y < -30) {
+        fl.y = h + Math.random() * 40;
+        fl.x = w * 0.08 + Math.random() * w * 0.84;
+      }
+      c.save();
+      c.globalAlpha = fl.alpha * (isClimax ? 1 : 0.85);
+      if (fl.isWhiteHoly) {
+        c.fillStyle = "#ffffff";
+        c.shadowColor = "#fef08a";
+        c.shadowBlur = 14;
+      } else if (fl.isAsh) {
+        c.fillStyle = "#a8a29e"; // 灰燼加冕
+      } else {
+        c.fillStyle = i % 2 === 0 ? "#f59e0b" : "#ef4444";
+        c.shadowColor = "#dc2626";
+        c.shadowBlur = 10;
+      }
+      c.beginPath();
+      c.arc(fl.x, fl.y, fl.size * (isClimax ? 1.3 : 1), 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 5. 火神之罰巨劍虛影
+    if (is.swordImpact > 0) {
+      is.swordImpact *= 0.93;
+      const sScale = 0.85 + is.swordImpact * 0.45;
+      const sY = cy - 20 + (1 - is.swordImpact) * 20;
+      drawIgnalionSwordSilhouette(c, cx, sY, sScale, Math.min(0.9, is.swordImpact * 1.2));
+    }
+
+    // 6. 聖火震波與衝擊碎屑
+    for (let i = st.burstSparks.length - 1; i >= 0; i--) {
+      const sp = st.burstSparks[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.vy += 0.05;
+      sp.alpha *= 0.95;
+      if (sp.alpha <= 0.02) {
+        st.burstSparks.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sp.alpha;
+      c.fillStyle = sp.color || "#fde047";
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      c.fill();
+    }
+    for (let i = st.shockwaves.length - 1; i >= 0; i--) {
+      const sw = st.shockwaves[i];
+      sw.r += sw.speed;
+      sw.alpha *= 0.93;
+      if (sw.alpha <= 0.02) {
+        st.shockwaves.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sw.alpha;
+      c.strokeStyle = sw.color || "#f59e0b";
+      c.lineWidth = sw.lineWidth || 3.5;
+      c.beginPath();
+      c.arc(cx, cy, sw.r, 0, Math.PI * 2);
+      c.stroke();
+    }
+
+    // 7. 帝國聖火四角暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.32, cx, cy, Math.max(w, h) * 0.78);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(0, 0, 0, 0.88)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
+  // ==================== 沃利爾 德瑪 專屬畫面：戰爭與古羅馬競技場 (warrior-arena) ====================
+  function createWarriorFxState(w, h) {
+    // 1. 競技場血戰火星與戰意紅蓮 (Colosseum Sparks & War Fury Wisps)
+    const sparks = [];
+    for (let i = 0; i < 56; i++) {
+      sparks.push({
+        x: w * 0.05 + Math.random() * w * 0.9,
+        y: h + Math.random() * 80,
+        vx: (Math.random() - 0.5) * 2.2,
+        vy: -2.8 - Math.random() * 4.6,
+        size: 3.0 + Math.random() * 6.5,
+        alpha: 0.55 + Math.random() * 0.45,
+        swayPhase: Math.random() * Math.PI * 2,
+        swaySpeed: 0.003 + Math.random() * 0.004,
+        isCrimson: i % 3 === 0,
+        isSteel: i % 4 === 1
+      });
+    }
+
+    // 2. 競技場插地戰器剪影 (Weapons of War thrust into the Arena Sand)
+    const groundWeapons = [];
+    const wepTypes = ["sword", "spear", "axe", "halberd"];
+    for (let i = 0; i < 8; i++) {
+      const dir = i % 2 === 0 ? -1 : 1;
+      const distRatio = 0.22 + Math.floor(i / 2) * 0.16;
+      groundWeapons.push({
+        type: wepTypes[i % wepTypes.length],
+        xRatio: 0.5 + dir * distRatio,
+        tilt: dir * (0.12 + (i % 3) * 0.08),
+        scale: 0.7 + (i % 3) * 0.15
+      });
+    }
+
+    return {
+      sparks,
+      groundWeapons,
+      swordImpact: 0,
+      shockwaves: []
+    };
+  }
+
+  // 繪製古羅馬圓形競技場拱門與巨石迴廊
+  function drawWarriorColosseum(c, cx, cy, w, h, elapsed, isClimax, alpha) {
+    if (alpha <= 0.01) return;
+    c.save();
+
+    // 遠景巨石角鬥看台與拱門柱列 (Colosseum Arches)
+    const archCount = 14;
+    const archY = cy - 25;
+    const archSpan = w * 0.92;
+    const startX = cx - archSpan / 2;
+    const stepX = archSpan / (archCount - 1);
+
+    for (let i = 0; i < archCount; i++) {
+      const ax = startX + i * stepX;
+      const distFromCenter = Math.abs(ax - cx) / (archSpan / 2);
+      const curveY = archY + Math.pow(distFromCenter, 2) * 28;
+      const archH = (isClimax ? 150 : 130) * (1 - distFromCenter * 0.25);
+      const archW = stepX * 0.72;
+
+      // 巨石柱
+      c.fillStyle = "rgba(40, 12, 6, " + (alpha * (0.45 + (1 - distFromCenter) * 0.35)) + ")";
+      c.fillRect(ax - archW / 2, curveY - archH, archW, archH);
+
+      // 拱門弧頂
+      c.beginPath();
+      c.arc(ax, curveY - archH * 0.65, archW * 0.35, Math.PI, 0, false);
+      c.lineTo(ax + archW * 0.35, curveY);
+      c.lineTo(ax - archW * 0.35, curveY);
+      c.closePath();
+      c.fillStyle = "rgba(18, 4, 2, " + (alpha * 0.9) + ")";
+      c.fill();
+      c.strokeStyle = "rgba(234, 88, 12, " + (alpha * 0.45) + ")";
+      c.lineWidth = 1.5;
+      c.stroke();
+    }
+
+    // 競技場血色烽火台鐵盆 (兩側燃燒的火盆)
+    [-1, 1].forEach((dir) => {
+      const bx = cx + dir * (w * 0.38);
+      const by = cy + 18;
+      // 鐵架
+      c.strokeStyle = "rgba(234, 88, 12, " + alpha + ")";
+      c.lineWidth = 3;
+      c.beginPath();
+      c.moveTo(bx - 16, by);
+      c.lineTo(bx + 16, by);
+      c.lineTo(bx + 10, by + 24);
+      c.lineTo(bx - 10, by + 24);
+      c.closePath();
+      c.stroke();
+
+      // 烽火烈焰
+      const fFlameR = 14 + 6 * Math.sin(elapsed * 0.01 + dir);
+      c.beginPath();
+      c.arc(bx, by - 10, fFlameR, 0, Math.PI * 2);
+      c.fillStyle = "rgba(234, 88, 12, 0.85)";
+      c.fill();
+      c.beginPath();
+      c.arc(bx, by - 16, fFlameR * 0.65, 0, Math.PI * 2);
+      c.fillStyle = "rgba(254, 215, 170, 0.95)";
+      c.fill();
+    });
+
+    c.restore();
+  }
+
+  // 繪製競技場血沙地面與插地戰器（戰爭之器）
+  function drawWarriorArenaFloor(c, cx, cy, w, h, elapsed, isClimax, groundWeapons, alpha) {
+    if (alpha <= 0.01) return;
+    c.save();
+
+    // 橢圓血沙地面
+    const floorY = cy + 50;
+    const rx = w * 0.46;
+    const ry = (h - floorY) * 0.95;
+
+    const floorGrad = c.createRadialGradient(cx, floorY + ry * 0.3, 20, cx, floorY + ry * 0.3, rx);
+    floorGrad.addColorStop(0, "rgba(90, 22, 10, " + (alpha * 0.95) + ")");
+    floorGrad.addColorStop(0.48, "rgba(55, 14, 6, " + (alpha * 0.9) + ")");
+    floorGrad.addColorStop(0.85, "rgba(28, 6, 2, " + (alpha * 0.85) + ")");
+    floorGrad.addColorStop(1, "rgba(10, 2, 1, 0)");
+
+    c.beginPath();
+    c.ellipse(cx, floorY + ry * 0.5, rx, ry, 0, 0, Math.PI * 2);
+    c.fillStyle = floorGrad;
+    c.fill();
+
+    // 圓形角鬥環形標記線（勝者為王）
+    c.strokeStyle = "rgba(234, 88, 12, " + (alpha * 0.6) + ")";
+    c.lineWidth = 2.5;
+    c.beginPath();
+    c.ellipse(cx, floorY + ry * 0.5, rx * 0.72, ry * 0.72, 0, 0, Math.PI * 2);
+    c.stroke();
+
+    // 插地兵器（闊劍、長槍、戰斧、長戟）
+    groundWeapons.forEach((gw) => {
+      const wx = w * gw.xRatio;
+      const wy = floorY + ry * 0.45 + Math.abs(gw.xRatio - 0.5) * 45;
+      c.save();
+      c.translate(wx, wy);
+      c.rotate(gw.tilt);
+      c.scale(gw.scale, gw.scale);
+
+      if (gw.type === "spear") {
+        // 長矛／槍
+        c.strokeStyle = "rgba(253, 186, 116, 0.9)";
+        c.lineWidth = 3;
+        c.beginPath();
+        c.moveTo(0, 15);
+        c.lineTo(0, -95);
+        c.stroke();
+        c.fillStyle = "rgba(234, 88, 12, 0.95)";
+        c.beginPath();
+        c.moveTo(-6, -95);
+        c.lineTo(0, -118);
+        c.lineTo(6, -95);
+        c.closePath();
+        c.fill();
+      } else if (gw.type === "axe") {
+        // 戰斧
+        c.strokeStyle = "rgba(253, 186, 116, 0.9)";
+        c.lineWidth = 3.5;
+        c.beginPath();
+        c.moveTo(0, 10);
+        c.lineTo(0, -85);
+        c.stroke();
+        c.fillStyle = "rgba(220, 38, 38, 0.95)";
+        c.beginPath();
+        c.arc(14, -70, 22, -Math.PI / 2, Math.PI / 2, false);
+        c.lineTo(0, -70);
+        c.closePath();
+        c.fill();
+      } else {
+        // 闊劍／長劍
+        c.fillStyle = "rgba(254, 215, 170, 0.95)";
+        c.beginPath();
+        c.moveTo(-4, 15);
+        c.lineTo(4, 15);
+        c.lineTo(6, -75);
+        c.lineTo(0, -90);
+        c.lineTo(-6, -75);
+        c.closePath();
+        c.fill();
+        c.strokeStyle = "rgba(234, 88, 12, 0.95)";
+        c.lineWidth = 3.5;
+        c.beginPath();
+        c.moveTo(-16, -72);
+        c.lineTo(16, -72);
+        c.stroke();
+      }
+      c.restore();
+    });
+
+    c.restore();
+  }
+
+  // 繪製戰神之劍－阿瑞斯之魂巨劍虛影
+  function drawWarriorAresSwordSilhouette(c, cx, swordY, scale, alpha) {
+    if (alpha <= 0.01) return;
+    c.save();
+    c.translate(cx, swordY);
+    c.scale(scale, scale);
+
+    c.shadowColor = "#ea580c";
+    c.shadowBlur = 36;
+
+    // 巨型戰神闊劍
+    c.beginPath();
+    c.moveTo(0, 155); // 劍尖朝下插地
+    c.lineTo(24, 120);
+    c.lineTo(28, -120);
+    c.lineTo(48, -126); // 戰神鋼角護手
+    c.lineTo(52, -145);
+    c.lineTo(12, -145);
+    c.lineTo(8, -195);  // 劍柄
+    c.lineTo(18, -202); // 劍首角鬥環
+    c.lineTo(0, -215);
+    c.lineTo(-18, -202);
+    c.lineTo(-8, -195);
+    c.lineTo(-12, -145);
+    c.lineTo(-52, -145);
+    c.lineTo(-48, -126);
+    c.lineTo(-28, -120);
+    c.lineTo(-24, 120);
+    c.closePath();
+
+    c.fillStyle = "rgba(255, 247, 237, " + (alpha * 0.94) + ")";
+    c.fill();
+    c.strokeStyle = "rgba(234, 88, 12, " + (alpha * 0.95) + ")";
+    c.lineWidth = 4.5;
+    c.stroke();
+
+    // 劍脊赤紅紅蓮戰痕血槽
+    c.beginPath();
+    c.moveTo(0, 125);
+    c.lineTo(0, -115);
+    c.strokeStyle = "#b91c1c";
+    c.lineWidth = 4;
+    c.stroke();
+
+    c.restore();
+  }
+
+  // 沃利爾 德瑪 每幀專屬渲染循環 (warrior-arena)
+  function renderWarriorFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const ws = st.warrior;
+    if (!ws) return;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // 1. 競技場暮色血火天際背景
+    const bgGrad = c.createRadialGradient(cx, cy, 30, cx, cy, Math.max(w, h) * 0.8);
+    bgGrad.addColorStop(0, "rgba(65, 15, 6, 0.96)");
+    bgGrad.addColorStop(0.45, "rgba(35, 8, 3, 0.98)");
+    bgGrad.addColorStop(0.85, "rgba(15, 3, 1, 0.99)");
+    bgGrad.addColorStop(1, "#050100");
+    c.fillStyle = bgGrad;
+    c.fillRect(0, 0, w, h);
+
+    // 2. 遠景巨石圓形競技場拱門與看台
+    drawWarriorColosseum(c, cx, cy, w, h, elapsed, isClimax, isUp ? 0.88 : 0.6);
+
+    // 3. 競技場血沙地面與插地兵器（戰爭之器）
+    drawWarriorArenaFloor(c, cx, cy, w, h, elapsed, isClimax, ws.groundWeapons, isUp ? 0.92 : 0.68);
+
+    // 4. 飛濺火星與血霧戰意粒子
+    const sparkSpeed = isClimax ? 2.3 : isUp ? 1.45 : 1;
+    for (let i = 0; i < ws.sparks.length; i++) {
+      const spk = ws.sparks[i];
+      spk.y += spk.vy * sparkSpeed;
+      spk.x += Math.sin(elapsed * spk.swaySpeed + spk.swayPhase) * 2.0;
+      if (spk.y < -30) {
+        spk.y = h + Math.random() * 40;
+        spk.x = w * 0.05 + Math.random() * w * 0.9;
+      }
+      c.save();
+      c.globalAlpha = spk.alpha * (isClimax ? 1 : 0.85);
+      if (spk.isSteel) {
+        c.fillStyle = "#ffffff";
+        c.shadowColor = "#fed7aa";
+        c.shadowBlur = 12;
+      } else if (spk.isCrimson) {
+        c.fillStyle = "#dc2626";
+        c.shadowColor = "#7f1d1d";
+        c.shadowBlur = 14;
+      } else {
+        c.fillStyle = i % 2 === 0 ? "#ea580c" : "#f97316";
+        c.shadowColor = "#c2410c";
+        c.shadowBlur = 10;
+      }
+      c.beginPath();
+      c.arc(spk.x, spk.y, spk.size * (isClimax ? 1.3 : 1), 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 5. 戰神之劍－阿瑞斯之魂巨劍插地虛影
+    if (ws.swordImpact > 0) {
+      ws.swordImpact *= 0.92;
+      const sScale = 0.88 + ws.swordImpact * 0.48;
+      const sY = cy - 15 + (1 - ws.swordImpact) * 22;
+      drawWarriorAresSwordSilhouette(c, cx, sY, sScale, Math.min(0.92, ws.swordImpact * 1.25));
+    }
+
+    // 6. 戰神之威震波與重擊碎屑
+    for (let i = st.burstSparks.length - 1; i >= 0; i--) {
+      const sp = st.burstSparks[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.vy += 0.06;
+      sp.alpha *= 0.94;
+      if (sp.alpha <= 0.02) {
+        st.burstSparks.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sp.alpha;
+      c.fillStyle = sp.color || "#fdba74";
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      c.fill();
+    }
+    for (let i = st.shockwaves.length - 1; i >= 0; i--) {
+      const sw = st.shockwaves[i];
+      sw.r += sw.speed;
+      sw.alpha *= 0.92;
+      if (sw.alpha <= 0.02) {
+        st.shockwaves.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sw.alpha;
+      c.strokeStyle = sw.color || "#ea580c";
+      c.lineWidth = sw.lineWidth || 4.0;
+      c.beginPath();
+      c.arc(cx, cy, sw.r, 0, Math.PI * 2);
+      c.stroke();
+    }
+
+    // 7. 競技場四角鐵血暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.3, cx, cy, Math.max(w, h) * 0.76);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(0, 0, 0, 0.9)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
+  // ==================== 別西卜 阿斯拉 撒旦 專屬畫面：暴食血紅與群蠅暴虐 (beelzebub-swarm) ====================
+  function createBeelzebubFxState(w, h) {
+    const flyCount = 76;
+    const flies = [];
+    for (let i = 0; i < flyCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const orbitR = 40 + Math.random() * Math.max(w, h) * 0.46;
+      flies.push({
+        x: w * 0.5 + Math.cos(angle) * orbitR,
+        y: h * 0.5 + Math.sin(angle) * orbitR,
+        vx: (Math.random() - 0.5) * 3.5,
+        vy: (Math.random() - 0.5) * 3.5,
+        orbitR,
+        orbitAngle: angle,
+        orbitSpeed: (0.015 + Math.random() * 0.035) * (i % 2 === 0 ? 1 : -1),
+        wingPhase: Math.random() * Math.PI * 2,
+        wingSpeed: 0.25 + Math.random() * 0.35,
+        size: 2.6 + Math.random() * 3.2,
+        alpha: 0.65 + Math.random() * 0.35,
+        isAggressive: i % 4 === 0,
+        swayPhase: Math.random() * Math.PI * 2,
+        swoopTimer: Math.random() * 100
+      });
+    }
+
+    // 猩紅暴力血滴與撕裂血霧
+    const bloodMist = [];
+    for (let i = 0; i < 48; i++) {
+      bloodMist.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 1.8,
+        vy: (Math.random() - 0.5) * 1.8,
+        r: 1.5 + Math.random() * 3.5,
+        alpha: 0.3 + Math.random() * 0.5,
+        color: i % 3 === 0 ? "#ef4444" : i % 2 === 0 ? "#dc2626" : "#7f1d1d"
+      });
+    }
+
+    return {
+      flies,
+      bloodMist,
+      violentImpact: 0,
+      slashLines: [],
+      climaxPulse: 0
+    };
+  }
+
+  function drawBeelzebubFlies(c, cx, cy, w, h, elapsed, isClimax, flies, alpha) {
+    const flySpeedMul = isClimax ? 2.4 : 1.0;
+    for (let i = 0; i < flies.length; i++) {
+      const fly = flies[i];
+      fly.orbitAngle += fly.orbitSpeed * flySpeedMul;
+      fly.wingPhase += fly.wingSpeed * flySpeedMul;
+      fly.swoopTimer += 0.05 * flySpeedMul;
+
+      // 蒼蠅狂暴之字形走位 (Jitter & Swoop)
+      const jitterX = Math.sin(fly.wingPhase * 5) * (isClimax ? 4.5 : 2.5);
+      const jitterY = Math.cos(fly.wingPhase * 4) * (isClimax ? 4.5 : 2.5);
+      const swoop = Math.sin(fly.swoopTimer) * (fly.isAggressive ? 35 : 15);
+
+      const targetR = fly.orbitR + swoop;
+      const targetX = cx + Math.cos(fly.orbitAngle) * targetR + jitterX;
+      const targetY = cy + Math.sin(fly.orbitAngle) * (targetR * 0.68) + jitterY;
+
+      fly.x += (targetX - fly.x) * 0.12;
+      fly.y += (targetY - fly.y) * 0.12;
+
+      c.save();
+      c.translate(fly.x, fly.y);
+      const moveAngle = fly.orbitAngle + (fly.orbitSpeed > 0 ? Math.PI / 2 : -Math.PI / 2);
+      c.rotate(moveAngle);
+
+      c.globalAlpha = fly.alpha * alpha;
+
+      // 1. 蒼蠅翅膀（高頻微振幅半透明暗紅透光）
+      const wingW = fly.size * 1.9;
+      const wingH = fly.size * 0.85;
+      const wingFlap = Math.sin(fly.wingPhase * 8) * 0.7;
+
+      [-1, 1].forEach((dir) => {
+        c.save();
+        c.rotate(dir * (0.45 + wingFlap));
+        c.fillStyle = fly.isAggressive ? "rgba(239, 68, 68, 0.55)" : "rgba(220, 38, 38, 0.4)";
+        c.strokeStyle = "rgba(254, 202, 202, 0.75)";
+        c.lineWidth = 0.8;
+        c.beginPath();
+        c.ellipse(dir * wingW * 0.55, -wingH * 0.7, wingW * 0.6, wingH * 0.5, dir * 0.2, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+        c.restore();
+      });
+
+      // 2. 蒼蠅軀幹（黑血腹部 + 黑曜胸節）
+      c.fillStyle = "#0a0102";
+      c.beginPath();
+      c.ellipse(0, 0, fly.size * 0.7, fly.size * 1.1, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // 3. 腹部血紋
+      c.fillStyle = fly.isAggressive ? "#dc2626" : "#7f1d1d";
+      c.beginPath();
+      c.ellipse(0, fly.size * 0.35, fly.size * 0.55, fly.size * 0.65, 0, 0, Math.PI * 2);
+      c.fill();
+
+      // 4. 蒼蠅血紅複眼
+      c.fillStyle = "#ef4444";
+      c.shadowColor = "#f87171";
+      c.shadowBlur = 4;
+      c.beginPath();
+      c.arc(-fly.size * 0.32, -fly.size * 0.65, fly.size * 0.28, 0, Math.PI * 2);
+      c.arc(fly.size * 0.32, -fly.size * 0.65, fly.size * 0.28, 0, Math.PI * 2);
+      c.fill();
+
+      c.restore();
+    }
+  }
+
+  function renderBeelzebubFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const cx = w / 2;
+    const cy = h / 2;
+    const bz = st.beelzebub;
+    if (!bz) return;
+
+    // 1. 暴食血紅暴虐深淵天幕 (Blood-Gore Radial Void)
+    const bloodGrad = c.createRadialGradient(cx, cy, 30, cx, cy, Math.max(w, h) * 0.78);
+    bloodGrad.addColorStop(0, isClimax ? "#5c080b" : "#3b0507");
+    bloodGrad.addColorStop(0.35, "#220305");
+    bloodGrad.addColorStop(0.72, "#110102");
+    bloodGrad.addColorStop(1, "#030001");
+    c.fillStyle = bloodGrad;
+    c.fillRect(0, 0, w, h);
+
+    // 2. 原初屠掠魔神之印 (Rotating Visceral Demon Seal on floor)
+    c.save();
+    c.translate(cx, cy);
+    c.rotate(elapsed * 0.0008);
+    c.scale(1, 0.42); // 透視地表法陣
+    c.strokeStyle = isClimax ? "rgba(239, 68, 68, 0.5)" : "rgba(185, 28, 28, 0.32)";
+    c.lineWidth = 2.5;
+
+    // 外圈魔神環
+    const sealR = 210 + Math.sin(elapsed * 0.003) * 8;
+    c.beginPath();
+    c.arc(0, 0, sealR, 0, Math.PI * 2);
+    c.stroke();
+
+    // 內環倒五芒屠掠陣
+    c.beginPath();
+    for (let k = 0; k < 5; k++) {
+      const a = (k * 4 * Math.PI) / 5 + Math.PI / 2;
+      const x = Math.cos(a) * sealR;
+      const y = Math.sin(a) * sealR;
+      if (k === 0) c.moveTo(x, y);
+      else c.lineTo(x, y);
+    }
+    c.closePath();
+    c.stroke();
+    c.restore();
+
+    // 3. 猩紅血霧顆粒漩渦
+    for (let i = 0; i < bz.bloodMist.length; i++) {
+      const m = bz.bloodMist[i];
+      m.x += m.vx;
+      m.y += m.vy;
+      if (m.x < 0) m.x = w;
+      if (m.x > w) m.x = 0;
+      if (m.y < 0) m.y = h;
+      if (m.y > h) m.y = 0;
+
+      c.save();
+      c.globalAlpha = m.alpha * (isClimax ? 0.85 : 0.6);
+      c.fillStyle = m.color;
+      c.shadowColor = m.color;
+      c.shadowBlur = 8;
+      c.beginPath();
+      c.arc(m.x, m.y, m.r * (isClimax ? 1.4 : 1), 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 4. 暴力撕裂血痕 (Violent Blood Slashes)
+    if (bz.violentImpact > 0.01) {
+      bz.violentImpact *= 0.91;
+      c.save();
+      c.globalAlpha = Math.min(1, bz.violentImpact * 1.5);
+      for (let s = 0; s < 4; s++) {
+        const offset = (s - 1.5) * 55;
+        c.strokeStyle = s % 2 === 0 ? "#ffffff" : "#ef4444";
+        c.shadowColor = "#dc2626";
+        c.shadowBlur = 24;
+        c.lineWidth = (4.5 - s * 0.8) * bz.violentImpact;
+        c.beginPath();
+        c.moveTo(cx - 320 + offset, cy - 180 - offset * 0.5);
+        c.lineTo(cx + 320 + offset, cy + 180 + offset * 0.5);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    // 5. 萬千蒼蠅狂暴群舞 (Flies Swarm)
+    drawBeelzebubFlies(c, cx, cy, w, h, elapsed, isClimax, bz.flies, 1);
+
+    // 6. 高潮魔神毀滅血環脈衝 (Climax Blood Pulses)
+    if (isClimax) {
+      const pulseR = ((elapsed * 0.22) % 360) + 30;
+      c.save();
+      c.globalAlpha = (1 - pulseR / 390) * 0.65;
+      c.strokeStyle = "#dc2626";
+      c.lineWidth = 4;
+      c.beginPath();
+      c.arc(cx, cy, pulseR, 0, Math.PI * 2);
+      c.stroke();
+      c.restore();
+    }
+
+    // 7. 震波碎屑與暗角
+    for (let i = st.burstSparks.length - 1; i >= 0; i--) {
+      const sp = st.burstSparks[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.alpha *= 0.93;
+      if (sp.alpha <= 0.02) {
+        st.burstSparks.splice(i, 1);
+        continue;
+      }
+      c.globalAlpha = sp.alpha;
+      c.fillStyle = sp.color || "#ef4444";
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      c.fill();
+    }
+
+    // 8. 暴虐暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.28, cx, cy, Math.max(w, h) * 0.78);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(0, 0, 0, 0.92)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
+  // ==================== 降臨級 尤諾拉 倪克斯 專屬畫面：月亮與星空風 (nyx-moon-stars) ====================
+  function createNyxFxState(w, h) {
+    const starCount = 130;
+    const stars = [];
+    const colors = ["#ffffff", "#e0f2fe", "#bae6fd", "#c7d2fe", "#fdf4ff"];
+    for (let i = 0; i < starCount; i++) {
+      stars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 0.8 + Math.random() * 2.2,
+        alpha: 0.35 + Math.random() * 0.65,
+        twinkleSpeed: 0.002 + Math.random() * 0.005,
+        twinklePhase: Math.random() * Math.PI * 2,
+        color: colors[i % colors.length],
+        isMajor: i < 18
+      });
+    }
+
+    // 5 顆流星群
+    const shootingStars = [];
+    for (let i = 0; i < 5; i++) {
+      shootingStars.push({
+        x: Math.random() * w,
+        y: Math.random() * (h * 0.5),
+        len: 80 + Math.random() * 120,
+        speed: 12 + Math.random() * 10,
+        angle: (Math.PI / 4) + (Math.random() - 0.5) * 0.25,
+        alpha: 0,
+        active: false,
+        timer: Math.random() * 120 + i * 40
+      });
+    }
+
+    // 6 團深邃星雲星塵
+    const nebula = [];
+    const nebColors = [
+      "rgba(30, 27, 75, 0.45)",
+      "rgba(15, 23, 42, 0.55)",
+      "rgba(56, 189, 248, 0.14)",
+      "rgba(99, 102, 241, 0.22)",
+      "rgba(147, 51, 234, 0.16)",
+      "rgba(2, 6, 23, 0.65)"
+    ];
+    for (let i = 0; i < 6; i++) {
+      nebula.push({
+        x: (w * 0.2) + Math.random() * (w * 0.6),
+        y: (h * 0.15) + Math.random() * (h * 0.7),
+        rx: 120 + Math.random() * 180,
+        ry: 80 + Math.random() * 120,
+        color: nebColors[i],
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.0004
+      });
+    }
+
+    // 星座連線組（挑選前 16 顆主要星宿組成四條星座線條）
+    const constellationEdges = [
+      [0, 1], [1, 2], [2, 3], [3, 4], // 仙后星軌
+      [5, 6], [6, 7], [7, 8], [8, 5], // 天琴四邊形
+      [9, 10], [10, 11], [11, 12],     // 獵戶腰帶弧光
+      [13, 14], [14, 15]               // 月華雙子星
+    ];
+
+    return {
+      stars,
+      shootingStars,
+      nebula,
+      constellationEdges,
+      swordImpact: 0,
+      moonGlowPulse: 0
+    };
+  }
+
+  function drawNyxMoon(c, cx, cy, w, h, elapsed, isClimax, alpha) {
+    const mx = cx;
+    const my = cy - Math.min(h * 0.22, 115);
+    const mr = isClimax ? 66 : 52;
+    const pulse = 1 + Math.sin(elapsed * 0.0025) * 0.04;
+
+    c.save();
+    c.globalAlpha = alpha;
+
+    // 1. 滿月外層巨大幽夜大氣月華光環 (Multi-layered Radial Halo)
+    const haloR = mr * (isClimax ? 4.2 : 3.4) * pulse;
+    const haloGrad = c.createRadialGradient(mx, my, mr * 0.8, mx, my, haloR);
+    haloGrad.addColorStop(0, isClimax ? "rgba(56, 189, 248, 0.5)" : "rgba(56, 189, 248, 0.32)");
+    haloGrad.addColorStop(0.35, isClimax ? "rgba(129, 140, 248, 0.28)" : "rgba(99, 102, 241, 0.18)");
+    haloGrad.addColorStop(0.7, "rgba(30, 27, 75, 0.12)");
+    haloGrad.addColorStop(1, "rgba(2, 6, 23, 0)");
+    c.fillStyle = haloGrad;
+    c.beginPath();
+    c.arc(mx, my, haloR, 0, Math.PI * 2);
+    c.fill();
+
+    // 2. 月夜空靈天體銀環 (Celestial Orbital Silver Ring)
+    c.save();
+    c.translate(mx, my);
+    c.rotate(-0.35 + Math.sin(elapsed * 0.0008) * 0.05);
+    c.scale(1, 0.32);
+    c.strokeStyle = isClimax ? "rgba(224, 242, 254, 0.7)" : "rgba(186, 230, 253, 0.45)";
+    c.lineWidth = 1.8;
+    c.beginPath();
+    c.arc(0, 0, mr * 2.3 * pulse, 0, Math.PI * 2);
+    c.stroke();
+    c.restore();
+
+    // 3. 高潮時從明月向下投射的皎潔月光神聖光芒瀑布 (8 Moonlight Beams)
+    if (isClimax) {
+      for (let b = 0; b < 8; b++) {
+        const bAngle = (b - 3.5) * 0.16 + Math.PI / 2;
+        const bLen = h * 0.85;
+        const bWidth = 24 + (b % 3) * 12;
+        c.save();
+        c.globalAlpha = 0.28 + Math.sin(elapsed * 0.003 + b) * 0.12;
+        const beamGrad = c.createLinearGradient(mx, my, mx + Math.cos(bAngle) * bLen, my + Math.sin(bAngle) * bLen);
+        beamGrad.addColorStop(0, "rgba(255, 255, 255, 0.55)");
+        beamGrad.addColorStop(0.35, "rgba(56, 189, 248, 0.35)");
+        beamGrad.addColorStop(1, "rgba(30, 27, 75, 0)");
+        c.fillStyle = beamGrad;
+        c.beginPath();
+        c.moveTo(mx - bWidth * 0.2, my);
+        c.lineTo(mx + bWidth * 0.2, my);
+        c.lineTo(mx + Math.cos(bAngle) * bLen + bWidth, my + Math.sin(bAngle) * bLen);
+        c.lineTo(mx + Math.cos(bAngle) * bLen - bWidth, my + Math.sin(bAngle) * bLen);
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+    }
+
+    // 4. 明月本體 (皎潔銀白到冰晶天青漸層)
+    const moonGrad = c.createRadialGradient(mx - mr * 0.32, my - mr * 0.32, mr * 0.1, mx, my, mr);
+    moonGrad.addColorStop(0, "#ffffff");
+    moonGrad.addColorStop(0.45, "#f0f9ff");
+    moonGrad.addColorStop(0.8, "#bae6fd");
+    moonGrad.addColorStop(1, "#7dd3fc");
+    c.fillStyle = moonGrad;
+    c.shadowColor = "#38bdf8";
+    c.shadowBlur = isClimax ? 38 : 24;
+    c.beginPath();
+    c.arc(mx, my, mr, 0, Math.PI * 2);
+    c.fill();
+    c.shadowBlur = 0;
+
+    // 5. 月海微光紋理 (Subtle Lunar Maria)
+    c.fillStyle = "rgba(15, 23, 42, 0.18)";
+    [
+      [-mr * 0.25, -mr * 0.1, mr * 0.26],
+      [mr * 0.18, -mr * 0.22, mr * 0.22],
+      [-mr * 0.05, mr * 0.24, mr * 0.3],
+      [mr * 0.28, mr * 0.15, mr * 0.2]
+    ].forEach(([cxo, cyo, cr]) => {
+      c.beginPath();
+      c.arc(mx + cxo, my + cyo, cr, 0, Math.PI * 2);
+      c.fill();
+    });
+
+    // 6. 新月邊緣璀璨反光
+    c.strokeStyle = "rgba(255, 255, 255, 0.9)";
+    c.lineWidth = 2.2;
+    c.beginPath();
+    c.arc(mx, my, mr - 1, -Math.PI * 0.6, Math.PI * 0.3);
+    c.stroke();
+
+    c.restore();
+  }
+
+  function drawNyxConstellations(c, w, h, stars, edges, elapsed, alpha) {
+    c.save();
+    c.globalAlpha = alpha * 0.55;
+    c.strokeStyle = "rgba(186, 230, 253, 0.45)";
+    c.lineWidth = 1.0;
+
+    for (let i = 0; i < edges.length; i++) {
+      const [idxA, idxB] = edges[i];
+      if (idxA < stars.length && idxB < stars.length) {
+        const sA = stars[idxA];
+        const sB = stars[idxB];
+        c.beginPath();
+        c.moveTo(sA.x, sA.y);
+        c.lineTo(sB.x, sB.y);
+        c.stroke();
+      }
+    }
+
+    // 主要星座節點菱形十字光芒
+    for (let i = 0; i < 16 && i < stars.length; i++) {
+      const st = stars[i];
+      const sparkR = st.r * (1.6 + Math.sin(elapsed * st.twinkleSpeed * 3 + st.twinklePhase) * 0.6);
+      c.strokeStyle = "rgba(224, 242, 254, 0.75)";
+      c.lineWidth = 1.2;
+      c.beginPath();
+      c.moveTo(st.x - sparkR * 2.5, st.y);
+      c.lineTo(st.x + sparkR * 2.5, st.y);
+      c.moveTo(st.x, st.y - sparkR * 2.5);
+      c.lineTo(st.x, st.y + sparkR * 2.5);
+      c.stroke();
+    }
+
+    c.restore();
+  }
+
+  function drawNyxSwordSilhouette(c, cx, cy, scale, alpha) {
+    c.save();
+    c.translate(cx, cy);
+    c.scale(scale, scale);
+    c.globalAlpha = alpha;
+
+    // -星輝浮光－月之劍- 晶瑩星藍與純銀劍體
+    // 1. 劍身神聖外暈
+    c.shadowColor = "#38bdf8";
+    c.shadowBlur = 24;
+
+    // 2. 細長晶瑩劍刃
+    const swordGrad = c.createLinearGradient(0, -180, 0, 90);
+    swordGrad.addColorStop(0, "#ffffff");
+    swordGrad.addColorStop(0.4, "#bae6fd");
+    swordGrad.addColorStop(0.8, "#38bdf8");
+    swordGrad.addColorStop(1, "#1e1b4b");
+    c.fillStyle = swordGrad;
+    c.beginPath();
+    c.moveTo(0, -180);
+    c.lineTo(7, -130);
+    c.lineTo(5, 70);
+    c.lineTo(0, 90);
+    c.lineTo(-5, 70);
+    c.lineTo(-7, -130);
+    c.closePath();
+    c.fill();
+
+    // 3. 劍身中央晶藍光紋
+    c.strokeStyle = "#ffffff";
+    c.lineWidth = 1.5;
+    c.beginPath();
+    c.moveTo(0, -170);
+    c.lineTo(0, 75);
+    c.stroke();
+
+    // 4. 新月護手 (Crescent Guard)
+    c.strokeStyle = "#e0f2fe";
+    c.lineWidth = 3.5;
+    c.beginPath();
+    c.arc(0, 72, 34, Math.PI * 0.8, Math.PI * 2.2);
+    c.stroke();
+
+    // 5. 護手核心月華星辰寶石
+    c.fillStyle = "#ffffff";
+    c.shadowColor = "#60a5fa";
+    c.shadowBlur = 18;
+    c.beginPath();
+    c.arc(0, 72, 6.5, 0, Math.PI * 2);
+    c.fill();
+
+    // 6. 劍柄與星鑽劍首
+    c.strokeStyle = "#93c5fd";
+    c.lineWidth = 4;
+    c.beginPath();
+    c.moveTo(0, 78);
+    c.lineTo(0, 125);
+    c.stroke();
+
+    c.fillStyle = "#38bdf8";
+    c.beginPath();
+    c.arc(0, 128, 7, 0, Math.PI * 2);
+    c.fill();
+
+    c.restore();
+  }
+
+  function renderNyxFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const cx = w / 2;
+    const cy = h / 2;
+    const nyx = st.nyx;
+    if (!nyx) return;
+
+    // 1. 深邃星空幽夜天幕 (Deep Midnight Celestial Void)
+    const skyGrad = c.createRadialGradient(cx, cy * 0.65, 30, cx, cy, Math.max(w, h) * 0.85);
+    skyGrad.addColorStop(0, isClimax ? "#1e1b4b" : "#0f172a");
+    skyGrad.addColorStop(0.42, "#090d24");
+    skyGrad.addColorStop(0.78, "#040714");
+    skyGrad.addColorStop(1, "#010208");
+    c.fillStyle = skyGrad;
+    c.fillRect(0, 0, w, h);
+
+    // 2. 柔和深邃星雲流動 (Flowing Nebula Clouds)
+    for (let i = 0; i < nyx.nebula.length; i++) {
+      const neb = nyx.nebula[i];
+      neb.rot += neb.rotSpeed;
+      c.save();
+      c.translate(neb.x, neb.y);
+      c.rotate(neb.rot);
+      const ng = c.createRadialGradient(0, 0, 10, 0, 0, neb.rx);
+      ng.addColorStop(0, neb.color);
+      ng.addColorStop(1, "rgba(2, 6, 23, 0)");
+      c.fillStyle = ng;
+      c.beginPath();
+      c.ellipse(0, 0, neb.rx, neb.ry, 0, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 3. 流星劃破天際 (Shooting Stars)
+    for (let i = 0; i < nyx.shootingStars.length; i++) {
+      const ss = nyx.shootingStars[i];
+      if (!ss.active) {
+        ss.timer--;
+        if (ss.timer <= 0) {
+          ss.active = true;
+          ss.x = Math.random() * (w * 0.75);
+          ss.y = Math.random() * (h * 0.45);
+          ss.alpha = 0.9;
+        }
+      } else {
+        ss.x += Math.cos(ss.angle) * ss.speed;
+        ss.y += Math.sin(ss.angle) * ss.speed;
+        ss.alpha *= 0.94;
+        if (ss.alpha <= 0.04) {
+          ss.active = false;
+          ss.timer = 60 + Math.random() * 140;
+        } else {
+          c.save();
+          c.globalAlpha = ss.alpha;
+          const tailX = ss.x - Math.cos(ss.angle) * ss.len;
+          const tailY = ss.y - Math.sin(ss.angle) * ss.len;
+          const ssGrad = c.createLinearGradient(tailX, tailY, ss.x, ss.y);
+          ssGrad.addColorStop(0, "rgba(56, 189, 248, 0)");
+          ssGrad.addColorStop(0.7, "rgba(186, 230, 253, 0.65)");
+          ssGrad.addColorStop(1, "#ffffff");
+          c.strokeStyle = ssGrad;
+          c.lineWidth = 1.8;
+          c.beginPath();
+          c.moveTo(tailX, tailY);
+          c.lineTo(ss.x, ss.y);
+          c.stroke();
+          c.restore();
+        }
+      }
+    }
+
+    // 4. 繁星閃爍 (Twinkling Stars)
+    for (let i = 0; i < nyx.stars.length; i++) {
+      const s = nyx.stars[i];
+      const curAlpha = s.alpha * (0.65 + Math.sin(elapsed * s.twinkleSpeed + s.twinklePhase) * 0.35);
+      c.save();
+      c.globalAlpha = curAlpha * (isClimax ? 1 : 0.85);
+      c.fillStyle = s.color;
+      if (s.isMajor) {
+        c.shadowColor = s.color;
+        c.shadowBlur = 8;
+      }
+      c.beginPath();
+      c.arc(s.x, s.y, s.r * (isClimax ? 1.25 : 1), 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 5. 璀璨星座連線 (Constellation Charts)
+    drawNyxConstellations(c, w, h, nyx.stars, nyx.constellationEdges, elapsed, isClimax ? 0.9 : 0.65);
+
+    // 6. 皎潔明月與月華神聖光瀑 (Celestial Moon & Coronas)
+    drawNyxMoon(c, cx, cy, w, h, elapsed, isClimax, 1);
+
+    // 7. -星輝浮光－月之劍- 虛影顯現（當文字重擊或高潮時）
+    if (nyx.swordImpact > 0.01) {
+      nyx.swordImpact *= 0.92;
+      const sScale = 0.88 + nyx.swordImpact * 0.45;
+      const sY = cy - 10 + (1 - nyx.swordImpact) * 20;
+      drawNyxSwordSilhouette(c, cx, sY, sScale, Math.min(0.95, nyx.swordImpact * 1.35));
+    } else if (isClimax) {
+      const climSwordAlpha = 0.45 + Math.sin(elapsed * 0.003) * 0.2;
+      drawNyxSwordSilhouette(c, cx, cy + 15, 0.95, climSwordAlpha);
+    }
+
+    // 8. 星塵震波碎屑與水波月華
+    for (let i = st.burstSparks.length - 1; i >= 0; i--) {
+      const sp = st.burstSparks[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.alpha *= 0.94;
+      if (sp.alpha <= 0.02) {
+        st.burstSparks.splice(i, 1);
+        continue;
+      }
+      c.save();
+      c.globalAlpha = sp.alpha;
+      c.fillStyle = sp.color || "#bae6fd";
+      c.shadowColor = "#38bdf8";
+      c.shadowBlur = 6;
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 9. 幽夜星空暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.32, cx, cy, Math.max(w, h) * 0.78);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(1, 2, 8, 0.9)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
+  // ==================== 降臨級 迪米諾拉 赫墨拉 專屬畫面：烈陽風格 (hemera-sun) ====================
+  function createHemeraFxState(w, h) {
+    const particleCount = 88;
+    const solarParticles = [];
+    const colors = ["#ffffff", "#fef08a", "#fde047", "#f59e0b", "#ea580c", "#dc2626"];
+    for (let i = 0; i < particleCount; i++) {
+      solarParticles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 1.2 + Math.random() * 2.8,
+        vy: -1.2 - Math.random() * 2.8,
+        vx: (Math.random() - 0.5) * 1.8,
+        swaySpeed: 0.003 + Math.random() * 0.004,
+        swayPhase: Math.random() * Math.PI * 2,
+        alpha: 0.4 + Math.random() * 0.6,
+        color: colors[i % colors.length]
+      });
+    }
+
+    // 16 道烈陽耀斑放射光芒
+    const solarRays = [];
+    for (let i = 0; i < 16; i++) {
+      solarRays.push({
+        angle: (i / 16) * Math.PI * 2,
+        len: 120 + Math.random() * 80,
+        width: 14 + (i % 3) * 8,
+        speed: 0.0012 * (i % 2 === 0 ? 1 : -1),
+        pulsePhase: Math.random() * Math.PI * 2
+      });
+    }
+
+    // 8 條日珥電漿噴發環 (Coronal Prominences)
+    const prominences = [];
+    for (let i = 0; i < 8; i++) {
+      prominences.push({
+        angle: (i / 8) * Math.PI * 2 + Math.random() * 0.3,
+        height: 28 + Math.random() * 38,
+        width: 32 + Math.random() * 24,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.003 + Math.random() * 0.002
+      });
+    }
+
+    return {
+      solarParticles,
+      solarRays,
+      prominences,
+      spearImpact: 0,
+      coronaPulse: 0
+    };
+  }
+
+  function drawHemeraProminences(c, sx, sy, sr, prominences, elapsed, isClimax, alpha) {
+    c.save();
+    c.globalAlpha = alpha * (isClimax ? 0.95 : 0.75);
+    for (let i = 0; i < prominences.length; i++) {
+      const p = prominences[i];
+      const hMul = isClimax ? 1.5 : 1.0;
+      const curH = (p.height + Math.sin(elapsed * p.speed + p.phase) * 12) * hMul;
+      const midAngle = p.angle + Math.sin(elapsed * 0.001 + i) * 0.1;
+      const baseA1 = midAngle - 0.18;
+      const baseA2 = midAngle + 0.18;
+
+      const x1 = sx + Math.cos(baseA1) * sr;
+      const y1 = sy + Math.sin(baseA1) * sr;
+      const x2 = sx + Math.cos(baseA2) * sr;
+      const y2 = sy + Math.sin(baseA2) * sr;
+      const topX = sx + Math.cos(midAngle) * (sr + curH);
+      const topY = sy + Math.sin(midAngle) * (sr + curH);
+
+      c.save();
+      c.strokeStyle = i % 2 === 0 ? "rgba(245, 158, 11, 0.85)" : "rgba(234, 88, 12, 0.85)";
+      c.lineWidth = 3.5 * (isClimax ? 1.3 : 1);
+      c.shadowColor = "#f59e0b";
+      c.shadowBlur = 14;
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.quadraticCurveTo(topX, topY, x2, y2);
+      c.stroke();
+      c.restore();
+    }
+    c.restore();
+  }
+
+  function drawHemeraSun(c, cx, cy, w, h, elapsed, isClimax, alpha) {
+    const sx = cx;
+    const sy = cy - Math.min(h * 0.22, 115);
+    const sr = isClimax ? 70 : 54;
+    const pulse = 1 + Math.sin(elapsed * 0.0035) * 0.05;
+
+    c.save();
+    c.globalAlpha = alpha;
+
+    // 1. 巨大烈陽電漿耀斑熱暈 (Colossal Solar Corona)
+    const haloR = sr * (isClimax ? 4.5 : 3.6) * pulse;
+    const coronaGrad = c.createRadialGradient(sx, sy, sr * 0.8, sx, sy, haloR);
+    coronaGrad.addColorStop(0, isClimax ? "rgba(254, 240, 138, 0.65)" : "rgba(245, 158, 11, 0.45)");
+    coronaGrad.addColorStop(0.3, isClimax ? "rgba(245, 158, 11, 0.45)" : "rgba(234, 88, 12, 0.32)");
+    coronaGrad.addColorStop(0.65, "rgba(124, 45, 18, 0.18)");
+    coronaGrad.addColorStop(1, "rgba(26, 5, 0, 0)");
+    c.fillStyle = coronaGrad;
+    c.beginPath();
+    c.arc(sx, sy, haloR, 0, Math.PI * 2);
+    c.fill();
+
+    // 2. 旋轉烈陽金芒光刃 (Rotating Solar Sunburst Rays)
+    const rayRot = elapsed * 0.0008;
+    const rayCount = 16;
+    for (let r = 0; r < rayCount; r++) {
+      const a = rayRot + (r * Math.PI * 2) / rayCount;
+      const rayLen = sr * (isClimax ? 2.8 : 2.2) + Math.sin(elapsed * 0.004 + r) * 14;
+      const rayHalfW = 10 + (r % 3) * 6;
+      c.save();
+      c.translate(sx, sy);
+      c.rotate(a);
+      c.globalAlpha = (isClimax ? 0.42 : 0.26) + Math.sin(elapsed * 0.003 + r) * 0.1;
+      const rg = c.createLinearGradient(0, 0, rayLen, 0);
+      rg.addColorStop(0, "#ffffff");
+      rg.addColorStop(0.3, "#fef08a");
+      rg.addColorStop(0.7, "#f59e0b");
+      rg.addColorStop(1, "rgba(234, 88, 12, 0)");
+      c.fillStyle = rg;
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.lineTo(rayLen, -rayHalfW);
+      c.lineTo(rayLen * 1.08, 0);
+      c.lineTo(rayLen, rayHalfW);
+      c.closePath();
+      c.fill();
+      c.restore();
+    }
+
+    // 3. 高潮時貫穿全場的「終焉日冕」萬道烈目光瀑 (12 Blinding Solar Cascade Beams)
+    if (isClimax) {
+      for (let b = 0; b < 12; b++) {
+        const bAngle = (b - 5.5) * 0.14 + Math.PI / 2;
+        const bLen = h * 0.9;
+        const bWidth = 28 + (b % 4) * 14;
+        c.save();
+        c.globalAlpha = 0.35 + Math.sin(elapsed * 0.004 + b) * 0.15;
+        const beamGrad = c.createLinearGradient(sx, sy, sx + Math.cos(bAngle) * bLen, sy + Math.sin(bAngle) * bLen);
+        beamGrad.addColorStop(0, "#ffffff");
+        beamGrad.addColorStop(0.3, "rgba(254, 240, 138, 0.75)");
+        beamGrad.addColorStop(0.65, "rgba(245, 158, 11, 0.45)");
+        beamGrad.addColorStop(1, "rgba(69, 26, 3, 0)");
+        c.fillStyle = beamGrad;
+        c.beginPath();
+        c.moveTo(sx - bWidth * 0.25, sy);
+        c.lineTo(sx + bWidth * 0.25, sy);
+        c.lineTo(sx + Math.cos(bAngle) * bLen + bWidth, sy + Math.sin(bAngle) * bLen);
+        c.lineTo(sx + Math.cos(bAngle) * bLen - bWidth, sy + Math.sin(bAngle) * bLen);
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+    }
+
+    // 4. 烈陽核聚變核心本體 (Blinding White-Gold Solar Sphere)
+    const sunGrad = c.createRadialGradient(sx - sr * 0.28, sy - sr * 0.28, sr * 0.1, sx, sy, sr);
+    sunGrad.addColorStop(0, "#ffffff");
+    sunGrad.addColorStop(0.35, "#fef9c3");
+    sunGrad.addColorStop(0.68, "#fde047");
+    sunGrad.addColorStop(0.88, "#f59e0b");
+    sunGrad.addColorStop(1, "#ea580c");
+    c.fillStyle = sunGrad;
+    c.shadowColor = "#f59e0b";
+    c.shadowBlur = isClimax ? 46 : 28;
+    c.beginPath();
+    c.arc(sx, sy, sr, 0, Math.PI * 2);
+    c.fill();
+    c.shadowBlur = 0;
+
+    // 5. 太陽黑子與熾熱日耀紋理 (Solar Granulation & Sunspots)
+    c.fillStyle = "rgba(124, 45, 18, 0.22)";
+    [
+      [-sr * 0.22, -sr * 0.14, sr * 0.18],
+      [sr * 0.25, -sr * 0.18, sr * 0.15],
+      [-sr * 0.08, sr * 0.25, sr * 0.24],
+      [sr * 0.18, sr * 0.18, sr * 0.16]
+    ].forEach(([cxo, cyo, cr]) => {
+      c.beginPath();
+      c.arc(sx + cxo, sy + cyo, cr, 0, Math.PI * 2);
+      c.fill();
+    });
+
+    // 6. 白熾日緣耀斑光弧
+    c.strokeStyle = "rgba(255, 255, 255, 0.95)";
+    c.lineWidth = 2.5;
+    c.beginPath();
+    c.arc(sx, sy, sr - 1.2, -Math.PI * 0.8, Math.PI * 0.2);
+    c.stroke();
+
+    c.restore();
+  }
+
+  function drawHemeraSolarSpear(c, cx, cy, scale, alpha) {
+    c.save();
+    c.translate(cx, cy);
+    c.scale(scale, scale);
+    c.globalAlpha = alpha;
+
+    // -天輝浮光－日之矛- 烈陽黃金耀斑神矛
+    // 1. 烈陽外暈
+    c.shadowColor = "#f59e0b";
+    c.shadowBlur = 28;
+
+    // 2. 矛刃本體（熾熱黃金白熾矛頭）
+    const spearGrad = c.createLinearGradient(0, -195, 0, 80);
+    spearGrad.addColorStop(0, "#ffffff");
+    spearGrad.addColorStop(0.35, "#fef08a");
+    spearGrad.addColorStop(0.75, "#f59e0b");
+    spearGrad.addColorStop(1, "#b45309");
+    c.fillStyle = spearGrad;
+    c.beginPath();
+    c.moveTo(0, -195);
+    c.lineTo(11, -135);
+    c.lineTo(7, 60);
+    c.lineTo(0, 80);
+    c.lineTo(-7, 60);
+    c.lineTo(-11, -135);
+    c.closePath();
+    c.fill();
+
+    // 3. 矛頭中央熾熱光脊
+    c.strokeStyle = "#ffffff";
+    c.lineWidth = 1.8;
+    c.beginPath();
+    c.moveTo(0, -185);
+    c.lineTo(0, 65);
+    c.stroke();
+
+    // 4. 太陽日輪雙翼護手 (Solar Sunburst Wings Guard)
+    c.strokeStyle = "#fde047";
+    c.lineWidth = 3.5;
+    c.beginPath();
+    c.arc(0, 62, 38, -Math.PI * 0.2, Math.PI * 1.2);
+    c.stroke();
+
+    // 5. 護手核心日耀紅寶石日冕
+    c.fillStyle = "#ffffff";
+    c.shadowColor = "#ea580c";
+    c.shadowBlur = 22;
+    c.beginPath();
+    c.arc(0, 62, 7.5, 0, Math.PI * 2);
+    c.fill();
+
+    // 6. 矛柄與烈陽金鑽矛尾
+    c.strokeStyle = "#f59e0b";
+    c.lineWidth = 4.5;
+    c.beginPath();
+    c.moveTo(0, 70);
+    c.lineTo(0, 135);
+    c.stroke();
+
+    c.fillStyle = "#dc2626";
+    c.beginPath();
+    c.arc(0, 138, 7.5, 0, Math.PI * 2);
+    c.fill();
+
+    c.restore();
+  }
+
+  function renderHemeraFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const cx = w / 2;
+    const cy = h / 2;
+    const hemera = st.hemera;
+    if (!hemera) return;
+
+    // 1. 烈陽焦灼天幕 (Scorched Amber-Crimson Solar Void)
+    const skyGrad = c.createRadialGradient(cx, cy * 0.65, 30, cx, cy, Math.max(w, h) * 0.85);
+    skyGrad.addColorStop(0, isClimax ? "#7c2d12" : "#451a03");
+    skyGrad.addColorStop(0.42, "#361002");
+    skyGrad.addColorStop(0.78, "#1f0701");
+    skyGrad.addColorStop(1, "#0a0200");
+    c.fillStyle = skyGrad;
+    c.fillRect(0, 0, w, h);
+
+    // 2. 熾熱空氣熱浪波紋 (Heat Waves / Atmospheric Mirage Shimmer)
+    for (let i = 0; i < 5; i++) {
+      const wy = h * 0.25 + i * (h * 0.14);
+      c.save();
+      c.globalAlpha = 0.08 + Math.sin(elapsed * 0.003 + i) * 0.04;
+      c.fillStyle = i % 2 === 0 ? "rgba(245, 158, 11, 0.4)" : "rgba(234, 88, 12, 0.35)";
+      c.beginPath();
+      c.moveTo(0, wy);
+      for (let x = 0; x <= w; x += 30) {
+        const offset = Math.sin(elapsed * 0.004 + x * 0.015 + i) * 8;
+        c.lineTo(x, wy + offset);
+      }
+      c.lineTo(w, h);
+      c.lineTo(0, h);
+      c.closePath();
+      c.fill();
+      c.restore();
+    }
+
+    // 3. 烈陽電漿火星粒子向上奔湧 (Upward Solar Plasma Embers)
+    const partSpeed = isClimax ? 2.3 : isUp ? 1.4 : 1.0;
+    for (let i = 0; i < hemera.solarParticles.length; i++) {
+      const sp = hemera.solarParticles[i];
+      sp.y += sp.vy * partSpeed;
+      sp.x += Math.sin(elapsed * sp.swaySpeed + sp.swayPhase) * 1.5;
+      if (sp.y < -30) {
+        sp.y = h + Math.random() * 40;
+        sp.x = Math.random() * w;
+      }
+      c.save();
+      c.globalAlpha = sp.alpha * (isClimax ? 1 : 0.85);
+      c.fillStyle = sp.color;
+      c.shadowColor = sp.color;
+      c.shadowBlur = 8;
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.r * (isClimax ? 1.3 : 1), 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 4. 日珥電漿噴發拱弧 (Coronal Prominences)
+    const sx = cx;
+    const sy = cy - Math.min(h * 0.22, 115);
+    const sr = isClimax ? 70 : 54;
+    drawHemeraProminences(c, sx, sy, sr, hemera.prominences, elapsed, isClimax, 1);
+
+    // 5. 熾熱烈陽本體與日耀金芒 (Blazing Sun Disc & Sunburst Rays)
+    drawHemeraSun(c, cx, cy, w, h, elapsed, isClimax, 1);
+
+    // 6. -天輝浮光－日之矛- 烈陽神矛顯現（重擊或高潮時）
+    if (hemera.spearImpact > 0.01) {
+      hemera.spearImpact *= 0.92;
+      const sScale = 0.9 + hemera.spearImpact * 0.45;
+      const sY = cy - 10 + (1 - hemera.spearImpact) * 22;
+      drawHemeraSolarSpear(c, cx, sY, sScale, Math.min(0.96, hemera.spearImpact * 1.4));
+    } else if (isClimax) {
+      const climSpearAlpha = 0.5 + Math.sin(elapsed * 0.0035) * 0.22;
+      drawHemeraSolarSpear(c, cx, cy + 15, 0.98, climSpearAlpha);
+    }
+
+    // 7. 烈陽爆破碎屑與金色衝擊光環
+    for (let i = st.burstSparks.length - 1; i >= 0; i--) {
+      const sp = st.burstSparks[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.alpha *= 0.94;
+      if (sp.alpha <= 0.02) {
+        st.burstSparks.splice(i, 1);
+        continue;
+      }
+      c.save();
+      c.globalAlpha = sp.alpha;
+      c.fillStyle = sp.color || "#fef08a";
+      c.shadowColor = "#f59e0b";
+      c.shadowBlur = 8;
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 8. 烈陽焦灼暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.32, cx, cy, Math.max(w, h) * 0.78);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(10, 2, 0, 0.92)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
   function startCanvasSummonFx(tierSpec, totalDurationMs, specialVariant = null) {
     if (!canvasEl || !ctx2d) return;
     resizeFxCanvas();
@@ -1779,7 +6196,7 @@
 
     // 4A. Evil Abyssal Demon Eyes (For 賽特 伊斐爾 "phenom-seth-evil" or default ？ Tier)
     const abyssEyes = [];
-    if (lvl === 7 && specialVariant !== "phenom-the-abyss" && specialVariant !== "phenom-lycia-void") {
+    if ((lvl === 8 || specialVariant === "phenom-seth-evil") && specialVariant !== "phenom-the-abyss" && specialVariant !== "phenom-lycia-void") {
       for (let i = 0; i < 12; i++) {
         const ang = (i / 12) * Math.PI * 2 + (Math.random() - 0.5) * 0.25;
         const rad = 165 + (i % 2) * 75 + Math.random() * 35;
@@ -1895,6 +6312,13 @@
       voidScytheArcs,
       voidQuestionMarks,
       dragonEmbers,
+      hecate: specialVariant === "hecate-death" ? createHecateFxState(w, h) : null,
+      skadi: specialVariant === "skadi-darkness" ? createSkadiFxState(w, h) : null,
+      ignalion: specialVariant === "ignalion-holyfire" ? createIgnalionFxState(w, h) : null,
+      warrior: specialVariant === "warrior-arena" ? createWarriorFxState(w, h) : null,
+      beelzebub: specialVariant === "beelzebub-swarm" ? createBeelzebubFxState(w, h) : null,
+      nyx: specialVariant === "nyx-moon-stars" ? createNyxFxState(w, h) : null,
+      hemera: specialVariant === "hemera-sun" ? createHemeraFxState(w, h) : null,
       burstSparks: [],
       shockwaves: [],
       burstTriggered: false
@@ -1913,6 +6337,69 @@
       const vMode = activeFxState.specialVariant;
 
       ctx2d.clearRect(0, 0, wCurr, hCurr);
+
+      // 黑卡蒂：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "hecate-death" && activeFxState.hecate) {
+        renderHecateFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // 暗 斯卡奇〔霸王之暗・黑色暴君〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "skadi-darkness" && activeFxState.skadi) {
+        renderSkadiFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // 伊格那利昂 加拉爾〔熊熊聖火與帝國王道〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "ignalion-holyfire" && activeFxState.ignalion) {
+        renderIgnalionFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // 沃利爾 德瑪〔戰爭與古羅馬血沙競技場〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "warrior-arena" && activeFxState.warrior) {
+        renderWarriorFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // 別西卜 阿斯拉 撒旦〔暴食血紅與萬千群蠅暴虐〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "beelzebub-swarm" && activeFxState.beelzebub) {
+        renderBeelzebubFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // 尤諾拉 倪克斯〔皎潔明月與深邃星空・黑夜女神〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "nyx-moon-stars" && activeFxState.nyx) {
+        renderNyxFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // 迪米諾拉 赫墨拉〔熾熱烈陽與終焉日冕・日耀女神〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "hemera-sun" && activeFxState.hemera) {
+        renderHemeraFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
 
       let priColor = isUpgradedNow ? tierSpec.colorPrimary : "#38bdf8";
       let secColor = isUpgradedNow ? tierSpec.colorSecondary : "#60a5fa";
@@ -2240,7 +6727,7 @@
           ctx2d.fill();
           ctx2d.restore();
         }
-      } else if (isUpgradedNow && lvl === 7) {
+      } else if (isUpgradedNow && (lvl === 8 || vMode === "phenom-seth-evil")) {
         // 【賽特 伊斐爾 / Default ？：邪惡風格】Sinister Abyssal Darkness & 12 Glowing Red Demon Eyes!
         const abyssGrad = ctx2d.createRadialGradient(cx, cy, 40, cx, cy, Math.max(wCurr, hCurr) * 0.7);
         abyssGrad.addColorStop(0, "rgba(2, 0, 8, 0.72)");
@@ -2280,65 +6767,41 @@
         }
       }
 
-      // 1. Rotating God-Ray Beams (SSR / UR / EX / ？ after upgrade, intensified during Climax Finale!)
+      // 1. Rotating God-Ray Beams (SSR / UR / EX / Legend / ？ after upgrade, intensified during Climax Finale!)
       if (isUpgradedNow && (lvl >= 4 || isClimax)) {
-        const rayCount = vMode === "apocalypse-dragon" ? 22 : lvl === 7 ? 18 : lvl === 6 ? 16 : lvl === 5 ? 12 : lvl === 4 ? 8 : 6;
-        const rotSpeed = (isClimax ? 2.4 : 1) * (lvl === 7 ? -0.0022 : lvl >= 6 ? 0.0024 : 0.0012);
+        const rayCount = vMode === "apocalypse-dragon" ? 20 : lvl === 8 ? 18 : lvl === 7 ? 16 : lvl === 6 ? 14 : lvl === 5 ? 12 : lvl === 4 ? 8 : 6;
+        const rotSpeed = (isClimax ? 2.4 : 1) * (lvl === 8 ? -0.0022 : lvl >= 6 ? 0.0024 : 0.0012);
         const baseRot = elapsed * rotSpeed;
         const maxR = Math.max(wCurr, hCurr) * 0.82;
         ctx2d.save();
         ctx2d.translate(cx, cy);
+
+        // Pre-create shared gradients once per frame
+        const rayGrads = [];
+        const rayPal =
+          vMode === "phenom-the-abyss"
+            ? ["rgba(147, 51, 234, 0.44)", "rgba(79, 70, 229, 0.38)", "rgba(59, 7, 100, 0.52)", "rgba(192, 132, 252, 0.35)"]
+            : vMode === "phenom-lycia-void"
+            ? ["rgba(29, 78, 216, 0.52)", "rgba(0, 0, 0, 0.78)", "rgba(30, 58, 138, 0.58)", "rgba(59, 130, 246, 0.42)"]
+            : vMode === "apocalypse-dragon" || lvl === 7
+            ? ["rgba(239, 68, 68, 0.62)", "rgba(254, 240, 138, 0.58)", "rgba(185, 28, 28, 0.65)", "rgba(249, 115, 22, 0.55)"]
+            : lvl === 8
+            ? ["rgba(220, 38, 38, 0.42)", "rgba(147, 51, 234, 0.36)", "rgba(127, 29, 29, 0.45)", "rgba(239, 68, 68, 0.38)"]
+            : lvl === 6
+            ? ["rgba(254, 240, 138, 0.42)", "rgba(56, 189, 248, 0.36)", "rgba(255, 255, 255, 0.4)", "rgba(244, 63, 94, 0.32)"]
+            : [`${priColor}44`, `${secColor}33`];
+        for (let g = 0; g < rayPal.length; g++) {
+          const rg = ctx2d.createLinearGradient(0, 0, maxR, 0);
+          rg.addColorStop(0, rayPal[g]);
+          rg.addColorStop(1, "rgba(0, 0, 0, 0)");
+          rayGrads.push(rg);
+        }
+
         for (let r = 0; r < rayCount; r++) {
           const a = baseRot + (r * Math.PI * 2) / rayCount;
           ctx2d.save();
           ctx2d.rotate(a);
-          const grad = ctx2d.createLinearGradient(0, 0, maxR, 0);
-          if (vMode === "phenom-the-abyss") {
-            const abyssCols = [
-              "rgba(147, 51, 234, 0.44)",
-              "rgba(79, 70, 229, 0.38)",
-              "rgba(59, 7, 100, 0.52)",
-              "rgba(192, 132, 252, 0.35)"
-            ];
-            grad.addColorStop(0, abyssCols[r % abyssCols.length]);
-          } else if (vMode === "phenom-lycia-void") {
-            // Deep Blue & Pitch-Black Mysterious Void Rays
-            const voidCols = [
-              "rgba(29, 78, 216, 0.52)",
-              "rgba(0, 0, 0, 0.78)",
-              "rgba(30, 58, 138, 0.58)",
-              "rgba(59, 130, 246, 0.42)"
-            ];
-            grad.addColorStop(0, voidCols[r % voidCols.length]);
-          } else if (vMode === "apocalypse-dragon") {
-            const dragCols = [
-              "rgba(239, 68, 68, 0.62)",
-              "rgba(254, 240, 138, 0.58)",
-              "rgba(185, 28, 28, 0.65)",
-              "rgba(249, 115, 22, 0.55)"
-            ];
-            grad.addColorStop(0, dragCols[r % dragCols.length]);
-          } else if (lvl === 7) {
-            const evilCols = [
-              "rgba(220, 38, 38, 0.42)",
-              "rgba(147, 51, 234, 0.36)",
-              "rgba(127, 29, 29, 0.45)",
-              "rgba(239, 68, 68, 0.38)"
-            ];
-            grad.addColorStop(0, evilCols[r % evilCols.length]);
-          } else if (lvl === 6) {
-            const exCols = [
-              "rgba(254, 240, 138, 0.42)",
-              "rgba(56, 189, 248, 0.36)",
-              "rgba(255, 255, 255, 0.4)",
-              "rgba(244, 63, 94, 0.32)"
-            ];
-            grad.addColorStop(0, exCols[r % exCols.length]);
-          } else {
-            grad.addColorStop(0, r % 2 === 0 ? `${priColor}44` : `${secColor}33`);
-          }
-          grad.addColorStop(1, "rgba(0, 0, 0, 0)");
-          ctx2d.fillStyle = grad;
+          ctx2d.fillStyle = rayGrads[r % rayGrads.length];
           const beamHalfW = isClimax ? 38 : 24;
           ctx2d.beginPath();
           ctx2d.moveTo(0, 0);
@@ -2468,7 +6931,7 @@
           ctx2d.beginPath();
           ctx2d.arc(cx, cy, 245 * (1.6 - pulse * 0.6), 0, Math.PI * 2);
           ctx2d.stroke();
-        } else if (lvl === 7) {
+        } else if (lvl === 8 || vMode === "phenom-seth-evil") {
           // 賽特 伊斐爾 CLIMAX: Evil Blood-Eclipse Singularity Black Hole
           ctx2d.strokeStyle = "#ef4444";
           ctx2d.lineWidth = 5.5;
@@ -2529,7 +6992,7 @@
       const speedMult = isClimax ? 2.35 : isUpgradedNow ? 1.35 : 1;
       for (let i = 0; i < activeFxState.comets.length; i++) {
         const c = activeFxState.comets[i];
-        c.angle += c.speedRot * speedMult * (lvl === 7 ? -1.2 : 1);
+        c.angle += c.speedRot * speedMult * (lvl === 8 ? -1.2 : 1);
         if (!activeFxState.burstTriggered) {
           c.dist -= c.speedIn * (isClimax ? 2.2 : 1);
           if (c.dist < 16) {
@@ -2543,7 +7006,7 @@
         const px = cx + Math.cos(c.angle) * c.dist;
         const py = cy + Math.sin(c.angle) * c.dist;
         c.trail.push({ x: px, y: py });
-        if (c.trail.length > (isClimax ? 10 : 7)) c.trail.shift();
+        if (c.trail.length > (isClimax ? 5 : 4)) c.trail.shift();
 
         if (c.trail.length > 1) {
           ctx2d.beginPath();
@@ -2552,7 +7015,7 @@
             ctx2d.lineTo(c.trail[t].x, c.trail[t].y);
           }
           ctx2d.strokeStyle =
-            lvl === 7 && c.isAccent
+            (lvl === 8 || vMode === "phenom-seth-evil") && c.isAccent
               ? "#000000"
               : c.isAccent
               ? "#ffffff"
@@ -2565,7 +7028,7 @@
         }
 
         ctx2d.globalAlpha = 0.95;
-        ctx2d.fillStyle = lvl === 7 && i % 2 === 0 ? "#ef4444" : "#ffffff";
+        ctx2d.fillStyle = (lvl === 8 || vMode === "phenom-seth-evil") && i % 2 === 0 ? "#ef4444" : "#ffffff";
         ctx2d.beginPath();
         ctx2d.arc(px, py, c.size, 0, Math.PI * 2);
         ctx2d.fill();
@@ -2591,7 +7054,7 @@
               ? "#fef08a"
               : vMode === "phenom-lycia-void"
               ? "#60a5fa"
-              : lvl === 7
+              : (lvl === 8 || vMode === "phenom-seth-evil")
               ? "#fca5a5"
               : "#ffffff"
           );
@@ -2611,7 +7074,7 @@
               ? "#fde047"
               : vMode === "phenom-lycia-void"
               ? "#1d4ed8"
-              : lvl === 7
+              : (lvl === 8 || vMode === "phenom-seth-evil")
               ? "#ef4444"
               : "#ffffff";
           ctx2d.beginPath();
@@ -2632,7 +7095,7 @@
           } else if (vMode === "phenom-lycia-void") {
             ctx2d.strokeStyle = i % 2 === 0 ? "#2563eb" : "#000000";
             ctx2d.lineWidth = isClimax ? 4.5 : 2.8;
-          } else if (lvl === 7) {
+          } else if (lvl === 8 || vMode === "phenom-seth-evil") {
             ctx2d.strokeStyle = i % 2 === 0 ? "#ef4444" : "#9333ea";
             ctx2d.lineWidth = isClimax ? 4.2 : 2.6;
           } else {
@@ -2748,6 +7211,27 @@
     if (upgradeNow) {
       activeFxState.upgraded = true;
     }
+    if (activeFxState.hecate) {
+      activeFxState.hecate.twang = 1;
+    }
+    if (activeFxState.skadi) {
+      activeFxState.skadi.hammerImpact = 1;
+    }
+    if (activeFxState.ignalion) {
+      activeFxState.ignalion.swordImpact = 1;
+    }
+    if (activeFxState.warrior) {
+      activeFxState.warrior.swordImpact = 1;
+    }
+    if (activeFxState.beelzebub) {
+      activeFxState.beelzebub.violentImpact = 1;
+    }
+    if (activeFxState.nyx) {
+      activeFxState.nyx.swordImpact = 1;
+    }
+    if (activeFxState.hemera) {
+      activeFxState.hemera.spearImpact = 1;
+    }
     const cx = (canvasEl.clientWidth || 860) / 2;
     const cy = (canvasEl.clientHeight || 560) / 2;
     activeFxState.shockwaves.push(
@@ -2777,7 +7261,7 @@
     activeFxState.climaxStartTime = performance.now();
     const spec = activeFxState.tierSpec;
     activeFxState.shockwaves.push(
-      { r: 16, speed: 18, alpha: 1, color: spec.level === 7 ? "#ef4444" : "#ffffff", lineWidth: 5.5 },
+      { r: 16, speed: 18, alpha: 1, color: spec.level === 7 ? "#ef4444" : spec.level === 8 ? "#9333ea" : "#ffffff", lineWidth: 5.5 },
       { r: 10, speed: 12, alpha: 0.95, color: spec.colorPrimary, lineWidth: 4 },
       { r: 6, speed: 8, alpha: 0.88, color: spec.colorSecondary, lineWidth: 3 }
     );
@@ -2837,7 +7321,9 @@
   const STORAGE_KEY_STATS = "arelita_summon_stats_v1";
   const summonState = {
     theme: localStorage.getItem("arelita_theme") || "ocean",
-    sfxEnabled: true,
+    sfxVolume: parseFloat(localStorage.getItem("arelita_summon_volume") ?? "0.8"),
+    sfxEnabled: localStorage.getItem("arelita_summon_sfx_muted") !== "true",
+    lastSfxVolume: parseFloat(localStorage.getItem("arelita_summon_last_volume") ?? "0.8"),
     fastMode: false,
     prefRace: "",
     prefAlign: "",
@@ -2851,6 +7337,73 @@
     unlockedIds: new Set(),
     recentHistory: []
   };
+
+  function updateVolumeUI() {
+    const sfxBtn = document.getElementById("btnToggleSummonSfx");
+    const sfxIcon = document.getElementById("summonSfxIcon");
+    const sfxText = document.getElementById("summonSfxText");
+    const slider = document.getElementById("summonVolumeSlider");
+    const label = document.getElementById("summonVolumeText");
+
+    const volPct = Math.round((summonState.sfxVolume || 0) * 100);
+    const isMuted = !summonState.sfxEnabled || volPct === 0;
+
+    if (slider) {
+      slider.value = isMuted ? 0 : volPct;
+    }
+    if (label) {
+      label.textContent = `${isMuted ? 0 : volPct}%`;
+    }
+    if (sfxBtn) {
+      sfxBtn.classList.toggle("is-active", !isMuted);
+      sfxBtn.setAttribute("aria-pressed", isMuted ? "false" : "true");
+    }
+    if (sfxIcon) {
+      if (isMuted) sfxIcon.textContent = "🔇";
+      else if (volPct < 30) sfxIcon.textContent = "🔈";
+      else if (volPct < 70) sfxIcon.textContent = "🔉";
+      else sfxIcon.textContent = "🔊";
+    }
+    if (sfxText) {
+      sfxText.textContent = isMuted ? "靜音" : "音效";
+    }
+  }
+
+  function setSummonVolume(volPct, triggerTone = true) {
+    const clamped = Math.max(0, Math.min(100, Math.round(volPct)));
+    summonState.sfxVolume = clamped / 100;
+    if (clamped > 0) {
+      summonState.sfxEnabled = true;
+      summonState.lastSfxVolume = summonState.sfxVolume;
+      try {
+        localStorage.setItem("arelita_summon_last_volume", String(summonState.lastSfxVolume));
+        localStorage.removeItem("arelita_summon_sfx_muted");
+      } catch (e) {}
+    } else {
+      summonState.sfxEnabled = false;
+      try {
+        localStorage.setItem("arelita_summon_sfx_muted", "true");
+      } catch (e) {}
+    }
+    try {
+      localStorage.setItem("arelita_summon_volume", String(summonState.sfxVolume));
+    } catch (e) {}
+
+    if (masterGainNode && audioCtx) {
+      try {
+        masterGainNode.gain.setValueAtTime(summonState.sfxVolume, audioCtx.currentTime);
+      } catch (e) {}
+    }
+
+    updateVolumeUI();
+
+    if (triggerTone && summonState.sfxEnabled && clamped > 0) {
+      clearTimeout(previewToneTimeout);
+      previewToneTimeout = setTimeout(() => {
+        playVolumePreviewTone();
+      }, 50);
+    }
+  }
 
   function loadSavedSummonStats() {
     try {
@@ -3129,8 +7682,8 @@
     if (breakdownEl) {
       const weightedList = getWeightedCandidates(1);
       let totalW = 0;
-      const tierWeightSums = { 7: 0, 6: 0, 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-      const tierCounts = { 7: 0, 6: 0, 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      const tierWeightSums = { 8: 0, 7: 0, 6: 0, 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      const tierCounts = { 8: 0, 7: 0, 6: 0, 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
 
       weightedList.forEach(({ char, weight }) => {
         const lvl = char.summonTier ? char.summonTier.level : 1;
@@ -3139,7 +7692,7 @@
         totalW += weight;
       });
 
-      breakdownEl.innerHTML = [7, 6, 5, 4, 3, 2, 1]
+      breakdownEl.innerHTML = [8, 7, 6, 5, 4, 3, 2, 1]
         .map((lvl) => {
           const t = SUMMON_TIERS[lvl];
           const cnt = tierCounts[lvl] || 0;
@@ -3240,7 +7793,21 @@
 
     // Resolve upgraded primary/secondary/glow colors (accounting for bespoke character variants!)
     const upgPrimary =
-      specialVariant === "phenom-the-abyss"
+      specialVariant === "hecate-death"
+        ? "#f97316"
+        : specialVariant === "skadi-darkness"
+        ? "#9333ea"
+        : specialVariant === "ignalion-holyfire"
+        ? "#f59e0b"
+        : specialVariant === "warrior-arena"
+        ? "#ea580c"
+        : specialVariant === "beelzebub-swarm"
+        ? "#dc2626"
+        : specialVariant === "nyx-moon-stars"
+        ? "#38bdf8"
+        : specialVariant === "hemera-sun"
+        ? "#f59e0b"
+        : specialVariant === "phenom-the-abyss"
         ? "#9333ea"
         : specialVariant === "phenom-lycia-void"
         ? "#1d4ed8"
@@ -3249,7 +7816,21 @@
         : tierSpec.colorPrimary;
 
     const upgSecondary =
-      specialVariant === "phenom-the-abyss"
+      specialVariant === "hecate-death"
+        ? "#1c0702"
+        : specialVariant === "skadi-darkness"
+        ? "#000000"
+        : specialVariant === "ignalion-holyfire"
+        ? "#b91c1c"
+        : specialVariant === "warrior-arena"
+        ? "#7f1d1d"
+        : specialVariant === "beelzebub-swarm"
+        ? "#450a0a"
+        : specialVariant === "nyx-moon-stars"
+        ? "#1e1b4b"
+        : specialVariant === "hemera-sun"
+        ? "#7c2d12"
+        : specialVariant === "phenom-the-abyss"
         ? "#6366f1"
         : specialVariant === "phenom-lycia-void"
         ? "#3b82f6"
@@ -3258,7 +7839,21 @@
         : tierSpec.colorSecondary;
 
     const upgGlow =
-      specialVariant === "phenom-the-abyss"
+      specialVariant === "hecate-death"
+        ? "rgba(249, 115, 22, 0.96)"
+        : specialVariant === "skadi-darkness"
+        ? "rgba(147, 51, 234, 0.96)"
+        : specialVariant === "ignalion-holyfire"
+        ? "rgba(245, 158, 11, 0.96)"
+        : specialVariant === "warrior-arena"
+        ? "rgba(234, 88, 12, 0.96)"
+        : specialVariant === "beelzebub-swarm"
+        ? "rgba(220, 38, 38, 0.98)"
+        : specialVariant === "nyx-moon-stars"
+        ? "rgba(56, 189, 248, 0.95)"
+        : specialVariant === "hemera-sun"
+        ? "rgba(245, 158, 11, 0.96)"
+        : specialVariant === "phenom-the-abyss"
         ? "rgba(147, 51, 234, 0.96)"
         : specialVariant === "phenom-lycia-void"
         ? "rgba(29, 78, 216, 0.96)"
@@ -3287,13 +7882,93 @@
       impactStageEl.classList.add("is-impact-slamming", modeClass);
     }
 
-    // Phase 1 (0ms): Start in base blue/cyan state before rarity upgrade at Step 2
+    // Phase 1 (0ms): Start in base blue/cyan state before rarity upgrade at Step 2 (Hecate, Skadi, Ignalion, Warrior & Beelzebub start in bespoke state immediately!)
+    const isHecate = specialVariant === "hecate-death";
+    const isSkadi = specialVariant === "skadi-darkness";
+    const isIgnalion = specialVariant === "ignalion-holyfire";
+    const isWarrior = specialVariant === "warrior-arena";
+    const isBeelzebub = specialVariant === "beelzebub-swarm";
+    const isNyx = specialVariant === "nyx-moon-stars";
+    const isHemera = specialVariant === "hemera-sun";
     if (viewport) {
-      const initTierAttr = tierSpec.level >= 3 ? "tier-2" : `tier-${tierSpec.level}`;
+      const initTierAttr = isHecate
+        ? "tier-hecate"
+        : isSkadi
+        ? "tier-skadi"
+        : isIgnalion
+        ? "tier-ignalion"
+        : isWarrior
+        ? "tier-warrior"
+        : isBeelzebub
+        ? "tier-beelzebub"
+        : isNyx
+        ? "tier-nyx"
+        : isHemera
+        ? "tier-hemera"
+        : tierSpec.level >= 3
+        ? "tier-2"
+        : `tier-${tierSpec.level}`;
       viewport.setAttribute("data-tier", initTierAttr);
-      viewport.style.setProperty("--summon-primary", tierSpec.level >= 3 ? "#38bdf8" : upgPrimary);
-      viewport.style.setProperty("--summon-secondary", tierSpec.level >= 3 ? "#60a5fa" : upgSecondary);
-      viewport.style.setProperty("--summon-glow", tierSpec.level >= 3 ? "rgba(56, 189, 248, 0.85)" : upgGlow);
+      viewport.style.setProperty(
+        "--summon-primary",
+        isHecate
+          ? "#f97316"
+          : isSkadi
+          ? "#9333ea"
+          : isIgnalion
+          ? "#f59e0b"
+          : isWarrior
+          ? "#ea580c"
+          : isBeelzebub
+          ? "#dc2626"
+          : isNyx
+          ? "#38bdf8"
+          : isHemera
+          ? "#f59e0b"
+          : tierSpec.level >= 3
+          ? "#38bdf8"
+          : upgPrimary
+      );
+      viewport.style.setProperty(
+        "--summon-secondary",
+        isHecate
+          ? "#1c0702"
+          : isSkadi
+          ? "#000000"
+          : isIgnalion
+          ? "#b91c1c"
+          : isWarrior
+          ? "#7f1d1d"
+          : isBeelzebub
+          ? "#450a0a"
+          : isNyx
+          ? "#1e1b4b"
+          : isHemera
+          ? "#7c2d12"
+          : tierSpec.level >= 3
+          ? "#60a5fa"
+          : upgSecondary
+      );
+      viewport.style.setProperty(
+        "--summon-glow",
+        isHecate
+          ? "rgba(249, 115, 22, 0.85)"
+          : isSkadi
+          ? "rgba(147, 51, 234, 0.96)"
+          : isIgnalion
+          ? "rgba(245, 158, 11, 0.96)"
+          : isWarrior
+          ? "rgba(234, 88, 12, 0.96)"
+          : isBeelzebub
+          ? "rgba(220, 38, 38, 0.98)"
+          : isNyx
+          ? "rgba(56, 189, 248, 0.95)"
+          : isHemera
+          ? "rgba(245, 158, 11, 0.96)"
+          : tierSpec.level >= 3
+          ? "rgba(56, 189, 248, 0.85)"
+          : upgGlow
+      );
       viewport.classList.remove(
         "is-stage-shaking",
         "is-ex-singularity",
@@ -3301,15 +7976,40 @@
         "is-abyss-depths",
         "is-void-erasure",
         "is-apocalypse-dragon",
+        "is-hecate-death",
+        "is-skadi-darkness",
+        "is-ignalion-holyfire",
+        "is-warrior-arena",
+        "is-beelzebub-swarm",
+        "is-nyx-moon-stars",
+        "is-hemera-sun",
         "is-tier-upgraded",
         "is-climax-finale"
       );
+      if (isHecate) {
+        viewport.classList.add("is-hecate-death");
+      } else if (isSkadi) {
+        viewport.classList.add("is-skadi-darkness");
+      } else if (isIgnalion) {
+        viewport.classList.add("is-ignalion-holyfire");
+      } else if (isWarrior) {
+        viewport.classList.add("is-warrior-arena");
+      } else if (isBeelzebub) {
+        viewport.classList.add("is-beelzebub-swarm");
+      } else if (isNyx) {
+        viewport.classList.add("is-nyx-moon-stars");
+      } else if (isHemera) {
+        viewport.classList.add("is-hemera-sun");
+      }
     }
     if (card3d) {
       card3d.classList.remove("is-card-flipping", "is-card-upgraded");
+      if (isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera) {
+        card3d.classList.add("is-card-upgraded");
+      }
     }
-    if (coreSymEl) coreSymEl.textContent = "❖";
-    if (cardTierTxt) cardTierTxt.textContent = "SUMMON";
+    if (coreSymEl) coreSymEl.textContent = isHecate ? "🕸️" : isSkadi ? "👑" : isIgnalion ? "🔥" : isWarrior ? "⚔️" : isBeelzebub ? "🪰" : isNyx ? "🌙" : isHemera ? "☀️" : "❖";
+    if (cardTierTxt) cardTierTxt.textContent = isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera ? "EX" : "SUMMON";
 
     // Start 60fps Canvas FX & Background Ritual Charge Audio
     startCanvasSummonFx(tierSpec, totalMs, specialVariant);
@@ -3319,7 +8019,24 @@
     const voiceLine = extractCharacterSummonVoiceLine(featuredChar);
     featuredChar.summonVoiceLine = voiceLine;
     showGiantImpactText(voiceLine.text, "mode-quote");
-    triggerCanvasStepImpact("#38bdf8", false);
+    triggerCanvasStepImpact(
+      isHecate
+        ? "#f97316"
+        : isSkadi
+        ? "#9333ea"
+        : isIgnalion
+        ? "#f59e0b"
+        : isWarrior
+        ? "#ea580c"
+        : isBeelzebub
+        ? "#dc2626"
+        : isNyx
+        ? "#38bdf8"
+        : isHemera
+        ? "#f59e0b"
+        : "#38bdf8",
+      isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera
+    );
     playBigTextImpactSfx(1, tierSpec.level, specialVariant);
 
     // ==================== BEAT 2: 跳出大字 — 強度階級（並觸發稀有度與專屬角色領域變色！） ====================
@@ -3333,15 +8050,29 @@
         if (tierSpec.level >= 4) {
           viewport.classList.add("is-stage-shaking");
         }
-        if (specialVariant === "phenom-the-abyss") {
+        if (specialVariant === "hecate-death") {
+          viewport.classList.add("is-hecate-death");
+        } else if (specialVariant === "skadi-darkness") {
+          viewport.classList.add("is-skadi-darkness");
+        } else if (specialVariant === "ignalion-holyfire") {
+          viewport.classList.add("is-ignalion-holyfire");
+        } else if (specialVariant === "warrior-arena") {
+          viewport.classList.add("is-warrior-arena");
+        } else if (specialVariant === "beelzebub-swarm") {
+          viewport.classList.add("is-beelzebub-swarm");
+        } else if (specialVariant === "nyx-moon-stars") {
+          viewport.classList.add("is-nyx-moon-stars");
+        } else if (specialVariant === "hemera-sun") {
+          viewport.classList.add("is-hemera-sun");
+        } else if (specialVariant === "phenom-the-abyss") {
           viewport.classList.add("is-abyss-depths");
         } else if (specialVariant === "phenom-lycia-void") {
           viewport.classList.add("is-void-erasure");
-        } else if (specialVariant === "apocalypse-dragon") {
+        } else if (specialVariant === "apocalypse-dragon" || tierSpec.level === 7) {
           viewport.classList.add("is-apocalypse-dragon");
         } else if (tierSpec.level === 6) {
           viewport.classList.add("is-ex-singularity");
-        } else if (tierSpec.level === 7) {
+        } else if (tierSpec.level === 8) {
           viewport.classList.add("is-evil-abyss");
         }
       }
@@ -3350,7 +8081,21 @@
       }
       if (coreSymEl) {
         coreSymEl.textContent =
-          specialVariant === "phenom-the-abyss"
+          specialVariant === "hecate-death"
+            ? "🕸️"
+            : specialVariant === "skadi-darkness"
+            ? "👑"
+            : specialVariant === "ignalion-holyfire"
+            ? "🔥"
+            : specialVariant === "warrior-arena"
+            ? "⚔️"
+            : specialVariant === "beelzebub-swarm"
+            ? "🪰"
+            : specialVariant === "nyx-moon-stars"
+            ? "🌙"
+            : specialVariant === "hemera-sun"
+            ? "☀️"
+            : specialVariant === "phenom-the-abyss"
             ? "◈"
             : specialVariant === "phenom-lycia-void"
             ? "？？？"
@@ -3441,27 +8186,55 @@
         "is-abyss-depths",
         "is-void-erasure",
         "is-apocalypse-dragon",
+        "is-hecate-death",
+        "is-skadi-darkness",
+        "is-ignalion-holyfire",
+        "is-warrior-arena",
+        "is-beelzebub-swarm",
+        "is-nyx-moon-stars",
+        "is-hemera-sun",
         "is-climax-finale"
       );
     }
 
-    // Trigger screen flash (bespoke flash colors for Seth / The Abyss / Lycia / Apocalypse Dragon!)
+    // Trigger screen flash (bespoke flash colors for Seth / The Abyss / Lycia / Apocalypse Dragon / Hecate / Skadi / Ignalion / Warrior / Beelzebub / Nyx / Hemera!)
     if (flashEl) {
       flashEl.classList.remove(
         "is-flashing",
         "is-evil-flash",
         "is-abyss-flash",
         "is-void-flash",
-        "is-dragon-flash"
+        "is-dragon-flash",
+        "is-hecate-flash",
+        "is-skadi-flash",
+        "is-ignalion-flash",
+        "is-warrior-flash",
+        "is-beelzebub-flash",
+        "is-nyx-flash",
+        "is-hemera-flash"
       );
       void flashEl.offsetWidth;
-      if (specialVariant === "phenom-the-abyss") {
+      if (specialVariant === "hecate-death") {
+        flashEl.classList.add("is-hecate-flash");
+      } else if (specialVariant === "skadi-darkness") {
+        flashEl.classList.add("is-skadi-flash");
+      } else if (specialVariant === "ignalion-holyfire") {
+        flashEl.classList.add("is-ignalion-flash");
+      } else if (specialVariant === "warrior-arena") {
+        flashEl.classList.add("is-warrior-flash");
+      } else if (specialVariant === "beelzebub-swarm") {
+        flashEl.classList.add("is-beelzebub-flash");
+      } else if (specialVariant === "nyx-moon-stars") {
+        flashEl.classList.add("is-nyx-flash");
+      } else if (specialVariant === "hemera-sun") {
+        flashEl.classList.add("is-hemera-flash");
+      } else if (specialVariant === "phenom-the-abyss") {
         flashEl.classList.add("is-abyss-flash");
       } else if (specialVariant === "phenom-lycia-void") {
         flashEl.classList.add("is-void-flash");
-      } else if (specialVariant === "apocalypse-dragon") {
+      } else if (specialVariant === "apocalypse-dragon" || tierSpec.level === 7) {
         flashEl.classList.add("is-dragon-flash");
-      } else if (tierSpec.level === 7) {
+      } else if (tierSpec.level === 8) {
         flashEl.classList.add("is-evil-flash");
       }
       flashEl.classList.add("is-flashing");
@@ -3533,7 +8306,7 @@
             <span class="scr-tier-badge tier-badge-lv-${tier.level}">
               <span>${esc(tier.code)}</span>
             </span>
-            <span class="scr-stars">${esc(tier.stars)}</span>
+            <span class="scr-stars ${tier.level === 7 ? 'legend-black-stars' : ''}">${esc(tier.stars)}</span>
             ${
               isPreviewOnly
                 ? `<span class="scr-preview-tag">🎬 動畫預覽</span>`
@@ -3758,7 +8531,7 @@
     const grid = document.getElementById("tierGuideGrid");
 
     if (grid) {
-      grid.innerHTML = [7, 6, 5, 4, 3, 2, 1]
+      grid.innerHTML = [8, 7, 6, 5, 4, 3, 2, 1]
         .map((lvl) => {
           const t = SUMMON_TIERS[lvl];
           const sampleChars = characters.filter((c) => c.summonTier && c.summonTier.level === lvl);
@@ -3769,29 +8542,102 @@
           const ratePct = (t.tierTargetRate * 100).toFixed(1);
 
           let specialPreviewHtml = "";
-          if (lvl === 7) {
+          if (lvl === 8) {
             specialPreviewHtml = `
-              <div class="tgc-special-previews">
-                <button type="button" class="tgc-preview-btn is-evil-btn" data-preview-char-id="char-2">
-                  <span>👁️ 試播：賽特 伊斐爾〔邪惡風格〕</span>
-                </button>
-                <button type="button" class="tgc-preview-btn is-abyss-btn" data-preview-char-id="char-19">
-                  <span>🌊 試播：The Abyss〔深淵風格〕</span>
-                </button>
-                <button type="button" class="tgc-preview-btn is-void-btn" data-preview-char-id="char-15">
-                  <span>🌌 試播：莉琪雅 神隱〔虛空風格〕</span>
-                </button>
+              <div class="tgc-menu-container">
+                <div class="tgc-preview-select-row">
+                  <div class="tgc-select-wrap">
+                    <select class="tgc-tier-select" data-tier-select="${lvl}">
+                      <option value="char-2">👁️ 賽特 伊斐爾〔邪惡風格〕</option>
+                      <option value="char-19">🌊 The Abyss〔深淵風格〕</option>
+                      <option value="char-15">🌌 莉琪雅 神隱〔虛空風格〕</option>
+                    </select>
+                    <span class="tgc-select-arrow">▾</span>
+                  </div>
+                  <button type="button" class="tgc-preview-btn tgc-run-select-btn" data-run-tier-select="${lvl}">
+                    <span>🎬 立即試播</span>
+                  </button>
+                </div>
+                <details class="tgc-preview-accordion">
+                  <summary class="tgc-preview-accordion-summary">
+                    <span>📋 展開/收合所有按鈕選單（共 3 款）</span>
+                    <span class="tgc-accordion-chevron">▾</span>
+                  </summary>
+                  <div class="tgc-special-previews is-grid">
+                    <button type="button" class="tgc-preview-btn is-evil-btn" data-preview-char-id="char-2">
+                      <span>👁️ 試播：賽特 伊斐爾〔邪惡風格〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-abyss-btn" data-preview-char-id="char-19">
+                      <span>🌊 試播：The Abyss〔深淵風格〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-void-btn" data-preview-char-id="char-15">
+                      <span>🌌 試播：莉琪雅 神隱〔虛空風格〕</span>
+                    </button>
+                  </div>
+                </details>
               </div>
             `;
-          } else if (lvl === 6) {
+          } else if (lvl === 7) {
             specialPreviewHtml = `
               <div class="tgc-special-previews">
                 <button type="button" class="tgc-preview-btn is-dragon-btn" data-preview-char-id="char-37">
                   <span>🐉 試播：赤夜 終焉龍〔滅世風格＋震天龍吼〕</span>
                 </button>
-                <button type="button" class="tgc-preview-btn" data-preview-tier="${lvl}">
-                  <span>🎬 試播：一般 ${esc(t.code)} 神聖創世演出</span>
-                </button>
+              </div>
+            `;
+          } else if (lvl === 6) {
+            specialPreviewHtml = `
+              <div class="tgc-menu-container">
+                <div class="tgc-preview-select-row">
+                  <div class="tgc-select-wrap">
+                    <select class="tgc-tier-select" data-tier-select="${lvl}">
+                      <option value="char-13">☀️ 迪米諾拉 赫墨拉〔烈陽風格・日耀女神〕</option>
+                      <option value="char-12">🌙 尤諾拉 倪克斯〔月亮與星空・黑夜女神〕</option>
+                      <option value="char-32">🪰 別西卜 阿斯拉 撒旦〔暴食血紅・群蠅暴虐〕</option>
+                      <option value="char-25">⚔️ 沃利爾 德瑪〔戰爭・古羅馬競技場〕</option>
+                      <option value="char-7">🔥 伊格那利昂 加拉爾〔熊熊聖火・帝國王道〕</option>
+                      <option value="char-10">👑 暗 斯卡奇〔霸王之暗・黑色暴君〕</option>
+                      <option value="char-106">🕸️ 黑卡蒂 拉普拉斯〔死亡冥焰・命運絲線〕</option>
+                      <option value="tier-6">🎬 EX 通用神聖演出</option>
+                    </select>
+                    <span class="tgc-select-arrow">▾</span>
+                  </div>
+                  <button type="button" class="tgc-preview-btn tgc-run-select-btn" data-run-tier-select="${lvl}">
+                    <span>🎬 立即試播</span>
+                  </button>
+                </div>
+                <details class="tgc-preview-accordion">
+                  <summary class="tgc-preview-accordion-summary">
+                    <span>📋 展開/收合所有按鈕選單（共 8 款）</span>
+                    <span class="tgc-accordion-chevron">▾</span>
+                  </summary>
+                  <div class="tgc-special-previews is-grid">
+                    <button type="button" class="tgc-preview-btn is-hemera-btn" data-preview-char-id="char-13">
+                      <span>☀️ 試播：迪米諾拉 赫墨拉〔烈陽風格・日耀女神〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-nyx-btn" data-preview-char-id="char-12">
+                      <span>🌙 試播：尤諾拉 倪克斯〔月亮與星空・黑夜女神〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-beelzebub-btn" data-preview-char-id="char-32">
+                      <span>🪰 試播：別西卜 阿斯拉 撒旦〔暴食血紅・群蠅暴虐〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-warrior-btn" data-preview-char-id="char-25">
+                      <span>⚔️ 試播：沃利爾 德瑪〔戰爭・古羅馬競技場〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-ignalion-btn" data-preview-char-id="char-7">
+                      <span>🔥 試播：伊格那利昂 加拉爾〔熊熊聖火・帝國王道〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-skadi-btn" data-preview-char-id="char-10">
+                      <span>👑 試播：暗 斯卡奇〔霸王之暗・黑色暴君〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-hecate-btn" data-preview-char-id="char-106">
+                      <span>🕸️ 試播：黑卡蒂 拉普拉斯〔死亡冥焰・命運絲線〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn" data-preview-tier="${lvl}">
+                      <span>🎬 試播：EX 通用神聖演出</span>
+                    </button>
+                  </div>
+                </details>
               </div>
             `;
           } else {
@@ -3808,7 +8654,7 @@
                 <span class="scr-tier-badge tier-badge-lv-${lvl}">${esc(t.code)} ‧ ${esc(t.name)}</span>
                 <span class="tgc-count">基礎池機率 <strong>${ratePct}%</strong>（共 ${sampleChars.length} 人）</span>
               </div>
-              <h3 class="tgc-title">${esc(t.fullTitle)} ${esc(t.stars)}</h3>
+              <h3 class="tgc-title">${esc(t.fullTitle)} <span class="tgc-stars-span ${lvl === 7 ? 'legend-black-stars' : ''}">${esc(t.stars)}</span></h3>
               <div class="tgc-range">⚡ 對應強度：<strong>${esc(t.powerRangeText)}</strong></div>
               <p class="tgc-desc">${esc(t.animDesc)}</p>
               <div class="tgc-samples">代表角色：${esc(sampleNames)}${sampleChars.length > 5 ? " 等..." : ""}</div>
@@ -3829,11 +8675,59 @@
         });
       });
 
+      grid.querySelectorAll("[data-run-tier-select]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const lvl = btn.getAttribute("data-run-tier-select");
+          const sel = grid.querySelector(`select[data-tier-select="${lvl}"]`);
+          if (!sel) return;
+          const val = sel.value;
+          if (val.startsWith("char-")) {
+            const targetChar = characters.find((c) => c.id === val);
+            if (targetChar) {
+              if (modal) modal.classList.add("hidden");
+              playSummonSequenceForCharacter(targetChar, [targetChar], true);
+            }
+          } else if (val.startsWith("tier-")) {
+            const tLvl = Number(val.replace("tier-", ""));
+            const pool = characters.filter(
+              (c) =>
+                c.summonTier &&
+                c.summonTier.level === tLvl &&
+                (tLvl !== 6 ||
+                  (c.id !== "char-37" &&
+                    c.id !== "char-106" &&
+                    c.id !== "char-10" &&
+                    c.id !== "char-7" &&
+                    c.id !== "char-25" &&
+                    c.id !== "char-32" &&
+                    c.id !== "char-12" &&
+                    c.id !== "char-13"))
+            );
+            if (pool.length > 0) {
+              if (modal) modal.classList.add("hidden");
+              const sample = pool[Math.floor(Math.random() * pool.length)];
+              playSummonSequenceForCharacter(sample, [sample], true);
+            }
+          }
+        });
+      });
+
       grid.querySelectorAll("[data-preview-tier]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const lvl = Number(btn.getAttribute("data-preview-tier"));
           const pool = characters.filter(
-            (c) => c.summonTier && c.summonTier.level === lvl && (lvl !== 6 || c.id !== "char-37")
+            (c) =>
+              c.summonTier &&
+              c.summonTier.level === lvl &&
+              (lvl !== 6 ||
+                (c.id !== "char-37" &&
+                  c.id !== "char-106" &&
+                  c.id !== "char-10" &&
+                  c.id !== "char-7" &&
+                  c.id !== "char-25" &&
+                  c.id !== "char-32" &&
+                  c.id !== "char-12" &&
+                  c.id !== "char-13"))
           );
           if (pool.length > 0) {
             if (modal) modal.classList.add("hidden");
@@ -3912,15 +8806,33 @@
     const sfxBtn = document.getElementById("btnToggleSummonSfx");
     if (sfxBtn) {
       sfxBtn.addEventListener("click", () => {
-        summonState.sfxEnabled = !summonState.sfxEnabled;
-        sfxBtn.classList.toggle("is-active", summonState.sfxEnabled);
-        sfxBtn.setAttribute("aria-pressed", summonState.sfxEnabled ? "true" : "false");
-        const icon = document.getElementById("summonSfxIcon");
-        const txt = document.getElementById("summonSfxText");
-        if (icon) icon.textContent = summonState.sfxEnabled ? "🔊" : "🔇";
-        if (txt) txt.textContent = summonState.sfxEnabled ? "音效：ON" : "音效：OFF";
+        if (summonState.sfxEnabled && summonState.sfxVolume > 0) {
+          // 靜音
+          summonState.lastSfxVolume = summonState.sfxVolume || 0.8;
+          try {
+            localStorage.setItem("arelita_summon_last_volume", String(summonState.lastSfxVolume));
+          } catch (e) {}
+          setSummonVolume(0, false);
+        } else {
+          // 解除靜音，恢復前次音量
+          const restoreVol = Math.round((summonState.lastSfxVolume || 0.8) * 100);
+          setSummonVolume(restoreVol > 0 ? restoreVol : 80, true);
+        }
       });
     }
+
+    const volumeSlider = document.getElementById("summonVolumeSlider");
+    if (volumeSlider) {
+      volumeSlider.addEventListener("input", (e) => {
+        setSummonVolume(Number(e.target.value), false);
+      });
+      volumeSlider.addEventListener("change", (e) => {
+        setSummonVolume(Number(e.target.value), true);
+      });
+    }
+
+    // 初始化時同步音量介面
+    updateVolumeUI();
 
     const fastBtn = document.getElementById("btnToggleFastSummon");
     if (fastBtn) {

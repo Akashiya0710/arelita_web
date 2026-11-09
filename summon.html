@@ -13,7 +13,7 @@
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="stylesheet" href="assets/styles.css?v=20261109_legend" />
 </head>
 <body class="compare-page-body summon-page-body">
   <!-- Decorative Game-Portal Background Grid & Orbs -->
@@ -65,10 +65,16 @@
       </a>
 
       <div class="compare-header-controls">
-        <button type="button" class="compare-action-btn is-active" id="btnToggleSummonSfx" aria-pressed="true" title="開啟或關閉召喚音效">
-          <span id="summonSfxIcon">🔊</span>
-          <span id="summonSfxText">音效：ON</span>
-        </button>
+        <div class="summon-volume-ctrl-group" title="召喚音效與音量大小調整">
+          <button type="button" class="compare-action-btn is-active summon-vol-mute-btn" id="btnToggleSummonSfx" aria-pressed="true" title="點擊靜音 / 取消靜音">
+            <span id="summonSfxIcon">🔊</span>
+            <span id="summonSfxText" class="summon-vol-quick-text">音效</span>
+          </button>
+          <div class="summon-vol-slider-box">
+            <input type="range" id="summonVolumeSlider" class="summon-vol-slider" min="0" max="100" value="80" step="1" aria-label="召喚音量調整" title="拖動滑桿調整召喚音效音量大小" />
+            <span id="summonVolumeText" class="summon-vol-label">80%</span>
+          </div>
+        </div>
         <button type="button" class="compare-action-btn" id="btnToggleFastSummon" aria-pressed="false" title="縮短召喚前導動畫時間">
           <span id="fastSummonIcon">⚡</span>
           <span id="fastSummonText">快速動畫：OFF</span>
@@ -196,7 +202,7 @@
             <strong class="s-stat-val" id="statCollectionRate">0 / 175 (0%)</strong>
           </div>
           <div class="s-stat-item">
-            <span class="s-stat-label">UR / EX / ？</span>
+            <span class="s-stat-label">UR / EX / Legend / ？</span>
             <strong class="s-stat-val is-gold" id="statHighRarityCount">0 次</strong>
           </div>
         </div>
@@ -337,7 +343,7 @@
           <button type="button" class="tier-guide-close" id="btnCloseTierGuide" aria-label="關閉說明">✕</button>
         </div>
         <div class="tier-guide-body">
-          <p class="tier-guide-intro">系統依據角色的<strong>「強度階級」</strong>劃分為 7 個稀有度等級（<strong>N、R、SR、SSR、UR、EX、？</strong>）。角色實力越強，抽取機率越低，且抽中時的特效規模與音效層次越華麗（可點擊下方按鈕直接試播各階級特效）：</p>
+          <p class="tier-guide-intro">系統依據角色的<strong>「強度階級」</strong>劃分為 8 個稀有度等級（<strong>N、R、SR、SSR、UR、EX、Legend、？</strong>）。角色實力越強，抽取機率越低，且抽中時的特效規模與音效層次越華麗（可點擊下方按鈕直接試播各階級特效）：</p>
           <div class="tier-guide-grid" id="tierGuideGrid"></div>
         </div>
       </div>
@@ -346,6 +352,6 @@
 
   <!-- Load Official Data & Summon Simulator Engine -->
   <script src="assets/data.js"></script>
-  <script src="assets/summon.js"></script>
+  <script src="assets/summon.js?v=20261109_beelzebub"></script>
 </body>
 </html>
