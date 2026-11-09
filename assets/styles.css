@@ -10482,3 +10482,517 @@ body.compare-page-body {
   gap: 6px;
   padding: 8px;
 }
+
+/* ==================== CHARACTER ARCHIVE / DEX MODAL (圖鑑庫 & 未獲得角色) ==================== */
+.btn-stat-dex-open {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(239, 68, 68, 0.16));
+  border: 1px solid var(--border-gold);
+  color: var(--accent-gold);
+  font-weight: 800;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.btn-stat-dex-open:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(239, 68, 68, 0.3));
+  border-color: #fbbf24;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+}
+
+.compare-action-btn.is-gold {
+  border-color: rgba(245, 158, 11, 0.6);
+  color: var(--accent-gold);
+}
+
+.compare-action-btn.is-gold:hover {
+  border-color: #fbbf24;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fff;
+}
+
+.summon-dex-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 920;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.dex-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.88);
+  backdrop-filter: blur(8px);
+}
+
+.dex-modal-dialog {
+  position: relative;
+  z-index: 2;
+  max-width: 1280px;
+  width: 96vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-gold);
+  background: var(--bg-surface);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+
+.dex-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.5rem;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.dex-modal-header h2 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  margin: 0.15rem 0 0;
+  color: var(--text-primary);
+}
+
+.dex-summary-ribbon {
+  padding: 0.9rem 1.5rem;
+  background: rgba(15, 23, 42, 0.65);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.dex-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.dex-progress-title {
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.dex-progress-numbers {
+  color: var(--text-secondary);
+}
+
+.dex-progress-numbers strong {
+  color: var(--accent-gold);
+  font-size: 1rem;
+}
+
+.dex-progress-numbers .is-missing-num {
+  color: #f87171;
+}
+
+.dex-progress-bar-track {
+  height: 9px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.45rem;
+}
+
+.dex-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8 0%, #818cf8 40%, #fbbf24 75%, #ef4444 100%);
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.dex-filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.dex-status-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dex-status-tab {
+  padding: 0.42rem 0.85rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dex-status-tab:hover {
+  border-color: var(--border-gold);
+  color: var(--text-primary);
+}
+
+.dex-status-tab.is-active {
+  background: var(--accent-gold-soft);
+  border-color: var(--border-gold);
+  color: var(--accent-gold);
+}
+
+.dex-status-tab.is-missing-tab.is-active {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+}
+
+.dex-status-tab.is-unlocked-tab.is-active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #7dd3fc;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.dex-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 240px;
+  flex: 1;
+  max-width: 380px;
+}
+
+.dex-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  font-size: 0.85rem;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.dex-search-input {
+  width: 100%;
+  padding: 0.45rem 2rem 0.45rem 2.2rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dex-search-input:focus {
+  border-color: var(--border-gold);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+}
+
+.dex-clear-search-btn {
+  position: absolute;
+  right: 0.5rem;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.7rem;
+}
+
+.dex-tier-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.5rem;
+  background: rgba(10, 15, 29, 0.45);
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.dex-tier-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dex-tier-pill:hover {
+  border-color: var(--border-gold);
+  color: var(--text-primary);
+}
+
+.dex-tier-pill.is-active {
+  border-color: var(--border-gold);
+  background: var(--accent-gold-soft);
+  color: var(--accent-gold);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.dex-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-surface);
+}
+
+.dex-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.dex-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  gap: 0.65rem;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+  contain: content;
+}
+
+.dex-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+
+.dex-card.is-unlocked {
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.dex-card.is-unlocked:hover {
+  border-color: var(--border-gold);
+  box-shadow: 0 10px 28px rgba(245, 158, 11, 0.25);
+}
+
+.dex-card.is-locked {
+  background: rgba(15, 23, 42, 0.55);
+  border: 1.5px dashed rgba(255, 255, 255, 0.16);
+  opacity: 0.88;
+}
+
+.dex-card.is-locked:hover {
+  opacity: 1;
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.15);
+}
+
+.dex-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.dex-card-status-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.dex-card-status-badge.is-unlocked {
+  background: rgba(34, 197, 94, 0.18);
+  border: 1px solid #22c55e;
+  color: #86efac;
+}
+
+.dex-card-status-badge.is-missing {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+}
+
+.dex-card-avatar-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dex-card-avatar-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.dex-card.is-unlocked:hover .dex-card-avatar-wrap img {
+  transform: scale(1.05);
+}
+
+.dex-card.is-locked .dex-card-avatar-wrap img {
+  filter: grayscale(100%) brightness(0.25) contrast(1.2);
+}
+
+.dex-card-lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 18, 0.45);
+  color: #fca5a5;
+  font-size: 0.8rem;
+  font-weight: 800;
+  gap: 0.25rem;
+}
+
+.dex-card-lock-overlay span {
+  font-size: 1.4rem;
+}
+
+.dex-card-placeholder-sym {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.dex-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.dex-card-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dex-card.is-locked .dex-card-name {
+  color: #e2e8f0;
+}
+
+.dex-card-subline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.dex-card-power {
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.dex-card.is-locked .dex-card-power {
+  color: #fdba74;
+}
+
+.dex-card-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: auto;
+}
+
+.dex-card-btn {
+  flex: 1;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.dex-card-btn:hover {
+  border-color: var(--border-gold);
+  color: var(--accent-gold);
+  background: var(--accent-gold-soft);
+}
+
+.dex-card.is-locked .dex-card-btn.is-locked-hint {
+  border-style: dashed;
+  color: var(--text-muted);
+  cursor: default;
+  background: transparent;
+  pointer-events: none;
+}
+
+.dex-empty-state {
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.dex-empty-icon {
+  font-size: 2.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.dex-empty-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.dex-empty-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}

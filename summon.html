@@ -79,6 +79,10 @@
           <span id="fastSummonIcon">⚡</span>
           <span id="fastSummonText">快速動畫：OFF</span>
         </button>
+        <button type="button" class="compare-action-btn is-gold" id="btnOpenDexModal" title="開啟全角色圖鑑庫，檢視已收集與尚未抽到角色清單">
+          <span>📚</span>
+          <span>角色圖鑑庫</span>
+        </button>
         <button type="button" class="compare-action-btn" id="btnOpenTierGuide" title="檢視各稀有度分級與抽取機率說明">
           <span>📊</span>
           <span>機率與分級說明</span>
@@ -202,9 +206,12 @@
             <strong class="s-stat-val" id="statCollectionRate">0 / 175 (0%)</strong>
           </div>
           <div class="s-stat-item">
-            <span class="s-stat-label">UR / EX / Legend / ？</span>
+            <span class="s-stat-label">EX / Legend / ？</span>
             <strong class="s-stat-val is-gold" id="statHighRarityCount">0 次</strong>
           </div>
+          <button type="button" class="btn-stat-dex-open" id="btnOpenDexFromStats" title="檢視全角色圖鑑庫，查看哪些角色尚未抽到">
+            <span>📚 檢視圖鑑（查看未抽到角色） ➔</span>
+          </button>
         </div>
       </aside>
 
@@ -219,8 +226,8 @@
           <div class="summon-screen-flash" id="summonScreenFlash" aria-hidden="true"></div>
 
           <!-- Skip Animation Button (Visible during summoning sequence) -->
-          <button type="button" class="summon-skip-btn hidden" id="btnSkipSummonAnim">
-            <span>⏩ 略過動畫 (SKIP)</span>
+          <button type="button" class="summon-skip-btn hidden" id="btnSkipSummonAnim" title="點擊或按下空白鍵 (Space) 立即跳過動畫">
+            <span>⏩ 略過動畫 (SKIP / 空白鍵)</span>
           </button>
 
           <!-- 1. IDLE STAGE STATE (Before first summon) -->
@@ -345,6 +352,74 @@
         <div class="tier-guide-body">
           <p class="tier-guide-intro">系統依據角色的<strong>「強度階級」</strong>劃分為 8 個稀有度等級（<strong>N、R、SR、SSR、UR、EX、Legend、？</strong>）。角色實力越強，抽取機率越低，且抽中時的特效規模與音效層次越華麗（可點擊下方按鈕直接試播各階級特效）：</p>
           <div class="tier-guide-grid" id="tierGuideGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Character Dex / Archive Modal (全角色圖鑑庫 & 尚未抽到角色一覽) -->
+    <section class="summon-dex-modal hidden" id="summonDexModal" role="dialog" aria-modal="true" aria-labelledby="dexModalTitle">
+      <div class="dex-modal-backdrop" id="dexModalBackdrop"></div>
+      <div class="dex-modal-dialog">
+        <!-- Header -->
+        <div class="dex-modal-header">
+          <div class="dex-header-main">
+            <div class="summon-kicker">CHARACTER ARCHIVE // 亞雷利塔全角色收集圖鑑庫</div>
+            <h2 id="dexModalTitle">📚 角色圖鑑庫（已解鎖與尚未抽到一覽）</h2>
+          </div>
+          <button type="button" class="tier-guide-close" id="btnCloseDexModal" aria-label="關閉圖鑑">✕</button>
+        </div>
+
+        <!-- Progress Ribbon -->
+        <div class="dex-summary-ribbon">
+          <div class="dex-progress-col">
+            <div class="dex-progress-info">
+              <span class="dex-progress-title">🎯 當前召喚收集進度</span>
+              <span class="dex-progress-numbers">
+                已解鎖 <strong id="dexSummaryUnlocked">0</strong> / 175 人
+                （<strong id="dexSummaryPct">0%</strong>）
+                · 尚未抽到 <strong id="dexSummaryMissing" class="is-missing-num">175</strong> 人
+              </span>
+            </div>
+            <div class="dex-progress-bar-track">
+              <div class="dex-progress-bar-fill" id="dexProgressBarFill" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls: Status Filter, Search Bar -->
+        <div class="dex-filter-toolbar">
+          <!-- Status Tabs: All, Missing (未抽到), Obtained (已抽到) -->
+          <div class="dex-status-tabs" role="tablist">
+            <button type="button" class="dex-status-tab" data-dex-status="all">
+              <span>🔘 全部角色 (175)</span>
+            </button>
+            <button type="button" class="dex-status-tab is-active is-missing-tab" data-dex-status="missing">
+              <span>❓ 尚未抽到 (<span id="dexTabMissingCount">175</span>)</span>
+            </button>
+            <button type="button" class="dex-status-tab is-unlocked-tab" data-dex-status="unlocked">
+              <span>✨ 已經抽到 (<span id="dexTabUnlockedCount">0</span>)</span>
+            </button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="dex-search-wrap">
+            <span class="dex-search-icon">🔍</span>
+            <input type="text" id="dexSearchInput" class="dex-search-input" placeholder="搜尋角色名稱、稱號、種族、強度..." />
+            <button type="button" id="btnDexClearSearch" class="dex-clear-search-btn hidden" title="清除搜尋">✕</button>
+          </div>
+        </div>
+
+        <!-- Tier Filter Chips (with collection count per tier) -->
+        <div class="dex-tier-pills-row" id="dexTierPillsRow"></div>
+
+        <!-- Character Cards Grid -->
+        <div class="dex-grid-container">
+          <div class="dex-cards-grid" id="dexCardsGrid"></div>
+          <div class="dex-empty-state hidden" id="dexEmptyState">
+            <div class="dex-empty-icon">🔍</div>
+            <div class="dex-empty-title">查無符合條件之角色</div>
+            <div class="dex-empty-desc">請嘗試切換稀有度等級標籤或清除關鍵字搜尋。</div>
+          </div>
         </div>
       </div>
     </section>

@@ -333,11 +333,11 @@
     if (c.id === "char-37" || /終焉龍/.test(nm)) return "apocalypse-dragon";
     if (c.id === "char-106" || /黑卡蒂/.test(nm)) return "hecate-death";
     if (c.id === "char-10" || /斯卡奇/.test(nm)) return "skadi-darkness";
-    if (c.id === "char-7" || /伊格那利昂|加拉爾/.test(nm)) return "ignalion-holyfire";
-    if (c.id === "char-25" || /沃利爾|德瑪/.test(nm)) return "warrior-arena";
+    if (c.id === "char-7" || /伊格那利昂/.test(nm)) return "ignalion-holyfire";
+    if (c.id === "char-25" || /沃利爾/.test(nm)) return "warrior-arena";
     if (c.id === "char-32" || /別西卜/.test(nm)) return "beelzebub-swarm";
-    if (c.id === "char-12" || /尤諾拉|倪克斯/.test(nm)) return "nyx-moon-stars";
-    if (c.id === "char-13" || /迪米諾拉|赫墨拉/.test(nm)) return "hemera-sun";
+    if (c.id === "char-12" || /倪克斯/.test(nm)) return "nyx-moon-stars";
+    if (c.id === "char-13" || /赫墨拉/.test(nm)) return "hemera-sun";
     return "";
   }
 
@@ -7451,6 +7451,17 @@
       if (Array.isArray(parsed.recentHistory)) {
         summonState.recentHistory = parsed.recentHistory.slice(0, 30);
       }
+      // Migrate: Exclude UR (level 5) from historical highRarityCount (now strictly EX / Legend / ？: level >= 6)
+      if (!parsed.v_ex_only) {
+        let exCount = 0;
+        characters.forEach((c) => {
+          if (c.summonTier && c.summonTier.level >= 6 && summonState.unlockedIds.has(c.id)) {
+            exCount++;
+          }
+        });
+        summonState.highRarityCount = exCount;
+        saveSummonStats();
+      }
     } catch (e) {
       // Ignore storage error
     }
@@ -7464,7 +7475,8 @@
           totalPulls: summonState.totalPulls,
           highRarityCount: summonState.highRarityCount,
           unlockedIds: Array.from(summonState.unlockedIds),
-          recentHistory: summonState.recentHistory.slice(0, 30)
+          recentHistory: summonState.recentHistory.slice(0, 30),
+          v_ex_only: true
         })
       );
     } catch (e) {
@@ -8287,7 +8299,8 @@
       summonState.totalPulls += batch.length;
       batch.forEach((c) => {
         summonState.unlockedIds.add(c.id);
-        if (c.summonTier && c.summonTier.level >= 5) {
+        // Exclude UR (level 5): Only count EX / Legend / ？ (level >= 6)
+        if (c.summonTier && c.summonTier.level >= 6) {
           summonState.highRarityCount += 1;
         }
         summonState.recentHistory.unshift({
@@ -8298,6 +8311,7 @@
       summonState.recentHistory = summonState.recentHistory.slice(0, 30);
       saveSummonStats();
       renderStatsAndHistory();
+      renderCharacterDexModal();
     }
 
     const tStopCanvas = setTimeout(() => {
@@ -8789,6 +8803,263 @@
     }
   }
 
+  // ==================== CHARACTER ARCHIVE / DEX MODAL ====================
+  let dexFilterStatus = "missing"; // "all" | "missing" | "unlocked"
+  let dexFilterTier = null; // null for all, or 1..8
+  let dexSearchQuery = "";
+
+  function initCharacterDexModal() {
+    const modal = document.getElementById("summonDexModal");
+    const openBtnNav = document.getElementById("btnOpenDexModal");
+    const openBtnStats = document.getElementById("btnOpenDexFromStats");
+    const closeBtn = document.getElementById("btnCloseDexModal");
+    const backdrop = document.getElementById("dexModalBackdrop");
+    const searchInput = document.getElementById("dexSearchInput");
+    const clearSearchBtn = document.getElementById("btnDexClearSearch");
+
+    function openDex(defaultTab) {
+      if (defaultTab) {
+        dexFilterStatus = defaultTab;
+      }
+      renderCharacterDexModal();
+      if (modal) modal.classList.remove("hidden");
+    }
+
+    function closeDex() {
+      if (modal) modal.classList.add("hidden");
+    }
+
+    if (openBtnNav) openBtnNav.addEventListener("click", () => openDex("all"));
+    if (openBtnStats) openBtnStats.addEventListener("click", () => openDex("missing"));
+    if (closeBtn) closeBtn.addEventListener("click", closeDex);
+    if (backdrop) backdrop.addEventListener("click", closeDex);
+
+    // Escape key closes modal
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal && !modal.classList.contains("hidden")) {
+        closeDex();
+      }
+    });
+
+    // Status tabs (全部 / 尚未抽到 / 已經抽到)
+    document.querySelectorAll(".dex-status-tab[data-dex-status]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        dexFilterStatus = btn.getAttribute("data-dex-status") || "all";
+        renderCharacterDexModal();
+      });
+    });
+
+    // Search input
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        dexSearchQuery = (e.target.value || "").trim().toLowerCase();
+        if (clearSearchBtn) {
+          clearSearchBtn.classList.toggle("hidden", dexSearchQuery.length === 0);
+        }
+        renderCharacterDexModal();
+      });
+    }
+
+    if (clearSearchBtn && searchInput) {
+      clearSearchBtn.addEventListener("click", () => {
+        dexSearchQuery = "";
+        searchInput.value = "";
+        clearSearchBtn.classList.add("hidden");
+        renderCharacterDexModal();
+      });
+    }
+  }
+
+  function renderCharacterDexModal() {
+    const modal = document.getElementById("summonDexModal");
+    if (!modal) return;
+
+    const unlockedSet = summonState.unlockedIds;
+    const totalCount = characters.length;
+    const unlockedCount = unlockedSet.size;
+    const missingCount = Math.max(0, totalCount - unlockedCount);
+    const pct = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+
+    // Update progress ribbon
+    const sumUnlocked = document.getElementById("dexSummaryUnlocked");
+    const sumMissing = document.getElementById("dexSummaryMissing");
+    const sumPct = document.getElementById("dexSummaryPct");
+    const barFill = document.getElementById("dexProgressBarFill");
+    const tabMissingCnt = document.getElementById("dexTabMissingCount");
+    const tabUnlockedCnt = document.getElementById("dexTabUnlockedCount");
+
+    if (sumUnlocked) sumUnlocked.textContent = unlockedCount;
+    if (sumMissing) sumMissing.textContent = missingCount;
+    if (sumPct) sumPct.textContent = `${pct}%`;
+    if (barFill) barFill.style.width = `${pct}%`;
+    if (tabMissingCnt) tabMissingCnt.textContent = missingCount;
+    if (tabUnlockedCnt) tabUnlockedCnt.textContent = unlockedCount;
+
+    // Update status tabs active state
+    document.querySelectorAll(".dex-status-tab[data-dex-status]").forEach((btn) => {
+      const st = btn.getAttribute("data-dex-status");
+      btn.classList.toggle("is-active", st === dexFilterStatus);
+    });
+
+    // Render tier filter pills row with counts
+    const tierRow = document.getElementById("dexTierPillsRow");
+    if (tierRow) {
+      const tierStats = { 8: { u: 0, t: 0 }, 7: { u: 0, t: 0 }, 6: { u: 0, t: 0 }, 5: { u: 0, t: 0 }, 4: { u: 0, t: 0 }, 3: { u: 0, t: 0 }, 2: { u: 0, t: 0 }, 1: { u: 0, t: 0 } };
+      characters.forEach((c) => {
+        const lvl = c.summonTier ? c.summonTier.level : 1;
+        if (tierStats[lvl]) {
+          tierStats[lvl].t++;
+          if (unlockedSet.has(c.id)) tierStats[lvl].u++;
+        }
+      });
+
+      const allActive = dexFilterTier === null;
+      let pillsHtml = `
+        <button type="button" class="dex-tier-pill ${allActive ? "is-active" : ""}" data-dex-tier="all">
+          <span>全部階級</span>
+          <small>(${unlockedCount}/${totalCount})</small>
+        </button>
+      `;
+
+      [8, 7, 6, 5, 4, 3, 2, 1].forEach((lvl) => {
+        const t = SUMMON_TIERS[lvl];
+        const s = tierStats[lvl];
+        const isAct = dexFilterTier === lvl;
+        pillsHtml += `
+          <button type="button" class="dex-tier-pill ${isAct ? "is-active" : ""}" data-dex-tier="${lvl}">
+            <b>${esc(t.code)}</b>
+            <small>(${s.u}/${s.t})</small>
+          </button>
+        `;
+      });
+      tierRow.innerHTML = pillsHtml;
+
+      tierRow.querySelectorAll("[data-dex-tier]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const val = btn.getAttribute("data-dex-tier");
+          dexFilterTier = val === "all" ? null : Number(val);
+          renderCharacterDexModal();
+        });
+      });
+    }
+
+    // Filter characters
+    let filtered = characters.filter((c) => {
+      const isUnlocked = unlockedSet.has(c.id);
+
+      // Status filter
+      if (dexFilterStatus === "missing" && isUnlocked) return false;
+      if (dexFilterStatus === "unlocked" && !isUnlocked) return false;
+
+      // Tier filter
+      const lvl = c.summonTier ? c.summonTier.level : 1;
+      if (dexFilterTier !== null && lvl !== dexFilterTier) return false;
+
+      // Search query
+      if (dexSearchQuery) {
+        const name = (c.name || "").toLowerCase();
+        const epithet = String(c.profile["稱號"] || "").toLowerCase();
+        const power = (c.power || "").toLowerCase();
+        const race = String(c.profile["種族"] || "").toLowerCase();
+        const faction = (c.faction || "").toLowerCase();
+        const match =
+          name.includes(dexSearchQuery) ||
+          epithet.includes(dexSearchQuery) ||
+          power.includes(dexSearchQuery) ||
+          race.includes(dexSearchQuery) ||
+          faction.includes(dexSearchQuery);
+        if (!match) return false;
+      }
+      return true;
+    });
+
+    // Sort: highest rarity tier first, then unlocked/missing, then power score
+    filtered.sort((a, b) => {
+      const lvlA = a.summonTier ? a.summonTier.level : 1;
+      const lvlB = b.summonTier ? b.summonTier.level : 1;
+      if (lvlB !== lvlA) return lvlB - lvlA;
+      return (a.powerScore || 99) - (b.powerScore || 99);
+    });
+
+    const grid = document.getElementById("dexCardsGrid");
+    const emptyState = document.getElementById("dexEmptyState");
+    if (!grid) return;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = "";
+      if (emptyState) emptyState.classList.remove("hidden");
+      return;
+    }
+    if (emptyState) emptyState.classList.add("hidden");
+
+    grid.innerHTML = filtered
+      .map((c) => {
+        const isUnlocked = unlockedSet.has(c.id);
+        const tier = c.summonTier || SUMMON_TIERS[1];
+        const rawEpithet = String(c.profile["稱號"] || "").trim();
+        const epithet = isMeaningfulContent(rawEpithet) ? rawEpithet : "";
+        const thumb = getPortraitUrl(c.image);
+        const race = String(c.profile["種族"] || "未知種族").trim();
+
+        return `
+          <article class="dex-card tier-card-lv-${tier.level} ${isUnlocked ? "is-unlocked" : "is-locked"}" data-char-id="${esc(c.id)}">
+            <div class="dex-card-top">
+              <span class="scr-tier-badge tier-badge-lv-${tier.level}">
+                <span>${esc(tier.code)}</span>
+              </span>
+              <span class="dex-card-status-badge ${isUnlocked ? "is-unlocked" : "is-missing"}">
+                ${isUnlocked ? "✨ 已解鎖" : "🔒 尚未抽到"}
+              </span>
+            </div>
+
+            <div class="dex-card-avatar-wrap">
+              ${
+                thumb
+                  ? `<img src="${esc(thumb)}" alt="${esc(c.name)}" loading="lazy" />`
+                  : `<div class="dex-card-placeholder-sym">${esc(tier.code)}</div>`
+              }
+              ${
+                !isUnlocked
+                  ? `<div class="dex-card-lock-overlay"><span>🔒</span><small>尚未抽到</small></div>`
+                  : ""
+              }
+            </div>
+
+            <div class="dex-card-info">
+              <h3 class="dex-card-name" title="${esc(c.name)}">${esc(c.name)}</h3>
+              <div class="dex-card-subline">
+                <span class="dex-card-power">⚡ ${esc(c.power || "未知強度")}</span>
+                <span class="dex-card-race">${esc(race)}</span>
+              </div>
+              ${epithet ? `<div class="dex-card-subline"><small>《${esc(epithet)}》</small></div>` : ""}
+            </div>
+
+            <div class="dex-card-actions">
+              ${
+                isUnlocked
+                  ? `<button type="button" class="dex-card-btn is-preview" data-dex-play-anim="${esc(c.id)}" title="試播此角色的召喚抽卡動畫">🎬 試播動畫</button>
+                     <a href="compare.html?left=${encodeURIComponent(c.id)}" target="_blank" rel="noopener" class="dex-card-btn is-compare" title="於能力對比系統中檢視">⚔️ 能力對比</a>`
+                  : `<span class="dex-card-btn is-locked-hint">可在卡池中抽取獲得</span>`
+              }
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+
+    // Wire up preview animation buttons
+    grid.querySelectorAll("[data-dex-play-anim]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const cId = btn.getAttribute("data-dex-play-anim");
+        const target = characters.find((ch) => ch.id === cId);
+        if (target) {
+          if (modal) modal.classList.add("hidden");
+          playSummonSequenceForCharacter(target, [target], true);
+        }
+      });
+    });
+  }
+
   // ==================== HEADER & THEME ACTIONS ====================
   function applySummonTheme(theme) {
     const valid = ["ocean", "beach", "worldtree", "starry", "dark", "light"];
@@ -8894,6 +9165,7 @@
         summonState.recentHistory = [];
         saveSummonStats();
         renderStatsAndHistory();
+        renderCharacterDexModal();
       });
     }
 
@@ -8911,6 +9183,23 @@
         applySummonTheme(nextMap[summonState.theme] || "ocean");
       });
     }
+
+    // Global keyboard shortcut: Press Spacebar to skip summon animation immediately!
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" || e.key === " " || e.keyCode === 32) {
+        const tag = document.activeElement ? document.activeElement.tagName : "";
+        if (tag === "INPUT" || tag === "TEXTAREA" || (document.activeElement && document.activeElement.isContentEditable)) {
+          return;
+        }
+        if (summonState.isSummoning) {
+          e.preventDefault();
+          const skipBtn = document.getElementById("btnSkipSummonAnim");
+          if (skipBtn && !skipBtn.classList.contains("hidden")) {
+            skipBtn.click();
+          }
+        }
+      }
+    });
   }
 
   // Boot Summon Simulator
@@ -8920,5 +9209,6 @@
   syncPreferenceUI();
   renderStatsAndHistory();
   initTierGuideModal();
+  initCharacterDexModal();
   initSummonHeaderAndActions();
 })();

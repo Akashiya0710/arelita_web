@@ -32,7 +32,7 @@ try {
     $script:cmdId = 0;
 
     $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path;
-    $jsPath = Join-Path $scriptDir "test_pull_rates.js";
+    $jsPath = Join-Path $scriptDir "verify_all_after_fix.js";
     $jsCode = [System.IO.File]::ReadAllText($jsPath, [System.Text.Encoding]::UTF8);
     $r = Send-Cdp "Runtime.evaluate" @{ expression = $jsCode; returnByValue = $true };
     if ($r.result.exceptionDetails) {
