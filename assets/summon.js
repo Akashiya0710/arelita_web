@@ -335,7 +335,7 @@
     if (c.id === "char-10" || /斯卡奇/.test(nm)) return "skadi-darkness";
     if (c.id === "char-7" || /伊格那利昂|加拉爾/.test(nm)) return "ignalion-holyfire";
     if (c.id === "char-25" || /沃利爾|德瑪/.test(nm)) return "warrior-arena";
-    if (c.id === "char-32" || /別西卜|撒旦|阿斯拉/.test(nm)) return "beelzebub-swarm";
+    if (c.id === "char-32" || /別西卜/.test(nm)) return "beelzebub-swarm";
     if (c.id === "char-12" || /尤諾拉|倪克斯/.test(nm)) return "nyx-moon-stars";
     if (c.id === "char-13" || /迪米諾拉|赫墨拉/.test(nm)) return "hemera-sun";
     return "";
@@ -848,6 +848,39 @@
     return masterGainNode;
   }
 
+  // Dedicated Audio Bus for Summon Sequence (allows instant silence on SKIP)
+  let summonAudioBusNode = null;
+  function getSummonAudioBus(ctx) {
+    if (!ctx) return null;
+    const master = getMasterAudioOutput(ctx);
+    if (!master) return null;
+    if (!summonAudioBusNode) {
+      try {
+        summonAudioBusNode = ctx.createGain();
+        summonAudioBusNode.gain.setValueAtTime(1.0, ctx.currentTime);
+        summonAudioBusNode.connect(master);
+      } catch (e) {
+        return master;
+      }
+    }
+    return summonAudioBusNode;
+  }
+
+  function stopAllSummonAudio() {
+    if (summonAudioBusNode) {
+      try {
+        const ctx = getAudioCtx();
+        if (ctx) {
+          const now = ctx.currentTime;
+          summonAudioBusNode.gain.cancelScheduledValues(now);
+          summonAudioBusNode.gain.setValueAtTime(0, now);
+        }
+        summonAudioBusNode.disconnect();
+      } catch (e) {}
+      summonAudioBusNode = null;
+    }
+  }
+
   // Play a soft pleasant tone when player adjusts the volume slider
   let previewToneTimeout = null;
   function playVolumePreviewTone() {
@@ -937,7 +970,7 @@
       const now = ctx.currentTime;
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.34 * volumeMult, now);
-      master.connect(getMasterAudioOutput(ctx));
+      master.connect(getSummonAudioBus(ctx));
 
       // Nonlinear distortion waveshaper for ferocious draconic vocal growl
       const shaper = ctx.createWaveShaper();
@@ -2549,7 +2582,7 @@
       const sig = TIER_AUDIO_SIGNATURES[tierLevel] || TIER_AUDIO_SIGNATURES[1];
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.15, now);
-      master.connect(getMasterAudioOutput(ctx));
+      master.connect(getSummonAudioBus(ctx));
 
       if (specialVariant === "hecate-death") {
         master.gain.setValueAtTime(0.34, now);
@@ -2762,7 +2795,7 @@
       const sig = TIER_AUDIO_SIGNATURES[tierLevel] || TIER_AUDIO_SIGNATURES[1];
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.26, now);
-      master.connect(getMasterAudioOutput(ctx));
+      master.connect(getSummonAudioBus(ctx));
 
       if (specialVariant === "hecate-death") {
         playHecateImpactSfx(ctx, master, now, stepIdx);
@@ -2981,7 +3014,7 @@
       const sig = TIER_AUDIO_SIGNATURES[tierLevel] || TIER_AUDIO_SIGNATURES[1];
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.26, now);
-      master.connect(getMasterAudioOutput(ctx));
+      master.connect(getSummonAudioBus(ctx));
 
       if (specialVariant === "hecate-death") {
         playHecateClimaxSfx(ctx, master, now, finaleSec);
@@ -3240,7 +3273,7 @@
       const sig = TIER_AUDIO_SIGNATURES[tierLevel] || TIER_AUDIO_SIGNATURES[1];
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.26, now);
-      master.connect(getMasterAudioOutput(ctx));
+      master.connect(getSummonAudioBus(ctx));
 
       if (specialVariant === "hecate-death") {
         playHecateRevealSfx(ctx, master, now);
@@ -7752,6 +7785,7 @@
 
   function playSummonSequenceForCharacter(featuredChar, batch, isPreviewOnly = false) {
     clearActiveSummonTimers();
+    stopAllSummonAudio();
     summonState.isSummoning = true;
 
     const tierSpec = featuredChar.summonTier || SUMMON_TIERS[1];
@@ -8155,13 +8189,17 @@
 
     if (skipBtn) {
       skipBtn.onclick = () => {
-        finishSummonAndReveal(featuredChar, batch, isPreviewOnly);
+        stopAllSummonAudio();
+        finishSummonAndReveal(featuredChar, batch, isPreviewOnly, true);
       };
     }
   }
 
-  function finishSummonAndReveal(featuredChar, batch, isPreviewOnly = false) {
+  function finishSummonAndReveal(featuredChar, batch, isPreviewOnly = false, isSkipped = false) {
     clearActiveSummonTimers();
+    if (isSkipped) {
+      stopAllSummonAudio();
+    }
     summonState.isSummoning = false;
 
     const tierSpec = featuredChar.summonTier || SUMMON_TIERS[1];
@@ -8240,7 +8278,9 @@
       flashEl.classList.add("is-flashing");
     }
     triggerCanvasRevealBurst(tierSpec);
-    playSummonRevealSfx(tierSpec.level, specialVariant);
+    if (!isSkipped) {
+      playSummonRevealSfx(tierSpec.level, specialVariant);
+    }
 
     // Commit stats & history ONLY NOW after the animation finishes!
     if (!isPreviewOnly && batch && batch.length > 0) {
