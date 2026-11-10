@@ -1,0 +1,5 @@
+﻿char-11: 米迦勒 克斯拉 戴因 | Power: 降臨級 | Image: 
+char-12: 尤諾拉 倪克斯 | Power: 降臨級 | Image: 
+char-13: 迪米諾拉 赫墨拉 | Power: 降臨級 | Image: 
+char-21: 萊夫維芙 | Power: 降臨級 | Image: 
+char-38: 拉格 提斯 | Power: 降臨級 | Image: 

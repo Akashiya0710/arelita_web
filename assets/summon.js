@@ -338,6 +338,8 @@
     if (c.id === "char-32" || /別西卜/.test(nm)) return "beelzebub-swarm";
     if (c.id === "char-12" || /倪克斯/.test(nm)) return "nyx-moon-stars";
     if (c.id === "char-13" || /赫墨拉/.test(nm)) return "hemera-sun";
+    if (c.id === "char-21" || /萊夫維芙/.test(nm)) return "lifeweaver-verdant";
+    if (c.id === "char-38" || /拉格\s*提斯|拉格提斯/.test(nm)) return "ragtis-dragonslayer";
     return "";
   }
 
@@ -2574,6 +2576,401 @@
     });
   }
 
+  // ==================== 降臨級 萊夫維芙 專屬音效合成：生意盎然・原初生命交響 ====================
+  function playLifeweaverChargeSfx(ctx, out, now, dur) {
+    // 1. 神聖林間微風與萬物生長沙沙聲（柔和帶通濾波森林風吟）
+    const bufSize = Math.floor(ctx.sampleRate * Math.min(dur, 4.5));
+    const noiseBuf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.22;
+    }
+    const nSrc = ctx.createBufferSource();
+    nSrc.buffer = noiseBuf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(750, now);
+    filter.frequency.exponentialRampToValueAtTime(2400, now + dur);
+    filter.Q.setValueAtTime(4.0, now);
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.001, now);
+    ng.gain.linearRampToValueAtTime(0.2, now + 0.6);
+    ng.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    nSrc.connect(filter);
+    filter.connect(ng);
+    ng.connect(out);
+    nSrc.start(now);
+
+    // 2. 翡翠露珠甘霖晶鈴風鈴群（E大調五聲音階：E4, G#4, A4, B4, E5, G#5, B5, E6）
+    const lifeNotes = [329.63, 415.3, 440.0, 493.88, 659.25, 830.61, 987.77, 1318.51];
+    const chimeCount = Math.floor(dur / 0.28);
+    for (let i = 0; i < chimeCount; i++) {
+      const st = now + i * 0.28 + Math.random() * 0.06;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = "sine";
+      const f = lifeNotes[i % lifeNotes.length] * (Math.random() < 0.25 ? 2 : 1);
+      osc.frequency.setValueAtTime(f, st);
+      osc.frequency.exponentialRampToValueAtTime(f * 1.02, st + 0.5);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.19, st + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.5);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(st);
+      osc.stop(st + 0.52);
+    }
+
+    // 3. 原初生命之種萌芽大地長鳴（65Hz 豐饒大地之根溫潤共振）
+    const drone = ctx.createOscillator();
+    const dg = ctx.createGain();
+    drone.type = "triangle";
+    drone.frequency.setValueAtTime(65.41, now);
+    drone.frequency.linearRampToValueAtTime(82.41, now + dur);
+    dg.gain.setValueAtTime(0.001, now);
+    dg.gain.linearRampToValueAtTime(0.28, now + 0.6);
+    dg.gain.linearRampToValueAtTime(0.35, now + dur * 0.85);
+    dg.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    drone.connect(dg);
+    dg.connect(out);
+    drone.start(now);
+    drone.stop(now + dur + 0.1);
+  }
+
+  function playLifeweaverImpactSfx(ctx, out, now, stepIdx) {
+    // 1. 神聖生命萌芽甘霖重擊（水晶靈音與甘霖散落）
+    const fBase = 659.25;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(fBase * 1.8, now);
+    osc.frequency.exponentialRampToValueAtTime(fBase, now + 0.35);
+    g.gain.setValueAtTime(0.001, now);
+    g.gain.linearRampToValueAtTime(0.32, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+    osc.connect(g);
+    g.connect(out);
+    osc.start(now);
+    osc.stop(now + 0.7);
+
+    // 2. 蔓生藤蔓舒展琶音
+    [659.25, 830.61, 987.77, 1318.51].forEach((f, idx) => {
+      const o = ctx.createOscillator();
+      const og = ctx.createGain();
+      o.type = "sine";
+      const st = now + 0.04 + idx * 0.045;
+      o.frequency.setValueAtTime(f, st);
+      og.gain.setValueAtTime(0.001, st);
+      og.gain.linearRampToValueAtTime(0.2, st + 0.02);
+      og.gain.exponentialRampToValueAtTime(0.001, st + 0.45);
+      o.connect(og);
+      og.connect(out);
+      o.start(st);
+      o.stop(st + 0.48);
+    });
+
+    // 3. 綠野生機低頻沉響
+    const sub = ctx.createOscillator();
+    const subG = ctx.createGain();
+    sub.type = "sine";
+    sub.frequency.setValueAtTime(98, now);
+    sub.frequency.exponentialRampToValueAtTime(45, now + 0.42);
+    subG.gain.setValueAtTime(0.001, now);
+    subG.gain.linearRampToValueAtTime(0.38, now + 0.015);
+    subG.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    sub.connect(subG);
+    subG.connect(out);
+    sub.start(now);
+    sub.stop(now + 0.55);
+  }
+
+  function playLifeweaverClimaxSfx(ctx, out, now, dur) {
+    // 1. 「生命創造・生者亦能永恆」萬物盛綻天籟和弦（Emaj9: E3, B3, E4, G#4, B4, D#5, E5, G#5, B5）
+    const chord = [164.81, 246.94, 329.63, 415.3, 493.88, 622.25, 659.25, 830.61, 987.77, 1318.51];
+    chord.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = idx % 2 === 0 ? "triangle" : "sine";
+      const st = now + idx * 0.035;
+      osc.frequency.setValueAtTime(freq, st);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.22, st + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + dur);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(st);
+      osc.stop(st + dur);
+    });
+
+    // 2. 萬象初生・甘霖花雨連續天籟水鈴浪湧
+    const pulseCount = 8;
+    const interval = (dur * 0.85) / pulseCount;
+    for (let p = 0; p < pulseCount; p++) {
+      const st = now + p * interval;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(520 + p * 110, st);
+      o.frequency.exponentialRampToValueAtTime(1040 + p * 80, st + 0.32);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.24, st + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, st + 0.35);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 0.38);
+    }
+  }
+
+  function playLifeweaverRevealSfx(ctx, out, now) {
+    // 1. 原初生命女神神聖甘露長鐘（E大調翡翠長鳴，餘音繚繞 4 秒）
+    [[82.41, 0.42], [164.81, 0.38], [246.94, 0.32], [415.3, 0.28], [659.25, 0.22], [987.77, 0.16]].forEach(([freq, vol]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq, now);
+      o.frequency.exponentialRampToValueAtTime(freq * 0.995, now + 3.8);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(vol, now + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
+      o.connect(g);
+      g.connect(out);
+      o.start(now);
+      o.stop(now + 3.9);
+    });
+
+    // 2. 盛綻落花晶瑩微光琶音
+    [659.25, 830.61, 987.77, 1174.66, 1318.51, 1661.22, 1975.53].forEach((freq, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      const st = now + 0.08 + idx * 0.07;
+      o.frequency.setValueAtTime(freq, st);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.22, st + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 2.3);
+      o.connect(g);
+      g.connect(out);
+      o.start(st);
+      o.stop(st + 2.4);
+    });
+  }
+
+  // ==================== 降臨級 拉格提斯 專屬音效合成：沉穩深邃巨龍低吼與電影級弒神重擊 (ragtis-dragonslayer) ====================
+  // 全面消除尖銳刺耳白雜訊與高頻失真，採用電影預告級溫暖重低音（Low-pass < 360Hz）、胸腔調頻轟鳴與厚重打擊
+  function playRagtisDragonRoar(ctx, out, now, dur, volume = 0.24) {
+    // 1. 溫暖厚重的龍族胸腔共振喉音（Triangle + Sine 調頻，無刺耳高頻）
+    const throat = ctx.createOscillator();
+    const tMod = ctx.createOscillator();
+    const tModGain = ctx.createGain();
+    const tGain = ctx.createGain();
+    const tFilter = ctx.createBiquadFilter();
+
+    throat.type = "triangle";
+    throat.frequency.setValueAtTime(80, now);
+    throat.frequency.exponentialRampToValueAtTime(36, now + dur);
+
+    tMod.type = "sine";
+    tMod.frequency.setValueAtTime(16, now);
+    tModGain.gain.setValueAtTime(22, now);
+    tMod.connect(tModGain);
+    tModGain.connect(throat.frequency);
+
+    tFilter.type = "lowpass";
+    tFilter.frequency.setValueAtTime(220, now);
+    tFilter.frequency.linearRampToValueAtTime(130, now + dur);
+
+    tGain.gain.setValueAtTime(0.001, now);
+    tGain.gain.linearRampToValueAtTime(volume * 0.72, now + 0.15);
+    tGain.gain.linearRampToValueAtTime(volume * 0.52, now + dur * 0.6);
+    tGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    throat.connect(tFilter);
+    tFilter.connect(tGain);
+    tGain.connect(out);
+
+    throat.start(now);
+    tMod.start(now);
+    throat.stop(now + dur);
+    tMod.stop(now + dur);
+
+    // 2. 洞穴級深邃氣流轟鳴（嚴格低通濾波 < 260Hz，徹底消除所有高頻沙沙雜訊）
+    const bufSize = Math.floor(ctx.sampleRate * Math.min(dur, 2.5));
+    const noiseBuf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < bufSize; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99765 * b0 + white * 0.0990460;
+      b1 = 0.96300 * b1 + white * 0.2965164;
+      b2 = 0.57000 * b2 + white * 1.0526913;
+      data[i] = (b0 + b1 + b2 + white * 0.1848) * 0.06;
+    }
+    const nSrc = ctx.createBufferSource();
+    nSrc.buffer = noiseBuf;
+
+    const lpNoise = ctx.createBiquadFilter();
+    lpNoise.type = "lowpass";
+    lpNoise.frequency.setValueAtTime(240, now);
+    lpNoise.frequency.exponentialRampToValueAtTime(110, now + dur);
+
+    const roarG = ctx.createGain();
+    roarG.gain.setValueAtTime(0.001, now);
+    roarG.gain.linearRampToValueAtTime(volume * 0.55, now + 0.18);
+    roarG.gain.linearRampToValueAtTime(volume * 0.4, now + dur * 0.55);
+    roarG.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    nSrc.connect(lpNoise);
+    lpNoise.connect(roarG);
+    roarG.connect(out);
+
+    nSrc.start(now);
+  }
+
+  function playRagtisChargeSfx(ctx, out, now, dur) {
+    // 1. 低沉雄渾的遠方龍吟（音量舒適柔和，去除高頻雜音）
+    playRagtisDragonRoar(ctx, out, now + 0.2, Math.min(2.0, dur * 0.65), 0.2);
+
+    // 2. 沉穩深邃的低音雷鳴 (Cinematic Thunder Rumble - 嚴格低通 140Hz)
+    const rumble = ctx.createOscillator();
+    const rFilter = ctx.createBiquadFilter();
+    const rg = ctx.createGain();
+
+    rumble.type = "sine";
+    rumble.frequency.setValueAtTime(48, now);
+    rumble.frequency.linearRampToValueAtTime(32, now + dur);
+
+    rFilter.type = "lowpass";
+    rFilter.frequency.setValueAtTime(140, now);
+
+    rg.gain.setValueAtTime(0.001, now);
+    rg.gain.linearRampToValueAtTime(0.18, now + 0.6);
+    rg.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    rumble.connect(rFilter);
+    rFilter.connect(rg);
+    rg.connect(out);
+    rumble.start(now);
+    rumble.stop(now + dur + 0.1);
+  }
+
+  function playRagtisImpactSfx(ctx, out, now, stepIdx) {
+    // 電影預告級重低音打擊（Trailer Drum / Sub-bass Impact，無刺耳金屬摩擦與高頻雜訊）
+    const sub = ctx.createOscillator();
+    const sf = ctx.createBiquadFilter();
+    const sg = ctx.createGain();
+
+    sub.type = "sine";
+    sub.frequency.setValueAtTime(75, now);
+    sub.frequency.exponentialRampToValueAtTime(28, now + 0.38);
+
+    sf.type = "lowpass";
+    sf.frequency.setValueAtTime(170, now);
+
+    sg.gain.setValueAtTime(0.001, now);
+    sg.gain.linearRampToValueAtTime(0.32, now + 0.015);
+    sg.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+    sub.connect(sf);
+    sf.connect(sg);
+    sg.connect(out);
+    sub.start(now);
+    sub.stop(now + 0.5);
+
+    // 圓潤悠揚的重劍低頻共鳴 (Warm Low-Gong Ring: 196Hz G3, 293.66Hz D4，低通 350Hz)
+    const ringFilter = ctx.createBiquadFilter();
+    ringFilter.type = "lowpass";
+    ringFilter.frequency.setValueAtTime(350, now);
+    ringFilter.connect(out);
+
+    [196.0, 293.66].forEach((f, idx) => {
+      const o = ctx.createOscillator();
+      const og = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(f, now);
+      og.gain.setValueAtTime(0.001, now);
+      og.gain.linearRampToValueAtTime(0.1 - idx * 0.03, now + 0.02);
+      og.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      o.connect(og);
+      og.connect(ringFilter);
+      o.start(now);
+      o.stop(now + 0.45);
+    });
+  }
+
+  function playRagtisClimaxSfx(ctx, out, now, dur) {
+    // 1. 震撼而圓潤的巨龍長嘯（去除一切高頻刺耳雜訊）
+    playRagtisDragonRoar(ctx, out, now + 0.1, Math.min(2.5, dur * 0.9), 0.3);
+
+    // 2. 電影級泰坦重低音下潛 (Trailer Braam Sub Drop，低通 200Hz)
+    const subDrop = ctx.createOscillator();
+    const subF = ctx.createBiquadFilter();
+    const subG = ctx.createGain();
+
+    subDrop.type = "triangle";
+    subDrop.frequency.setValueAtTime(70, now);
+    subDrop.frequency.exponentialRampToValueAtTime(24, now + 1.2);
+
+    subF.type = "lowpass";
+    subF.frequency.setValueAtTime(200, now);
+    subF.frequency.linearRampToValueAtTime(80, now + 1.2);
+
+    subG.gain.setValueAtTime(0.001, now);
+    subG.gain.linearRampToValueAtTime(0.35, now + 0.03);
+    subG.gain.exponentialRampToValueAtTime(0.001, now + 1.3);
+
+    subDrop.connect(subF);
+    subF.connect(subG);
+    subG.connect(out);
+    subDrop.start(now);
+    subDrop.stop(now + 1.35);
+
+    // 3. 沉穩莊嚴的弒神銅管和弦 (D小調溫暖和聲：D2 73.4Hz, A2 110Hz, D3 146.8Hz, F3 174.6Hz, A3 220Hz - 嚴格低通 320Hz)
+    const chordFreqs = [73.42, 110.0, 146.83, 174.61, 220.0];
+    const chordF = ctx.createBiquadFilter();
+    chordF.type = "lowpass";
+    chordF.frequency.setValueAtTime(320, now);
+    chordF.connect(out);
+
+    chordFreqs.forEach((freq, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      const st = now + idx * 0.035;
+      o.frequency.setValueAtTime(freq, st);
+      g.gain.setValueAtTime(0.001, st);
+      g.gain.linearRampToValueAtTime(0.1, st + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + dur * 0.9);
+      o.connect(g);
+      g.connect(chordF);
+      o.start(st);
+      o.stop(st + dur);
+    });
+  }
+
+  function playRagtisRevealSfx(ctx, out, now) {
+    // 沉穩悠揚的凱歌鐘聲（低音溫暖三角波，低通 550Hz，消除刺耳鋸齒）
+    const bellFilter = ctx.createBiquadFilter();
+    bellFilter.type = "lowpass";
+    bellFilter.frequency.setValueAtTime(550, now);
+    bellFilter.connect(out);
+
+    [[73.42, 0.25], [146.83, 0.2], [220.0, 0.16], [293.66, 0.12], [440.0, 0.07]].forEach(([freq, vol]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(freq, now);
+      o.frequency.exponentialRampToValueAtTime(freq * 0.995, now + 3.0);
+      g.gain.setValueAtTime(0.001, now);
+      g.gain.linearRampToValueAtTime(vol, now + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 3.0);
+      o.connect(g);
+      g.connect(bellFilter);
+      o.start(now);
+      o.stop(now + 3.1);
+    });
+  }
+
   function playSummonChargeSfx(tierLevel, durationSec, specialVariant = null) {
     const ctx = getAudioCtx();
     if (!ctx) return;
@@ -2623,6 +3020,18 @@
       if (specialVariant === "hemera-sun") {
         master.gain.setValueAtTime(0.38, now);
         playHemeraChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
+
+      if (specialVariant === "lifeweaver-verdant") {
+        master.gain.setValueAtTime(0.36, now);
+        playLifeweaverChargeSfx(ctx, master, now, durationSec);
+        return;
+      }
+
+      if (specialVariant === "ragtis-dragonslayer") {
+        master.gain.setValueAtTime(0.38, now);
+        playRagtisChargeSfx(ctx, master, now, durationSec);
         return;
       }
 
@@ -2829,6 +3238,16 @@
 
       if (specialVariant === "hemera-sun") {
         playHemeraImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
+
+      if (specialVariant === "lifeweaver-verdant") {
+        playLifeweaverImpactSfx(ctx, master, now, stepIdx);
+        return;
+      }
+
+      if (specialVariant === "ragtis-dragonslayer") {
+        playRagtisImpactSfx(ctx, master, now, stepIdx);
         return;
       }
 
@@ -3048,6 +3467,16 @@
 
       if (specialVariant === "hemera-sun") {
         playHemeraClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
+
+      if (specialVariant === "lifeweaver-verdant") {
+        playLifeweaverClimaxSfx(ctx, master, now, finaleSec);
+        return;
+      }
+
+      if (specialVariant === "ragtis-dragonslayer") {
+        playRagtisClimaxSfx(ctx, master, now, finaleSec);
         return;
       }
 
@@ -3307,6 +3736,16 @@
 
       if (specialVariant === "hemera-sun") {
         playHemeraRevealSfx(ctx, master, now);
+        return;
+      }
+
+      if (specialVariant === "lifeweaver-verdant") {
+        playLifeweaverRevealSfx(ctx, master, now);
+        return;
+      }
+
+      if (specialVariant === "ragtis-dragonslayer") {
+        playRagtisRevealSfx(ctx, master, now);
         return;
       }
 
@@ -6158,6 +6597,1067 @@
     c.fillRect(0, 0, w, h);
   }
 
+  // ==================== 降臨級 萊夫維芙 專屬畫面：生意盎然・原初生命女神 (lifeweaver-verdant) ====================
+  function createLifeweaverFxState(w, h) {
+    const sporeCount = 96;
+    const spores = [];
+    const colors = ["#ffffff", "#dcfce7", "#86efac", "#4ade80", "#22c55e", "#fef08a", "#a7f3d0"];
+    for (let i = 0; i < sporeCount; i++) {
+      spores.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 1.2 + Math.random() * 2.8,
+        vy: -(0.6 + Math.random() * 1.6),
+        swaySpeed: 0.0018 + Math.random() * 0.0028,
+        swayPhase: Math.random() * Math.PI * 2,
+        color: colors[i % colors.length],
+        alpha: 0.35 + Math.random() * 0.65
+      });
+    }
+
+    const petalCount = 38;
+    const petals = [];
+    const petalColors = ["#86efac", "#a7f3d0", "#6ee7b7", "#fbcfe8", "#f472b6", "#fde047", "#ffffff"];
+    for (let i = 0; i < petalCount; i++) {
+      petals.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        size: 5 + Math.random() * 8,
+        angle: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.04,
+        orbitRadius: 40 + Math.random() * Math.max(w, h) * 0.45,
+        orbitAngle: Math.random() * Math.PI * 2,
+        orbitSpeed: (0.006 + Math.random() * 0.012) * (i % 2 === 0 ? 1 : -1),
+        color: petalColors[i % petalColors.length],
+        alpha: 0.45 + Math.random() * 0.55
+      });
+    }
+
+    const vines = [];
+    const vineCount = 8;
+    for (let i = 0; i < vineCount; i++) {
+      vines.push({
+        baseAngle: (i / vineCount) * Math.PI * 2,
+        rotSpeed: (0.0008 + (i % 3) * 0.0004) * (i % 2 === 0 ? 1 : -1),
+        maxDist: Math.max(w, h) * 0.52,
+        leafCount: 9 + (i % 3) * 2,
+        color: i % 2 === 0 ? "#34d399" : "#4ade80",
+        veinColor: "#fef08a"
+      });
+    }
+
+    return {
+      spores,
+      petals,
+      vines,
+      sproutPulse: 0,
+      bloomProgress: 0
+    };
+  }
+
+  function drawLifeweaverLeaf(c, x, y, angle, scale, alpha, baseColor, veinColor) {
+    c.save();
+    c.translate(x, y);
+    c.rotate(angle);
+    c.scale(scale, scale);
+    c.globalAlpha = alpha;
+
+    // 葉面本體 (翠綠水滴形曲線)
+    c.beginPath();
+    c.moveTo(0, 0);
+    c.quadraticCurveTo(12, -8, 22, 0);
+    c.quadraticCurveTo(12, 8, 0, 0);
+    c.closePath();
+    const lGrad = c.createLinearGradient(0, -6, 22, 6);
+    lGrad.addColorStop(0, "#86efac");
+    lGrad.addColorStop(0.5, baseColor || "#22c55e");
+    lGrad.addColorStop(1, "#065f46");
+    c.fillStyle = lGrad;
+    c.fill();
+    c.strokeStyle = "rgba(255, 255, 255, 0.45)";
+    c.lineWidth = 1;
+    c.stroke();
+
+    // 金色神聖葉脈 (Golden Sacred Leaf Vein)
+    c.beginPath();
+    c.moveTo(2, 0);
+    c.lineTo(19, 0);
+    c.strokeStyle = veinColor || "#fef08a";
+    c.lineWidth = 1.2;
+    c.stroke();
+
+    c.restore();
+  }
+
+  function drawLifeweaverVines(c, cx, cy, vines, elapsed, isClimax, growthProgress) {
+    c.save();
+    const activeGrowth = isClimax ? 1 : Math.min(1, Math.max(0.15, growthProgress));
+
+    vines.forEach((v, vIdx) => {
+      const currentAngle = v.baseAngle + elapsed * v.rotSpeed;
+      const points = [];
+      const steps = 32;
+      const maxLen = v.maxDist * activeGrowth;
+
+      // 螺旋生長曲線 (Archimedean organic growth path)
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps;
+        const r = t * maxLen;
+        const theta = currentAngle + Math.sin(t * Math.PI * 1.5 + elapsed * 0.002 + vIdx) * 0.45 + t * 0.8;
+        const px = cx + Math.cos(theta) * r;
+        const py = cy + Math.sin(theta) * r;
+        points.push({ x: px, y: py, r, t, theta });
+      }
+
+      // 繪製藤蔓主幹
+      c.beginPath();
+      c.moveTo(points[0].x, points[0].y);
+      for (let p = 1; p < points.length; p++) {
+        c.lineTo(points[p].x, points[p].y);
+      }
+      c.strokeStyle = v.color;
+      c.lineWidth = Math.max(1.5, 4.5 * (1 - activeGrowth * 0.35));
+      c.shadowColor = v.color;
+      c.shadowBlur = 10;
+      c.stroke();
+
+      // 在藤蔓節點處綻放翠葉 (Unfurling Leaves along the vine)
+      const leafStep = Math.max(2, Math.floor(steps / v.leafCount));
+      for (let l = leafStep; l < points.length - 1; l += leafStep) {
+        const pt = points[l];
+        const nextPt = points[l + 1];
+        const segAngle = Math.atan2(nextPt.y - pt.y, nextPt.x - pt.x);
+        const lScale = (0.7 + (l / steps) * 0.5) * (isClimax ? 1.2 : 1.0);
+        // 左右交錯長葉
+        const side = (l / leafStep) % 2 === 0 ? 1 : -1;
+        const leafAngle = segAngle + (Math.PI / 3) * side;
+        drawLifeweaverLeaf(c, pt.x, pt.y, leafAngle, lScale, 0.9, v.color, v.veinColor);
+      }
+
+      // 藤蔓尖端嫩芽光球 (Sprouting Tip Bud)
+      const tip = points[points.length - 1];
+      c.beginPath();
+      c.arc(tip.x, tip.y, 4.5 + Math.sin(elapsed * 0.006 + vIdx) * 1.8, 0, Math.PI * 2);
+      c.fillStyle = "#fef08a";
+      c.shadowColor = "#86efac";
+      c.shadowBlur = 14;
+      c.fill();
+    });
+
+    c.restore();
+  }
+
+  function drawLifeweaverMandala(c, cx, cy, elapsed, isClimax, alpha) {
+    c.save();
+    c.translate(cx, cy);
+    c.globalAlpha = alpha;
+
+    const baseR = isClimax ? 90 : 68;
+    const pulse = 1 + Math.sin(elapsed * 0.0035) * 0.06;
+    const rot = elapsed * 0.0006;
+
+    // 1. 外層神聖生命之輪 12 瓣蓮華法陣 (12-Petaled Sacred Lotus)
+    c.save();
+    c.rotate(rot);
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      c.save();
+      c.rotate(a);
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.quadraticCurveTo(18, baseR * 0.6 * pulse, 0, baseR * pulse);
+      c.quadraticCurveTo(-18, baseR * 0.6 * pulse, 0, 0);
+      c.closePath();
+      c.fillStyle = i % 2 === 0 ? "rgba(74, 222, 128, 0.18)" : "rgba(254, 240, 138, 0.22)";
+      c.fill();
+      c.strokeStyle = "rgba(134, 239, 172, 0.75)";
+      c.lineWidth = 1.4;
+      c.stroke();
+      c.restore();
+    }
+    c.restore();
+
+    // 2. 逆向旋轉內層 8 葉生命幾何環 (Inner 8-Petal Geometry)
+    c.save();
+    c.rotate(-rot * 1.4);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      c.save();
+      c.rotate(a);
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.quadraticCurveTo(14, baseR * 0.35, 0, baseR * 0.6);
+      c.quadraticCurveTo(-14, baseR * 0.35, 0, 0);
+      c.closePath();
+      c.fillStyle = "rgba(254, 240, 138, 0.35)";
+      c.fill();
+      c.strokeStyle = "#86efac";
+      c.lineWidth = 1.2;
+      c.stroke();
+      c.restore();
+    }
+    c.restore();
+
+    // 3. 幾何光環同心圓 (Concentric Golden Life Rings)
+    [baseR * 0.45, baseR * 0.82, baseR * 1.15].forEach((r, idx) => {
+      c.beginPath();
+      c.arc(0, 0, r * pulse, 0, Math.PI * 2);
+      c.strokeStyle = idx === 1 ? "rgba(254, 240, 138, 0.65)" : "rgba(74, 222, 128, 0.45)";
+      c.lineWidth = idx === 1 ? 2.0 : 1.2;
+      c.stroke();
+    });
+
+    // 4. 原初生命之種核心靈光 (Central Sprouting Seed of Genesis)
+    const seedGrad = c.createRadialGradient(0, 0, 2, 0, 0, 28 * pulse);
+    seedGrad.addColorStop(0, "#ffffff");
+    seedGrad.addColorStop(0.35, "#fef08a");
+    seedGrad.addColorStop(0.7, "#4ade80");
+    seedGrad.addColorStop(1, "rgba(6, 78, 59, 0)");
+    c.beginPath();
+    c.arc(0, 0, 28 * pulse, 0, Math.PI * 2);
+    c.fillStyle = seedGrad;
+    c.shadowColor = "#86efac";
+    c.shadowBlur = 24;
+    c.fill();
+
+    // 5. 原初神言銘刻光符 (Floating Life Runes: 生命・創造・生機・永恆)
+    const runes = ["生", "命", "創", "造", "生", "者", "永", "恆"];
+    c.save();
+    c.rotate(rot * 0.7);
+    c.font = "bold 13px 'Noto Serif TC', serif";
+    c.fillStyle = "rgba(254, 240, 138, 0.88)";
+    c.shadowColor = "#22c55e";
+    c.shadowBlur = 8;
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    for (let r = 0; r < 8; r++) {
+      const a = (r / 8) * Math.PI * 2;
+      const rx = Math.cos(a) * (baseR * 0.98 * pulse);
+      const ry = Math.sin(a) * (baseR * 0.98 * pulse);
+      c.save();
+      c.translate(rx, ry);
+      c.rotate(a + Math.PI / 2);
+      c.fillText(runes[r], 0, 0);
+      c.restore();
+    }
+    c.restore();
+
+    c.restore();
+  }
+
+  function drawLifeweaverKomorebi(c, cx, cy, w, h, elapsed, isClimax, alpha) {
+    c.save();
+    c.globalAlpha = alpha;
+    const rayCount = 12;
+    const maxR = Math.max(w, h) * 0.95;
+    const rot = elapsed * 0.0003;
+
+    for (let i = 0; i < rayCount; i++) {
+      const a = rot + (i / rayCount) * Math.PI * 2;
+      const spread = 0.12 + Math.sin(elapsed * 0.002 + i) * 0.03;
+      c.beginPath();
+      c.moveTo(cx, cy);
+      c.arc(cx, cy, maxR, a - spread, a + spread);
+      c.closePath();
+      const rGrad = c.createRadialGradient(cx, cy, 20, cx, cy, maxR);
+      rGrad.addColorStop(0, i % 2 === 0 ? "rgba(254, 240, 138, 0.22)" : "rgba(134, 239, 172, 0.18)");
+      rGrad.addColorStop(0.5, i % 2 === 0 ? "rgba(74, 222, 128, 0.1)" : "rgba(254, 240, 138, 0.08)");
+      rGrad.addColorStop(1, "rgba(2, 44, 34, 0)");
+      c.fillStyle = rGrad;
+      c.fill();
+    }
+    c.restore();
+  }
+
+  function renderLifeweaverFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const cx = w / 2;
+    const cy = h / 2;
+    const lw = st.lifeweaver;
+    if (!lw) return;
+
+    // 1. 神聖林冠翡翠深穹天幕 (Sacred Forest Emerald Canopy Void)
+    const skyGrad = c.createRadialGradient(cx, cy * 0.65, 30, cx, cy, Math.max(w, h) * 0.88);
+    skyGrad.addColorStop(0, isClimax ? "#064e3b" : "#022c22");
+    skyGrad.addColorStop(0.42, "#01261d");
+    skyGrad.addColorStop(0.78, "#011610");
+    skyGrad.addColorStop(1, "#000a06");
+    c.fillStyle = skyGrad;
+    c.fillRect(0, 0, w, h);
+
+    // 2. 原初生命之息極光波紋 (Living Green Auroral Waves)
+    for (let i = 0; i < 4; i++) {
+      const wy = h * 0.22 + i * (h * 0.18);
+      c.save();
+      c.globalAlpha = 0.07 + Math.sin(elapsed * 0.0025 + i * 1.5) * 0.035;
+      c.fillStyle = i % 2 === 0 ? "rgba(74, 222, 128, 0.35)" : "rgba(254, 240, 138, 0.28)";
+      c.beginPath();
+      c.moveTo(0, wy);
+      for (let x = 0; x <= w; x += 35) {
+        const offset = Math.sin(elapsed * 0.003 + x * 0.012 + i) * 12;
+        c.lineTo(x, wy + offset);
+      }
+      c.lineTo(w, h);
+      c.lineTo(0, h);
+      c.closePath();
+      c.fill();
+      c.restore();
+    }
+
+    // 3. 透過樹冠的神聖微光射線 (Komorebi Sacred Beams)
+    const komoAlpha = isClimax ? 0.75 : 0.45;
+    drawLifeweaverKomorebi(c, cx, cy * 0.85, w, h, elapsed, isClimax, komoAlpha);
+
+    // 4. 生意盎然生命孢子向上奔湧 (Upward Drifting Life Spores)
+    const sporeSpeed = isClimax ? 1.8 : isUp ? 1.25 : 1.0;
+    for (let i = 0; i < lw.spores.length; i++) {
+      const sp = lw.spores[i];
+      sp.y += sp.vy * sporeSpeed;
+      sp.x += Math.sin(elapsed * sp.swaySpeed + sp.swayPhase) * 1.2;
+      if (sp.y < -30) {
+        sp.y = h + Math.random() * 40;
+        sp.x = Math.random() * w;
+      }
+      c.save();
+      c.globalAlpha = sp.alpha * (isClimax ? 1 : 0.8);
+      c.fillStyle = sp.color;
+      c.shadowColor = sp.color;
+      c.shadowBlur = 8;
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.r * (isClimax ? 1.25 : 1), 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 5. 飄舞旋轉的翡翠與櫻粉花瓣 (Swirling Floral Petals)
+    for (let i = 0; i < lw.petals.length; i++) {
+      const pt = lw.petals[i];
+      pt.orbitAngle += pt.orbitSpeed * (isClimax ? 1.6 : 1.0);
+      pt.angle += pt.rotSpeed;
+      const px = cx + Math.cos(pt.orbitAngle) * pt.orbitRadius;
+      const py = cy + Math.sin(pt.orbitAngle) * (pt.orbitRadius * 0.65) + Math.sin(elapsed * 0.002 + i) * 15;
+
+      c.save();
+      c.translate(px, py);
+      c.rotate(pt.angle);
+      c.globalAlpha = pt.alpha * (isClimax ? 0.95 : 0.75);
+      c.beginPath();
+      c.ellipse(0, 0, pt.size, pt.size * 0.55, 0, 0, Math.PI * 2);
+      c.fillStyle = pt.color;
+      c.shadowColor = pt.color;
+      c.shadowBlur = 6;
+      c.fill();
+      c.restore();
+    }
+
+    // 6. 神聖生命藤蔓螺旋蔓生 (Sprouting Sacred Vines)
+    const vineGrowth = Math.min(1.0, elapsed / 5500);
+    drawLifeweaverVines(c, cx, cy, lw.vines, elapsed, isClimax, vineGrowth);
+
+    // 7. 神聖生命法陣・原初生命之輪 (Central Life Mandala & Seed)
+    const mandalaAlpha = isClimax ? 0.95 : 0.78;
+    drawLifeweaverMandala(c, cx, cy, elapsed, isClimax, mandalaAlpha);
+
+    // 8. 衝擊萌芽光震波 (Sprout Pulse Shockwaves)
+    if (lw.sproutPulse > 0.02) {
+      lw.sproutPulse *= 0.93;
+      c.save();
+      c.beginPath();
+      c.arc(cx, cy, (1 - lw.sproutPulse) * Math.min(w, h) * 0.45, 0, Math.PI * 2);
+      c.strokeStyle = `rgba(134, 239, 172, ${lw.sproutPulse * 0.8})`;
+      c.lineWidth = 3.5;
+      c.shadowColor = "#22c55e";
+      c.shadowBlur = 16;
+      c.stroke();
+      c.restore();
+    }
+
+    // 9. 萬物生長甘霖碎屑 (Burst Life Sparks)
+    for (let i = st.burstSparks.length - 1; i >= 0; i--) {
+      const sp = st.burstSparks[i];
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.alpha *= 0.94;
+      if (sp.alpha <= 0.02) {
+        st.burstSparks.splice(i, 1);
+        continue;
+      }
+      c.save();
+      c.globalAlpha = sp.alpha;
+      c.fillStyle = sp.color || "#86efac";
+      c.shadowColor = "#22c55e";
+      c.shadowBlur = 8;
+      c.beginPath();
+      c.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 10. 高潮階段：神聖大字浮現 (Climax Divine Banner)
+    if (isClimax) {
+      c.save();
+      const bAlpha = Math.min(1.0, climaxElapsed / 600);
+      c.globalAlpha = bAlpha;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+
+      // 上副標：❖ 原初生命之神 ❖
+      c.font = "800 16px 'Noto Serif TC', serif";
+      c.fillStyle = "#86efac";
+      c.shadowColor = "#16a34a";
+      c.shadowBlur = 10;
+      c.fillText("❖ 原初生命之神 ❖", cx, cy - 145);
+
+      // 主稱號：生命女神・萊夫維芙
+      c.font = "900 28px 'Noto Serif TC', serif";
+      c.fillStyle = "#ffffff";
+      c.shadowColor = "#4ade80";
+      c.shadowBlur = 24;
+      c.fillText("《 生命女神・萊夫維芙 》", cx, cy - 105);
+
+      // 下標：『 生命創造・生者亦能永恆 』
+      c.font = "700 15px 'Noto Serif TC', serif";
+      c.fillStyle = "#fef08a";
+      c.shadowColor = "#eab308";
+      c.shadowBlur = 12;
+      c.fillText("『 生命創造・生者亦能永恆 』", cx, cy + 125);
+
+      c.restore();
+    }
+
+    // 11. 神聖林海幽深暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.32, cx, cy, Math.max(w, h) * 0.8);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(0, 10, 6, 0.9)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
+  // ==================== 降臨級 拉格提斯 專屬畫面：Nano Banana 高精度西方巨龍素材與大劍・弒神風格 (ragtis-dragonslayer) ====================
+  const RAGTIS_DRAGON_ASSETS = {
+    soar: null,
+    breath: null,
+    maw: null,
+    profile: null,
+    sword: null
+  };
+
+  function getRagtisDragonImage(key) {
+    if (!RAGTIS_DRAGON_ASSETS[key]) {
+      const img = new Image();
+      if (key === "soar") img.src = "assets/dragons/dragon_flying_soar.jpg";
+      else if (key === "breath") img.src = "assets/dragons/dragon_breath_dive.jpg";
+      else if (key === "maw") img.src = "assets/dragons/dragon_colossal_maw.jpg";
+      else if (key === "profile") img.src = "assets/dragons/dragon_profile_roar.jpg";
+      else if (key === "sword") img.src = "assets/dragons/deicide_greatsword.jpg";
+      RAGTIS_DRAGON_ASSETS[key] = img;
+    }
+    return RAGTIS_DRAGON_ASSETS[key];
+  }
+
+  // 即刻預載 Nano Banana 西方巨龍與弒神大劍高精素材
+  try {
+    getRagtisDragonImage("soar");
+    getRagtisDragonImage("breath");
+    getRagtisDragonImage("maw");
+    getRagtisDragonImage("profile");
+    getRagtisDragonImage("sword");
+  } catch (e) {
+    console.warn("Ragtis dragon asset preload:", e);
+  }
+
+  function drawRagtisDragonSprite(c, imgKey, x, y, baseSize, angle = 0, alpha = 1, flipH = false, boost = 1.4) {
+    const img = getRagtisDragonImage(imgKey);
+    if (!img || !img.complete || img.naturalWidth === 0) return;
+
+    const aspect = img.naturalHeight / img.naturalWidth;
+    const w = baseSize;
+    const h = baseSize * aspect;
+
+    c.save();
+    c.translate(x, y);
+    if (angle) c.rotate(angle);
+    if (flipH) c.scale(-1, 1);
+    c.globalAlpha = Math.max(0, Math.min(1, alpha));
+    c.globalCompositeOperation = "screen";
+    c.filter = `brightness(${boost}) contrast(1.15)`;
+
+    c.drawImage(img, -w / 2, -h / 2, w, h);
+    c.filter = "none";
+    c.restore();
+  }
+
+  function drawRagtisDeicideGreatsword(c, x, y, height, angle = 0, alpha = 1, tipDown = true, boost = 1.4) {
+    const img = getRagtisDragonImage("sword");
+    if (!img || !img.complete || img.naturalWidth === 0) return;
+
+    const aspect = img.naturalWidth / img.naturalHeight; // 768 / 1376 ≈ 0.558
+    const w = height * aspect;
+    const h = height;
+
+    c.save();
+    c.translate(x, y);
+    c.rotate(angle + (tipDown ? Math.PI : 0));
+    c.globalAlpha = Math.max(0, Math.min(1, alpha));
+    c.globalCompositeOperation = "screen";
+    c.filter = `brightness(${boost}) contrast(1.18)`;
+
+    c.drawImage(img, -w / 2, -h / 2, w, h);
+    c.filter = "none";
+    c.restore();
+  }
+
+  function createRagtisFxState(w, h) {
+    // 1. 各種翱翔展翼的 Nano Banana 高精度西方巨龍 (Various High-Res Western Dragons)
+    const dragons = [
+      {
+        spriteKey: "soar",
+        x: -140,
+        y: h * 0.26,
+        vx: 3.4,
+        vy: 0.22,
+        size: Math.min(w, h) * 0.58,
+        baseAngle: 0.08,
+        flipH: false,
+        pulseOffset: 0
+      },
+      {
+        spriteKey: "breath",
+        x: w + 140,
+        y: h * 0.22,
+        vx: -3.0,
+        vy: 0.35,
+        size: Math.min(w, h) * 0.52,
+        baseAngle: -0.14,
+        flipH: true,
+        pulseOffset: 1.8
+      },
+      {
+        spriteKey: "profile",
+        x: -200,
+        y: h * 0.65,
+        vx: 3.6,
+        vy: -0.28,
+        size: Math.min(w, h) * 0.68,
+        baseAngle: 0.05,
+        flipH: false,
+        pulseOffset: 3.1
+      },
+      {
+        spriteKey: "soar",
+        x: w * 0.45,
+        y: -160,
+        vx: 1.8,
+        vy: 2.2,
+        size: Math.min(w, h) * 0.44,
+        baseAngle: 0.32,
+        flipH: false,
+        pulseOffset: 4.6
+      }
+    ];
+
+    // 2. 戰場周遭插立的弒神之大劍群 (Surrounding God-Slayer Greatswords)
+    const groundSwords = [
+      { x: w * 0.14, y: h * 0.76, angle: -0.22, scale: 0.72, rune: "屠神" },
+      { x: w * 0.28, y: h * 0.82, angle: 0.14, scale: 0.85, rune: "破神" },
+      { x: w * 0.44, y: h * 0.85, angle: -0.08, scale: 0.78, rune: "拒神" },
+      { x: w * 0.58, y: h * 0.84, angle: 0.18, scale: 0.82, rune: "滅神" },
+      { x: w * 0.74, y: h * 0.81, angle: -0.16, scale: 0.88, rune: "無神" },
+      { x: w * 0.88, y: h * 0.74, angle: 0.25, scale: 0.75, rune: "弒神" }
+    ];
+
+    // 3. 碎裂的「囚神之鏈」鐵鏈碎片 (Broken Chains of God-Imprisonment)
+    const brokenChains = [];
+    for (let i = 0; i < 18; i++) {
+      brokenChains.push({
+        x: w * 0.2 + Math.random() * w * 0.6,
+        y: h * 0.3 + Math.random() * h * 0.45,
+        vx: (Math.random() - 0.5) * 2.8,
+        vy: (Math.random() - 0.5) * 2.5,
+        angle: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.05,
+        size: 9 + Math.random() * 8
+      });
+    }
+
+    // 4. 弒神狂雷火星粒子 (Deicide Thunder Embers)
+    const embers = [];
+    for (let i = 0; i < 75; i++) {
+      embers.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 1.2 + Math.random() * 2.6,
+        vx: (Math.random() - 0.5) * 2.2,
+        vy: -1.2 - Math.random() * 2.5,
+        color: i % 3 === 0 ? "#ef4444" : i % 3 === 1 ? "#a855f7" : "#fbbf24",
+        alpha: 0.4 + Math.random() * 0.6
+      });
+    }
+
+    return {
+      dragons,
+      groundSwords,
+      brokenChains,
+      embers,
+      lightningFlash: 0,
+      deicideImpactPulse: 0,
+      climaxSwordDrop: 0
+    };
+  }
+
+  function drawWesternDragon(c, x, y, scale, angle, wingPhase, bodyColor, glowColor, breathAlpha) {
+    c.save();
+    c.translate(x, y);
+    c.rotate(angle);
+    c.scale(scale, scale);
+
+    const wingSpan = Math.sin(wingPhase);
+
+    // 1. 狂暴龍息或神龍狂雷雷光 (Draconic Breath Beam)
+    if (breathAlpha > 0.05) {
+      c.save();
+      c.globalAlpha = breathAlpha;
+      const bGrad = c.createLinearGradient(45, -12, 180, -25);
+      bGrad.addColorStop(0, "#ffffff");
+      bGrad.addColorStop(0.25, "#fef08a");
+      bGrad.addColorStop(0.65, "#ef4444");
+      bGrad.addColorStop(1, "rgba(168, 85, 247, 0)");
+      c.fillStyle = bGrad;
+      c.beginPath();
+      c.moveTo(42, -10);
+      c.lineTo(190, -45);
+      c.lineTo(185, 15);
+      c.closePath();
+      c.shadowColor = glowColor || "#ef4444";
+      c.shadowBlur = 18;
+      c.fill();
+      c.restore();
+    }
+
+    // 2. 西方龍背部巨型蝠翼（左翼 / 遠翼）
+    c.save();
+    c.beginPath();
+    c.moveTo(-5, -12);
+    const wyLeft = -45 + wingSpan * 28;
+    c.quadraticCurveTo(-20, wyLeft - 30, -55, wyLeft);
+    c.quadraticCurveTo(-40, wyLeft + 15, -25, wyLeft + 10);
+    c.quadraticCurveTo(-15, wyLeft + 20, 0, -5);
+    c.closePath();
+    c.fillStyle = "rgba(40, 10, 60, 0.75)";
+    c.fill();
+    c.restore();
+
+    // 3. 巨龍長尾（S型優美擺動，尾端帶倒刺戰矛）
+    c.beginPath();
+    c.moveTo(-28, 5);
+    c.quadraticCurveTo(-55, 18 + wingSpan * 8, -85, 5);
+    c.quadraticCurveTo(-115, -10 - wingSpan * 6, -135, 12);
+    c.lineTo(-125, 18);
+    c.quadraticCurveTo(-105, 5, -80, 15);
+    c.quadraticCurveTo(-50, 26, -24, 12);
+    c.closePath();
+    c.fillStyle = bodyColor || "#7e22ce";
+    c.fill();
+
+    // 尾刺戟刃
+    c.beginPath();
+    c.moveTo(-135, 12);
+    c.lineTo(-148, 8);
+    c.lineTo(-140, 22);
+    c.closePath();
+    c.fillStyle = "#ef4444";
+    c.fill();
+
+    // 4. 巨龍軀幹與粗壯後足
+    c.beginPath();
+    c.ellipse(-10, 5, 24, 14, -0.2, 0, Math.PI * 2);
+    c.fillStyle = bodyColor || "#7e22ce";
+    c.shadowColor = glowColor || "#a855f7";
+    c.shadowBlur = 12;
+    c.fill();
+
+    // 5. 巨龍長頸與龍首
+    c.beginPath();
+    c.moveTo(8, -2);
+    c.quadraticCurveTo(24, -14, 38, -12);
+    c.lineTo(46, -15);
+    c.lineTo(36, -22);
+    c.quadraticCurveTo(18, -24, 0, -12);
+    c.closePath();
+    c.fillStyle = bodyColor || "#7e22ce";
+    c.fill();
+
+    // 傲世威嚴龍角（後彎長雙角）
+    c.beginPath();
+    c.moveTo(34, -20);
+    c.quadraticCurveTo(18, -36, 6, -42);
+    c.quadraticCurveTo(18, -32, 30, -18);
+    c.closePath();
+    c.fillStyle = "#facc15";
+    c.shadowColor = "#facc15";
+    c.shadowBlur = 8;
+    c.fill();
+
+    // 猩紅狂怒龍眼 (Glowing Draconic Eye)
+    c.beginPath();
+    c.arc(36, -17, 2.2, 0, Math.PI * 2);
+    c.fillStyle = "#ffffff";
+    c.shadowColor = "#ef4444";
+    c.shadowBlur = 10;
+    c.fill();
+
+    // 6. 前翼（近處主翼，骨骼分明，隨羽翼拍擊舒展）
+    c.save();
+    c.beginPath();
+    c.moveTo(2, -8);
+    const wyRight = -70 - wingSpan * 35;
+    c.quadraticCurveTo(-15, wyRight - 25, -48, wyRight);
+    c.quadraticCurveTo(-38, wyRight + 32, -22, wyRight + 26);
+    c.quadraticCurveTo(-14, wyRight + 44, 4, wyRight + 34);
+    c.quadraticCurveTo(8, wyRight + 52, 16, -2);
+    c.closePath();
+    const wingGrad = c.createLinearGradient(0, -10, -40, wyRight);
+    wingGrad.addColorStop(0, bodyColor || "#7e22ce");
+    wingGrad.addColorStop(0.5, "rgba(220, 38, 38, 0.85)");
+    wingGrad.addColorStop(1, "rgba(251, 191, 36, 0.75)");
+    c.fillStyle = wingGrad;
+    c.shadowColor = glowColor || "#ef4444";
+    c.shadowBlur = 15;
+    c.fill();
+    c.strokeStyle = "#fef08a";
+    c.lineWidth = 1.4;
+    c.stroke();
+    c.restore();
+
+    c.restore();
+  }
+
+  function drawDeicideGreatsword(c, x, y, scale, angle, alpha, glowColor, runesText) {
+    c.save();
+    c.translate(x, y);
+    c.rotate(angle);
+    c.scale(scale, scale);
+    c.globalAlpha = alpha;
+
+    c.shadowColor = glowColor || "#a855f7";
+    c.shadowBlur = 22;
+
+    // 雙刃厚重大劍刃身 (Giant Deicide Blade)
+    c.beginPath();
+    c.moveTo(0, -160);
+    c.lineTo(16, -135);
+    c.lineTo(16, 20);
+    c.lineTo(-16, 20);
+    c.lineTo(-16, -135);
+    c.closePath();
+    const bGrad = c.createLinearGradient(-16, 0, 16, 0);
+    bGrad.addColorStop(0, "#1e1b4b");
+    bGrad.addColorStop(0.3, "#475569");
+    bGrad.addColorStop(0.5, "#f8fafc");
+    bGrad.addColorStop(0.7, "#475569");
+    bGrad.addColorStop(1, "#1e1b4b");
+    c.fillStyle = bGrad;
+    c.fill();
+    c.strokeStyle = "#ef4444";
+    c.lineWidth = 1.8;
+    c.stroke();
+
+    // 中央弒神血槽與狂雷紫芒
+    c.beginPath();
+    c.moveTo(0, -135);
+    c.lineTo(0, 18);
+    c.strokeStyle = "#f43f5e";
+    c.lineWidth = 4;
+    c.stroke();
+
+    c.beginPath();
+    c.moveTo(0, -135);
+    c.lineTo(0, 18);
+    c.strokeStyle = "#ffffff";
+    c.lineWidth = 1.5;
+    c.stroke();
+
+    // 劍身刻印弒神符文
+    if (runesText) {
+      c.save();
+      c.rotate(Math.PI / 2);
+      c.font = "bold 11px 'Noto Serif TC', serif";
+      c.fillStyle = "#fde047";
+      c.shadowColor = "#ef4444";
+      c.shadowBlur = 8;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.fillText(runesText, 60, 0);
+      c.restore();
+    }
+
+    // 霸氣龍翼棘刺護手
+    c.beginPath();
+    c.moveTo(0, 20);
+    c.lineTo(38, 26);
+    c.lineTo(46, 16);
+    c.lineTo(24, 34);
+    c.lineTo(0, 28);
+    c.lineTo(-24, 34);
+    c.lineTo(-46, 16);
+    c.lineTo(-38, 26);
+    c.closePath();
+    c.fillStyle = "#0f172a";
+    c.fill();
+    c.strokeStyle = "#facc15";
+    c.lineWidth = 2;
+    c.stroke();
+
+    // 雙手纏帶劍柄與巨龍真眼劍首
+    c.beginPath();
+    c.rect(-4, 28, 8, 42);
+    c.fillStyle = "#334155";
+    c.fill();
+    c.strokeStyle = "#ef4444";
+    c.lineWidth = 1.2;
+    c.stroke();
+
+    c.beginPath();
+    c.arc(0, 76, 7.5, 0, Math.PI * 2);
+    c.fillStyle = "#ef4444";
+    c.shadowColor = "#f43f5e";
+    c.shadowBlur = 14;
+    c.fill();
+
+    c.restore();
+  }
+
+  function renderRagtisFrame(c, st, w, h, elapsed, isUp, isClimax, climaxElapsed) {
+    const cx = w / 2;
+    const cy = h / 2;
+    const rt = st.ragtis;
+    if (!rt) return;
+
+    // 1. 弒神血雷狂暴深穹天幕 (Deicide Crimson & Purple Void)
+    const skyGrad = c.createRadialGradient(cx, cy * 0.7, 30, cx, cy, Math.max(w, h) * 0.88);
+    skyGrad.addColorStop(0, isClimax ? "#581c87" : "#3b0764");
+    skyGrad.addColorStop(0.38, "#2e1065");
+    skyGrad.addColorStop(0.72, "#1c0628");
+    skyGrad.addColorStop(1, "#090111");
+    c.fillStyle = skyGrad;
+    c.fillRect(0, 0, w, h);
+
+    // 2. 神龍狂雷暴風閃電弧 (Crackling Deicide Lightning Bolts)
+    if (Math.random() < 0.22 || rt.lightningFlash > 0.05) {
+      c.save();
+      c.strokeStyle = Math.random() < 0.5 ? "rgba(254, 240, 138, 0.9)" : "rgba(168, 85, 247, 0.95)";
+      c.lineWidth = 2.5;
+      c.shadowColor = "#ef4444";
+      c.shadowBlur = 16;
+      c.beginPath();
+      let lx = Math.random() * w;
+      let ly = 0;
+      c.moveTo(lx, ly);
+      for (let s = 0; s < 7; s++) {
+        lx += (Math.random() - 0.5) * 80;
+        ly += h / 7;
+        c.lineTo(lx, ly);
+      }
+      c.stroke();
+      c.restore();
+    }
+
+    // 3. 戰場周遭插立的 Nano Banana 弒神大劍群與狂雷鏈接光弧 (Perimeter Greatswords with Lightning Arcs)
+    rt.groundSwords.forEach((gs, idx) => {
+      drawRagtisDeicideGreatsword(c, gs.x, gs.y - 20, 240 * gs.scale, gs.angle, 0.98, true, 1.45);
+
+      // 劍柄龍目血紅魔光與電芒
+      c.save();
+      c.beginPath();
+      c.arc(gs.x, gs.y - 110 * gs.scale, 7 * gs.scale, 0, Math.PI * 2);
+      c.fillStyle = "#ef4444";
+      c.shadowColor = "#f43f5e";
+      c.shadowBlur = 14;
+      c.globalCompositeOperation = "lighter";
+      c.fill();
+      c.restore();
+
+      // 大劍之間的跳躍雷芒
+      if (idx < rt.groundSwords.length - 1) {
+        const nextGs = rt.groundSwords[idx + 1];
+        c.save();
+        c.strokeStyle = "rgba(250, 204, 21, 0.45)";
+        c.lineWidth = 1.2;
+        c.beginPath();
+        c.moveTo(gs.x, gs.y - 120 * gs.scale);
+        const midX = (gs.x + nextGs.x) / 2 + (Math.random() - 0.5) * 30;
+        const midY = (gs.y + nextGs.y) / 2 - 40 + (Math.random() - 0.5) * 20;
+        c.quadraticCurveTo(midX, midY, nextGs.x, nextGs.y - 120 * nextGs.scale);
+        c.stroke();
+        c.restore();
+      }
+    });
+
+    // 4. 碎裂的「囚神之鏈」殘片飛舞 (Floating Broken Chains)
+    rt.brokenChains.forEach((ch) => {
+      ch.x += ch.vx;
+      ch.y += ch.vy;
+      ch.angle += ch.rotSpeed;
+      if (ch.x < -40) ch.x = w + 40;
+      if (ch.x > w + 40) ch.x = -40;
+      if (ch.y < -40) ch.y = h + 40;
+      if (ch.y > h + 40) ch.y = -40;
+
+      c.save();
+      c.translate(ch.x, ch.y);
+      c.rotate(ch.angle);
+      c.strokeStyle = "#facc15";
+      c.lineWidth = 2.2;
+      c.shadowColor = "#ef4444";
+      c.shadowBlur = 8;
+      c.beginPath();
+      c.ellipse(0, 0, ch.size, ch.size * 0.55, 0, 0, Math.PI * 2);
+      c.stroke();
+      c.restore();
+    });
+
+    // 5. 各種 Nano Banana 西方巨龍翱翔飛舞與神龍狂雷 (Flying Western Dragons)
+    rt.dragons.forEach((dg, dIdx) => {
+      dg.x += dg.vx * (isClimax ? 1.3 : 1.0);
+      dg.y += dg.vy + Math.sin(elapsed * 0.0025 + dg.pulseOffset) * 0.7;
+
+      // 循環飛掠
+      if (dg.vx > 0 && dg.x > w + 220) {
+        dg.x = -220;
+        dg.y = h * (0.12 + Math.random() * 0.55);
+      } else if (dg.vx < 0 && dg.x < -220) {
+        dg.x = w + 220;
+        dg.y = h * (0.12 + Math.random() * 0.55);
+      }
+
+      // 飛掠俯仰角與羽翼動態
+      const dynamicAngle = dg.baseAngle + Math.sin(elapsed * 0.003 + dIdx) * 0.08;
+      const dynamicSize = dg.size * (1 + Math.sin(elapsed * 0.004 + dIdx) * 0.06);
+      const alpha = 0.92 + Math.sin(elapsed * 0.0035 + dIdx) * 0.08;
+
+      // 巨龍背後的神雷暗紫火環
+      c.save();
+      const glowGrad = c.createRadialGradient(dg.x, dg.y, 10, dg.x, dg.y, dynamicSize * 0.42);
+      glowGrad.addColorStop(0, "rgba(168, 85, 247, 0.32)");
+      glowGrad.addColorStop(0.5, "rgba(239, 68, 68, 0.16)");
+      glowGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      c.fillStyle = glowGrad;
+      c.globalCompositeOperation = "lighter";
+      c.beginPath();
+      c.arc(dg.x, dg.y, dynamicSize * 0.42, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+
+      drawRagtisDragonSprite(c, dg.spriteKey, dg.x, dg.y, dynamicSize, dynamicAngle, alpha, dg.flipH, 1.55);
+    });
+
+    // 6. 弒神狂雷火星粒子 (Embers)
+    for (let i = 0; i < rt.embers.length; i++) {
+      const em = rt.embers[i];
+      em.y += em.vy;
+      em.x += em.vx;
+      if (em.y < -20) {
+        em.y = h + 20;
+        em.x = Math.random() * w;
+      }
+      c.save();
+      c.globalAlpha = em.alpha;
+      c.fillStyle = em.color;
+      c.shadowColor = em.color;
+      c.shadowBlur = 6;
+      c.beginPath();
+      c.arc(em.x, em.y, em.r, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+
+    // 7. 衝擊地裂震波 (Deicide Shockwave Pulses)
+    if (rt.deicideImpactPulse > 0.02) {
+      rt.deicideImpactPulse *= 0.92;
+      c.save();
+      c.beginPath();
+      c.arc(cx, cy, (1 - rt.deicideImpactPulse) * Math.min(w, h) * 0.5, 0, Math.PI * 2);
+      c.strokeStyle = `rgba(239, 68, 68, ${rt.deicideImpactPulse * 0.9})`;
+      c.lineWidth = 4;
+      c.shadowColor = "#facc15";
+      c.shadowBlur = 20;
+      c.stroke();
+      c.restore();
+    }
+
+    // 8. 終極高潮階段：滅神巨劍破天而降 + 震撼 Nano Banana 狂暴巨龍咆哮！
+    if (isClimax) {
+      c.save();
+      const cProgress = Math.min(1.0, climaxElapsed / 650);
+
+      // (1) 背景深淵：中央撼世巨龍首咆哮 (Colossal Frontal Dragon Maw Roaring)
+      const mawProgress = Math.min(1.0, climaxElapsed / 750);
+      const mawSize = Math.max(w * 0.95, 760) * (0.82 + mawProgress * 0.28 + Math.sin(climaxElapsed * 0.012) * 0.02);
+      const mawAlpha = Math.min(1.0, climaxElapsed / 320);
+      drawRagtisDragonSprite(c, "maw", cx, cy - 25, mawSize, 0, mawAlpha, false);
+
+      // (2) 左側傲世巨龍展翼咆哮 (Left Flanking Profile Roar)
+      const sideAlpha = Math.min(0.92, climaxElapsed / 480);
+      const sideSize = Math.min(w, h) * 0.68;
+      drawRagtisDragonSprite(c, "profile", cx - w * 0.35, cy + 15, sideSize, 0.08, sideAlpha, false);
+
+      // (3) 右側狂暴俯衝吐息巨龍 (Right Flanking Breath Dive)
+      drawRagtisDragonSprite(c, "breath", cx + w * 0.35, cy - 20, sideSize * 0.88, -0.12, sideAlpha, true);
+
+      // (4) 弒神大劍天降破空神雷光柱
+      const swordY = cy - 35 + (1 - cProgress) * -260;
+      c.save();
+      const bladeRay = c.createLinearGradient(cx - 30, swordY - 260, cx + 30, swordY + 260);
+      bladeRay.addColorStop(0, "rgba(254, 240, 138, 0)");
+      bladeRay.addColorStop(0.3, "rgba(239, 68, 68, 0.45)");
+      bladeRay.addColorStop(0.5, "rgba(255, 255, 255, 0.7)");
+      bladeRay.addColorStop(0.7, "rgba(168, 85, 247, 0.5)");
+      bladeRay.addColorStop(1, "rgba(254, 240, 138, 0)");
+      c.fillStyle = bladeRay;
+      c.globalCompositeOperation = "lighter";
+      c.fillRect(cx - 24, swordY - 260, 48, 520);
+      c.restore();
+
+      // 中央滅神大劍自九天之上貫穿斬落 (Colossal Falling Nano Banana Deicide Greatsword)
+      drawRagtisDeicideGreatsword(c, cx, swordY, Math.min(h * 0.95, 550), 0, cProgress, true, 1.6);
+
+      // (5) 弒神文字橫幅 (Divine Deicide Banner)
+      const bAlpha = Math.min(1.0, climaxElapsed / 600);
+      c.globalCompositeOperation = "source-over";
+      c.globalAlpha = bAlpha;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+
+      c.font = "800 16px 'Noto Serif TC', serif";
+      c.fillStyle = "#facc15";
+      c.shadowColor = "#ef4444";
+      c.shadowBlur = 12;
+      c.fillText("❖ 傳奇・降臨級 ❖", cx, cy - 145);
+
+      c.font = "900 28px 'Noto Serif TC', serif";
+      c.fillStyle = "#ffffff";
+      c.shadowColor = "#dc2626";
+      c.shadowBlur = 25;
+      c.fillText("《 弒神狂龍・拉格提斯 》", cx, cy - 105);
+
+      c.font = "700 16px 'Noto Serif TC', serif";
+      c.fillStyle = "#fde047";
+      c.shadowColor = "#7e22ce";
+      c.shadowBlur = 14;
+      c.fillText("『 神將不再輝煌，吾終將諸神 』", cx, cy + 130);
+
+      c.restore();
+    }
+
+    // 9. 弒神血色暗角
+    c.globalAlpha = 1;
+    const vg = c.createRadialGradient(cx, cy, Math.min(w, h) * 0.35, cx, cy, Math.max(w, h) * 0.85);
+    vg.addColorStop(0, "rgba(0, 0, 0, 0)");
+    vg.addColorStop(1, "rgba(15, 2, 20, 0.92)");
+    c.fillStyle = vg;
+    c.fillRect(0, 0, w, h);
+  }
+
   function startCanvasSummonFx(tierSpec, totalDurationMs, specialVariant = null) {
     if (!canvasEl || !ctx2d) return;
     resizeFxCanvas();
@@ -6352,6 +7852,8 @@
       beelzebub: specialVariant === "beelzebub-swarm" ? createBeelzebubFxState(w, h) : null,
       nyx: specialVariant === "nyx-moon-stars" ? createNyxFxState(w, h) : null,
       hemera: specialVariant === "hemera-sun" ? createHemeraFxState(w, h) : null,
+      lifeweaver: specialVariant === "lifeweaver-verdant" ? createLifeweaverFxState(w, h) : null,
+      ragtis: specialVariant === "ragtis-dragonslayer" ? createRagtisFxState(w, h) : null,
       burstSparks: [],
       shockwaves: [],
       burstTriggered: false
@@ -6428,6 +7930,24 @@
       // 迪米諾拉 赫墨拉〔熾熱烈陽與終焉日冕・日耀女神〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
       if (vMode === "hemera-sun" && activeFxState.hemera) {
         renderHemeraFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // 萊夫維芙〔生意盎然・原初生命女神〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "lifeweaver-verdant" && activeFxState.lifeweaver) {
+        renderLifeweaverFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
+        ctx2d.globalAlpha = 1;
+        ctx2d.globalCompositeOperation = "source-over";
+        animFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // 拉格提斯〔弒神狂龍・西方巨龍與大劍群〕：完全使用專屬畫面，不繪製任何通用彗星 / 斬擊 / 光束 / 藍黃線條
+      if (vMode === "ragtis-dragonslayer" && activeFxState.ragtis) {
+        renderRagtisFrame(ctx2d, activeFxState, wCurr, hCurr, elapsed, isUpgradedNow, isClimax, climaxElapsed);
         ctx2d.globalAlpha = 1;
         ctx2d.globalCompositeOperation = "source-over";
         animFrameId = requestAnimationFrame(renderLoop);
@@ -7265,6 +8785,13 @@
     if (activeFxState.hemera) {
       activeFxState.hemera.spearImpact = 1;
     }
+    if (activeFxState.lifeweaver) {
+      activeFxState.lifeweaver.sproutPulse = 1;
+    }
+    if (activeFxState.ragtis) {
+      activeFxState.ragtis.deicideImpactPulse = 1;
+      activeFxState.ragtis.lightningFlash = 1;
+    }
     const cx = (canvasEl.clientWidth || 860) / 2;
     const cy = (canvasEl.clientHeight || 560) / 2;
     activeFxState.shockwaves.push(
@@ -7853,6 +9380,10 @@
         ? "#38bdf8"
         : specialVariant === "hemera-sun"
         ? "#f59e0b"
+        : specialVariant === "lifeweaver-verdant"
+        ? "#22c55e"
+        : specialVariant === "ragtis-dragonslayer"
+        ? "#a855f7"
         : specialVariant === "phenom-the-abyss"
         ? "#9333ea"
         : specialVariant === "phenom-lycia-void"
@@ -7876,6 +9407,10 @@
         ? "#1e1b4b"
         : specialVariant === "hemera-sun"
         ? "#7c2d12"
+        : specialVariant === "lifeweaver-verdant"
+        ? "#fef08a"
+        : specialVariant === "ragtis-dragonslayer"
+        ? "#ef4444"
         : specialVariant === "phenom-the-abyss"
         ? "#6366f1"
         : specialVariant === "phenom-lycia-void"
@@ -7899,6 +9434,10 @@
         ? "rgba(56, 189, 248, 0.95)"
         : specialVariant === "hemera-sun"
         ? "rgba(245, 158, 11, 0.96)"
+        : specialVariant === "lifeweaver-verdant"
+        ? "rgba(34, 197, 94, 0.96)"
+        : specialVariant === "ragtis-dragonslayer"
+        ? "rgba(168, 85, 247, 0.96)"
         : specialVariant === "phenom-the-abyss"
         ? "rgba(147, 51, 234, 0.96)"
         : specialVariant === "phenom-lycia-void"
@@ -7936,6 +9475,8 @@
     const isBeelzebub = specialVariant === "beelzebub-swarm";
     const isNyx = specialVariant === "nyx-moon-stars";
     const isHemera = specialVariant === "hemera-sun";
+    const isLifeweaver = specialVariant === "lifeweaver-verdant";
+    const isRagtis = specialVariant === "ragtis-dragonslayer";
     if (viewport) {
       const initTierAttr = isHecate
         ? "tier-hecate"
@@ -7951,6 +9492,10 @@
         ? "tier-nyx"
         : isHemera
         ? "tier-hemera"
+        : isLifeweaver
+        ? "tier-lifeweaver"
+        : isRagtis
+        ? "tier-ragtis"
         : tierSpec.level >= 3
         ? "tier-2"
         : `tier-${tierSpec.level}`;
@@ -7971,6 +9516,10 @@
           ? "#38bdf8"
           : isHemera
           ? "#f59e0b"
+          : isLifeweaver
+          ? "#22c55e"
+          : isRagtis
+          ? "#a855f7"
           : tierSpec.level >= 3
           ? "#38bdf8"
           : upgPrimary
@@ -7991,6 +9540,10 @@
           ? "#1e1b4b"
           : isHemera
           ? "#7c2d12"
+          : isLifeweaver
+          ? "#064e3b"
+          : isRagtis
+          ? "#ef4444"
           : tierSpec.level >= 3
           ? "#60a5fa"
           : upgSecondary
@@ -8011,6 +9564,10 @@
           ? "rgba(56, 189, 248, 0.95)"
           : isHemera
           ? "rgba(245, 158, 11, 0.96)"
+          : isLifeweaver
+          ? "rgba(34, 197, 94, 0.96)"
+          : isRagtis
+          ? "rgba(168, 85, 247, 0.96)"
           : tierSpec.level >= 3
           ? "rgba(56, 189, 248, 0.85)"
           : upgGlow
@@ -8029,6 +9586,8 @@
         "is-beelzebub-swarm",
         "is-nyx-moon-stars",
         "is-hemera-sun",
+        "is-lifeweaver-verdant",
+        "is-ragtis-dragonslayer",
         "is-tier-upgraded",
         "is-climax-finale"
       );
@@ -8046,16 +9605,20 @@
         viewport.classList.add("is-nyx-moon-stars");
       } else if (isHemera) {
         viewport.classList.add("is-hemera-sun");
+      } else if (isLifeweaver) {
+        viewport.classList.add("is-lifeweaver-verdant");
+      } else if (isRagtis) {
+        viewport.classList.add("is-ragtis-dragonslayer");
       }
     }
     if (card3d) {
       card3d.classList.remove("is-card-flipping", "is-card-upgraded");
-      if (isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera) {
+      if (isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera || isLifeweaver || isRagtis) {
         card3d.classList.add("is-card-upgraded");
       }
     }
-    if (coreSymEl) coreSymEl.textContent = isHecate ? "🕸️" : isSkadi ? "👑" : isIgnalion ? "🔥" : isWarrior ? "⚔️" : isBeelzebub ? "🪰" : isNyx ? "🌙" : isHemera ? "☀️" : "❖";
-    if (cardTierTxt) cardTierTxt.textContent = isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera ? "EX" : "SUMMON";
+    if (coreSymEl) coreSymEl.textContent = isHecate ? "🕸️" : isSkadi ? "👑" : isIgnalion ? "🔥" : isWarrior ? "⚔️" : isBeelzebub ? "🪰" : isNyx ? "🌙" : isHemera ? "☀️" : isLifeweaver ? "🌿" : isRagtis ? "🐉" : "❖";
+    if (cardTierTxt) cardTierTxt.textContent = isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera || isLifeweaver || isRagtis ? "EX" : "SUMMON";
 
     // Start 60fps Canvas FX & Background Ritual Charge Audio
     startCanvasSummonFx(tierSpec, totalMs, specialVariant);
@@ -8080,8 +9643,12 @@
         ? "#38bdf8"
         : isHemera
         ? "#f59e0b"
+        : isLifeweaver
+        ? "#22c55e"
+        : isRagtis
+        ? "#a855f7"
         : "#38bdf8",
-      isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera
+      isHecate || isSkadi || isIgnalion || isWarrior || isBeelzebub || isNyx || isHemera || isLifeweaver || isRagtis
     );
     playBigTextImpactSfx(1, tierSpec.level, specialVariant);
 
@@ -8110,6 +9677,10 @@
           viewport.classList.add("is-nyx-moon-stars");
         } else if (specialVariant === "hemera-sun") {
           viewport.classList.add("is-hemera-sun");
+        } else if (specialVariant === "lifeweaver-verdant") {
+          viewport.classList.add("is-lifeweaver-verdant");
+        } else if (specialVariant === "ragtis-dragonslayer") {
+          viewport.classList.add("is-ragtis-dragonslayer");
         } else if (specialVariant === "phenom-the-abyss") {
           viewport.classList.add("is-abyss-depths");
         } else if (specialVariant === "phenom-lycia-void") {
@@ -8141,6 +9712,10 @@
             ? "🌙"
             : specialVariant === "hemera-sun"
             ? "☀️"
+            : specialVariant === "lifeweaver-verdant"
+            ? "🌿"
+            : specialVariant === "ragtis-dragonslayer"
+            ? "🐉"
             : specialVariant === "phenom-the-abyss"
             ? "◈"
             : specialVariant === "phenom-lycia-void"
@@ -8243,11 +9818,13 @@
         "is-beelzebub-swarm",
         "is-nyx-moon-stars",
         "is-hemera-sun",
+        "is-lifeweaver-verdant",
+        "is-ragtis-dragonslayer",
         "is-climax-finale"
       );
     }
 
-    // Trigger screen flash (bespoke flash colors for Seth / The Abyss / Lycia / Apocalypse Dragon / Hecate / Skadi / Ignalion / Warrior / Beelzebub / Nyx / Hemera!)
+    // Trigger screen flash (bespoke flash colors for Seth / The Abyss / Lycia / Apocalypse Dragon / Hecate / Skadi / Ignalion / Warrior / Beelzebub / Nyx / Hemera / Lifeweaver / Ragtis!)
     if (flashEl) {
       flashEl.classList.remove(
         "is-flashing",
@@ -8261,7 +9838,9 @@
         "is-warrior-flash",
         "is-beelzebub-flash",
         "is-nyx-flash",
-        "is-hemera-flash"
+        "is-hemera-flash",
+        "is-lifeweaver-flash",
+        "is-ragtis-flash"
       );
       void flashEl.offsetWidth;
       if (specialVariant === "hecate-death") {
@@ -8278,6 +9857,10 @@
         flashEl.classList.add("is-nyx-flash");
       } else if (specialVariant === "hemera-sun") {
         flashEl.classList.add("is-hemera-flash");
+      } else if (specialVariant === "lifeweaver-verdant") {
+        flashEl.classList.add("is-lifeweaver-flash");
+      } else if (specialVariant === "ragtis-dragonslayer") {
+        flashEl.classList.add("is-ragtis-flash");
       } else if (specialVariant === "phenom-the-abyss") {
         flashEl.classList.add("is-abyss-flash");
       } else if (specialVariant === "phenom-lycia-void") {
@@ -8645,6 +10228,8 @@
                 <div class="tgc-preview-select-row">
                   <div class="tgc-select-wrap">
                     <select class="tgc-tier-select" data-tier-select="${lvl}">
+                      <option value="char-38">🐉 拉格提斯〔弒神狂龍・巨龍與大劍〕</option>
+                      <option value="char-21">🌿 萊夫維芙〔生意盎然・原初生命女神〕</option>
                       <option value="char-13">☀️ 迪米諾拉 赫墨拉〔烈陽風格・日耀女神〕</option>
                       <option value="char-12">🌙 尤諾拉 倪克斯〔月亮與星空・黑夜女神〕</option>
                       <option value="char-32">🪰 別西卜 阿斯拉 撒旦〔暴食血紅・群蠅暴虐〕</option>
@@ -8662,10 +10247,16 @@
                 </div>
                 <details class="tgc-preview-accordion">
                   <summary class="tgc-preview-accordion-summary">
-                    <span>📋 展開/收合所有按鈕選單（共 8 款）</span>
+                    <span>📋 展開/收合所有按鈕選單（共 10 款）</span>
                     <span class="tgc-accordion-chevron">▾</span>
                   </summary>
                   <div class="tgc-special-previews is-grid">
+                    <button type="button" class="tgc-preview-btn is-ragtis-btn" data-preview-char-id="char-38">
+                      <span>🐉 試播：拉格提斯〔弒神狂龍・巨龍與大劍〕</span>
+                    </button>
+                    <button type="button" class="tgc-preview-btn is-lifeweaver-btn" data-preview-char-id="char-21">
+                      <span>🌿 試播：萊夫維芙〔生意盎然・原初生命女神〕</span>
+                    </button>
                     <button type="button" class="tgc-preview-btn is-hemera-btn" data-preview-char-id="char-13">
                       <span>☀️ 試播：迪米諾拉 赫墨拉〔烈陽風格・日耀女神〕</span>
                     </button>
@@ -8849,19 +10440,24 @@
       });
     });
 
-    // Search input
+    // Search input (debounced for 60fps responsiveness)
+    let searchDebounceTimer = null;
     if (searchInput) {
       searchInput.addEventListener("input", (e) => {
-        dexSearchQuery = (e.target.value || "").trim().toLowerCase();
-        if (clearSearchBtn) {
-          clearSearchBtn.classList.toggle("hidden", dexSearchQuery.length === 0);
-        }
-        renderCharacterDexModal();
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+          dexSearchQuery = (e.target.value || "").trim().toLowerCase();
+          if (clearSearchBtn) {
+            clearSearchBtn.classList.toggle("hidden", dexSearchQuery.length === 0);
+          }
+          renderCharacterDexModal();
+        }, 120);
       });
     }
 
     if (clearSearchBtn && searchInput) {
       clearSearchBtn.addEventListener("click", () => {
+        clearTimeout(searchDebounceTimer);
         dexSearchQuery = "";
         searchInput.value = "";
         clearSearchBtn.classList.add("hidden");
@@ -9015,7 +10611,7 @@
             <div class="dex-card-avatar-wrap">
               ${
                 thumb
-                  ? `<img src="${esc(thumb)}" alt="${esc(c.name)}" loading="lazy" />`
+                  ? `<img src="${esc(thumb)}" alt="${esc(c.name)}" loading="lazy" decoding="async" />`
                   : `<div class="dex-card-placeholder-sym">${esc(tier.code)}</div>`
               }
               ${
