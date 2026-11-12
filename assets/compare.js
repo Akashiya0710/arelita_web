@@ -2513,7 +2513,7 @@
   }
 
   function applyCompareTheme(theme) {
-    const valid = ["ocean", "beach", "worldtree", "starry", "dark", "light"];
+    const valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
     compareState.theme = valid.includes(theme) ? theme : "ocean";
     document.documentElement.setAttribute("data-theme", compareState.theme);
     localStorage.setItem("arelita_theme", compareState.theme);
@@ -2527,6 +2527,9 @@
       } else if (compareState.theme === "beach") {
         iconEl.textContent = "🏖️";
         textEl.textContent = "假日海灘";
+      } else if (compareState.theme === "bubble") {
+        iconEl.textContent = "🌸";
+        textEl.textContent = "粉紅櫻花";
       } else if (compareState.theme === "worldtree") {
         iconEl.textContent = "🌳";
         textEl.textContent = "世界樹版";
@@ -2540,6 +2543,13 @@
         iconEl.textContent = "☀️";
         textEl.textContent = "白色版本";
       }
+    }
+
+    const wrap = document.getElementById("compareThemeSelectWrap");
+    if (wrap) {
+      wrap.querySelectorAll(".theme-option-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.themeVal === compareState.theme);
+      });
     }
   }
 
@@ -2677,18 +2687,48 @@
       });
     }
 
+    const themeWrap = document.getElementById("compareThemeSelectWrap");
     const themeBtn = document.getElementById("compareThemeToggleBtn");
-    if (themeBtn) {
-      themeBtn.addEventListener("click", () => {
-        const nextMap = {
-          ocean: "beach",
-          beach: "worldtree",
-          worldtree: "starry",
-          starry: "dark",
-          dark: "light",
-          light: "ocean"
-        };
-        applyCompareTheme(nextMap[compareState.theme] || "ocean");
+    const themeDropdown = document.getElementById("compareThemeDropdown");
+
+    function closeCompareThemeDropdown() {
+      if (themeDropdown) themeDropdown.classList.add("hidden");
+      if (themeWrap) themeWrap.classList.remove("is-open");
+      if (themeBtn) themeBtn.setAttribute("aria-expanded", "false");
+    }
+
+    if (themeBtn && themeDropdown) {
+      themeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = !themeDropdown.classList.contains("hidden");
+        if (isOpen) {
+          closeCompareThemeDropdown();
+        } else {
+          themeDropdown.classList.remove("hidden");
+          if (themeWrap) themeWrap.classList.add("is-open");
+          themeBtn.setAttribute("aria-expanded", "true");
+        }
+      });
+
+      themeDropdown.querySelectorAll(".theme-option-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const targetTheme = btn.dataset.themeVal;
+          if (targetTheme) {
+            applyCompareTheme(targetTheme);
+          }
+          closeCompareThemeDropdown();
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (themeWrap && !themeWrap.contains(e.target)) {
+          closeCompareThemeDropdown();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeCompareThemeDropdown();
       });
     }
 

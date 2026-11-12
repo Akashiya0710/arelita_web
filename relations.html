@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="ocean">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>亞雷利塔・角色關係全景圖譜｜官方世界觀檔案庫</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="shortcut icon" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap"
+    rel="stylesheet"
+  />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("arelita_theme");
+        var valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
+        var theme = valid.indexOf(saved) !== -1 ? saved : "ocean";
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="stylesheet" href="assets/relations.css" />
+</head>
+<body class="relations-page-body">
+  <!-- Decorative Grid & Graphic Layer -->
+  <div class="bg-grid-overlay" aria-hidden="true"></div>
+  <div class="bg-graphic-layer" aria-hidden="true">
+    <div class="bg-orb bg-orb-gold"></div>
+    <div class="bg-orb bg-orb-blue"></div>
+    <div class="bg-watermark-text">ARELITA // RELATIONS</div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header compare-site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand" title="返回亞雷利塔主檔案庫">
+        <div class="brand-emblem">
+          <span class="emblem-diamond">🧬</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
+            <span>亞雷利塔・角色關係全景圖譜</span>
+            <span class="brand-sub-en">ALL-CHARACTER RELATIONSHIP ATLAS</span>
+          </div>
+          <div class="brand-subtitle">175 位角色人際星網・魔風聯邦軍政階層・極真圃與世界宿命盟怨</div>
+        </div>
+      </a>
+
+      <!-- Quick Nav Links -->
+      <div class="compare-header-controls">
+        <div class="relations-header-tabs">
+          <button type="button" class="rel-tab-btn active" data-view="graph">
+            <span>🌌</span>
+            <span>人際星網圖</span>
+          </button>
+          <button type="button" class="rel-tab-btn" data-view="tree">
+            <span>👑</span>
+            <span>魔風軍政階層</span>
+          </button>
+          <button type="button" class="rel-tab-btn" data-view="matrix">
+            <span>📋</span>
+            <span>關係檢索總表</span>
+          </button>
+        </div>
+
+        <a href="index.html" class="compare-action-btn" title="回檔案庫主頁">
+          <span>🏛️</span>
+          <span>主頁</span>
+        </a>
+        <a href="compare.html" class="compare-action-btn" title="雙角色能力對比">
+          <span>⚖️</span>
+          <span>對比</span>
+        </a>
+        <a href="tierlist.html" class="compare-action-btn" title="自訂戰力 Tier List">
+          <span>🏆</span>
+          <span>排行</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="relations-main-container">
+    <!-- VIEW 1: DYNAMIC FORCE-DIRECTED GRAPH -->
+    <section id="view-graph" class="rel-view-panel active">
+      <div class="graph-viewport-wrap">
+        <canvas id="relationsCanvas"></canvas>
+
+        <!-- Floating Graph Toolbar -->
+        <div class="graph-floating-bar">
+          <div class="graph-bar-left">
+            <input type="text" id="graphSearchInput" class="graph-search-input" placeholder="🔍 搜尋角色定位..." />
+            <select id="graphRealmFilter" class="graph-select-filter">
+              <option value="all">🌍 全部界域</option>
+              <option value="現界">現界</option>
+              <option value="魔界">魔界</option>
+              <option value="天界">天界</option>
+              <option value="冥界">冥界</option>
+              <option value="其他">其他 / 神明</option>
+            </select>
+            <select id="graphRelFilter" class="graph-select-filter">
+              <option value="all">🔗 全部關係類型</option>
+              <option value="family">🩸 血緣親族</option>
+              <option value="superior">👑 主從統御</option>
+              <option value="comrade">🛡️ 同袍軍團</option>
+              <option value="ally">🤝 摯友盟友</option>
+              <option value="rival">⚔️ 宿敵對立</option>
+              <option value="romance">❤️ 戀愛伴侶</option>
+              <option value="master">🎓 師承造化</option>
+            </select>
+            <button type="button" class="graph-tool-btn" id="btnZoomIn" title="放大">➕</button>
+            <button type="button" class="graph-tool-btn" id="btnZoomOut" title="縮小">➖</button>
+            <button type="button" class="graph-tool-btn" id="btnResetGraph" title="重設視角">↺ 置中重整</button>
+          </div>
+          <div class="graph-bar-right">
+            <span style="font-size:0.8rem; color:#94a3b8;">💡 提示：點擊任意角色節點展開個人完整人際檔案，滾輪自由縮放</span>
+          </div>
+        </div>
+
+        <!-- Graph Legend Overlay -->
+        <div class="graph-legend-bottom">
+          <div class="legend-row">
+            <span style="font-weight:700; color:#e2e8f0; margin-right:0.3rem;">界域節點：</span>
+            <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> 現界</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span> 魔界</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#eab308;"></span> 天界</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#06b6d4;"></span> 冥界</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ec4899;"></span> 幻想界</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#f43f5e;"></span> 外界/神明</div>
+          </div>
+          <div class="legend-row" style="margin-top:0.4rem;">
+            <span style="font-weight:700; color:#e2e8f0; margin-right:0.3rem;">關係色標：</span>
+            <div class="legend-item"><span class="legend-line" style="background:var(--rel-family-color);"></span> 血緣宗親</div>
+            <div class="legend-item"><span class="legend-line" style="background:var(--rel-superior-color);"></span> 主從軍令</div>
+            <div class="legend-item"><span class="legend-line" style="background:var(--rel-comrade-color);"></span> 同袍戰友</div>
+            <div class="legend-item"><span class="legend-line" style="background:var(--rel-ally-color);"></span> 摯友同盟</div>
+            <div class="legend-item"><span class="legend-line" style="background:var(--rel-rival-color);"></span> 宿敵對立</div>
+            <div class="legend-item"><span class="legend-line" style="background:var(--rel-romance-color);"></span> 戀愛伴侶</div>
+            <div class="legend-item"><span class="legend-line" style="background:var(--rel-master-color);"></span> 師徒傳承</div>
+          </div>
+        </div>
+
+        <!-- Side Drawer: Character Dossier -->
+        <aside class="rel-dossier-drawer" id="dossierDrawer">
+          <div class="dossier-header">
+            <div>
+              <h2 class="dossier-char-name" id="dossierName">角色名稱</h2>
+              <div class="dossier-char-title" id="dossierTitle">稱號頭銜</div>
+            </div>
+            <button type="button" class="dossier-close-btn" id="drawerCloseBtn" title="關閉">✕</button>
+          </div>
+          <div class="dossier-body">
+            <div class="dossier-avatar-row">
+              <div class="dossier-avatar-frame" id="dossierAvatar"></div>
+              <div class="dossier-meta-badges" id="dossierBadges"></div>
+            </div>
+
+            <div>
+              <div class="dossier-section-title"><span>🔗</span> 核心人物人際關係網</div>
+              <div class="dossier-relation-list" id="dossierRelationsList" style="margin-top:0.6rem;"></div>
+            </div>
+
+            <div>
+              <div class="dossier-section-title"><span>📜</span> 原著背景與宿命故事摘錄</div>
+              <div class="dossier-story-box" id="dossierStory" style="margin-top:0.6rem;"></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- VIEW 2: FEDERAL HIERARCHY TREE -->
+    <section id="view-tree" class="rel-view-panel">
+      <div class="tree-view-wrap" id="treeViewContent"></div>
+    </section>
+
+    <!-- VIEW 3: MATRIX SEARCH TABLE -->
+    <section id="view-matrix" class="rel-view-panel">
+      <div class="matrix-view-wrap">
+        <div class="matrix-search-header">
+          <input type="text" id="matrixSearchInput" class="graph-search-input" style="width: 320px;" placeholder="🔍 即時搜尋全 175 位角色姓名、陣營或稱號..." />
+          <span style="font-size:0.85rem; color:#94a3b8;">點擊表格中任意角色或關係標籤，即可快速檢視詳情或定位於星網圖中。</span>
+        </div>
+        <div class="matrix-table-wrap">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>角色姓名</th>
+                <th>界域 / 陣營 / 部隊</th>
+                <th>戰力階級</th>
+                <th>核心人際連繫</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="matrixTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="assets/relations_data.js"></script>
+  <script src="assets/relations.js"></script>
+</body>
+</html>

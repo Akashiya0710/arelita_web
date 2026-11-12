@@ -1391,6 +1391,96 @@
     }
   }
 
+  // ==================== THEME CONTROLS ====================
+  function applyTierlistTheme(theme) {
+    const valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
+    const activeTheme = valid.includes(theme) ? theme : "ocean";
+    document.documentElement.setAttribute("data-theme", activeTheme);
+    localStorage.setItem("arelita_theme", activeTheme);
+
+    const iconEl = document.getElementById("tierlistThemeIcon");
+    const textEl = document.getElementById("tierlistThemeText");
+    if (iconEl && textEl) {
+      if (activeTheme === "ocean") {
+        iconEl.textContent = "🌊";
+        textEl.textContent = "夏日海洋";
+      } else if (activeTheme === "beach") {
+        iconEl.textContent = "🏖️";
+        textEl.textContent = "假日海灘";
+      } else if (activeTheme === "bubble") {
+        iconEl.textContent = "🌸";
+        textEl.textContent = "粉紅櫻花";
+      } else if (activeTheme === "worldtree") {
+        iconEl.textContent = "🌳";
+        textEl.textContent = "世界樹版";
+      } else if (activeTheme === "starry") {
+        iconEl.textContent = "🌌";
+        textEl.textContent = "星空版本";
+      } else if (activeTheme === "dark") {
+        iconEl.textContent = "🌙";
+        textEl.textContent = "黑色版本";
+      } else {
+        iconEl.textContent = "☀️";
+        textEl.textContent = "白色版本";
+      }
+    }
+
+    const wrap = document.getElementById("tierlistThemeSelectWrap");
+    if (wrap) {
+      wrap.querySelectorAll(".theme-option-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.themeVal === activeTheme);
+      });
+    }
+  }
+
+  function initThemeControl() {
+    const themeWrap = document.getElementById("tierlistThemeSelectWrap");
+    const themeBtn = document.getElementById("tierlistThemeToggleBtn");
+    const themeDropdown = document.getElementById("tierlistThemeDropdown");
+
+    function closeTierlistThemeDropdown() {
+      if (themeDropdown) themeDropdown.classList.add("hidden");
+      if (themeWrap) themeWrap.classList.remove("is-open");
+      if (themeBtn) themeBtn.setAttribute("aria-expanded", "false");
+    }
+
+    if (themeBtn && themeDropdown) {
+      themeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = !themeDropdown.classList.contains("hidden");
+        if (isOpen) {
+          closeTierlistThemeDropdown();
+        } else {
+          themeDropdown.classList.remove("hidden");
+          if (themeWrap) themeWrap.classList.add("is-open");
+          themeBtn.setAttribute("aria-expanded", "true");
+        }
+      });
+
+      themeDropdown.querySelectorAll(".theme-option-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const targetTheme = btn.dataset.themeVal;
+          if (targetTheme) {
+            applyTierlistTheme(targetTheme);
+          }
+          closeTierlistThemeDropdown();
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (themeWrap && !themeWrap.contains(e.target)) {
+          closeTierlistThemeDropdown();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeTierlistThemeDropdown();
+      });
+    }
+    applyTierlistTheme(localStorage.getItem("arelita_theme") || "ocean");
+  }
+
   // ==================== TOOLBAR & CONTROLS BINDING ====================
   function bindToolbarControls() {
     // ⚡ 一鍵官方戰力
@@ -1507,6 +1597,9 @@
 
     // Custom Editable Title
     initCustomTitle();
+
+    // Theme Toggle Control
+    initThemeControl();
 
     // Pool section dropzone (allow dragging characters back to pool)
     const poolSection = document.getElementById("unrankedPoolSection");

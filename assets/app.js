@@ -3194,7 +3194,7 @@
 
   // ==================== THEME & SCROLL CONTROLS ====================
   function applyTheme(theme) {
-    const validThemes = ["ocean", "beach", "worldtree", "starry", "dark", "light"];
+    const validThemes = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
     state.theme = validThemes.includes(theme) ? theme : "ocean";
     document.documentElement.setAttribute("data-theme", state.theme);
     localStorage.setItem("arelita_theme", state.theme);
@@ -3208,6 +3208,9 @@
       } else if (state.theme === "beach") {
         iconEl.textContent = "🏖️";
         textEl.textContent = "假日海灘";
+      } else if (state.theme === "bubble") {
+        iconEl.textContent = "🌸";
+        textEl.textContent = "粉紅櫻花";
       } else if (state.theme === "worldtree") {
         iconEl.textContent = "🌳";
         textEl.textContent = "世界樹版";
@@ -3222,45 +3225,95 @@
         textEl.textContent = "白色版本";
       }
     }
+
+    // Update active highlight in theme dropdown menu
+    document.querySelectorAll(".theme-option-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.themeVal === state.theme);
+    });
   }
 
   // ==================== EVENT LISTENERS ====================
   function initEventListeners() {
-    // Theme toggle button (Summer Ocean / Beach / World Tree / Starry / Dark / Light mode cycle)
+    // Theme Dropdown Selector (條列式風格版本選單)
+    const themeSelectWrap = document.getElementById("themeSelectWrap");
     const themeToggleBtn = document.getElementById("themeToggleBtn");
-    if (themeToggleBtn) {
-      themeToggleBtn.addEventListener("click", () => {
-        const nextMap = {
-          ocean: "beach",
-          beach: "worldtree",
-          worldtree: "starry",
-          starry: "dark",
-          dark: "light",
-          light: "ocean",
-        };
-        const nextTheme = nextMap[state.theme] || "ocean";
-        applyTheme(nextTheme);
-        runIntroSplash({ theme: nextTheme, isThemeSwitch: true });
+    const themeDropdown = document.getElementById("themeDropdownMenu");
 
-        // Auto-harmonize default BGM soundtrack with matching theme
-        if (nextTheme === "beach") {
-          bgmSystem.track = "beach";
-          localStorage.setItem("arelita_bgm_track", "beach");
-          updateBgmUI();
-          if (bgmSystem.isPlaying) startBgmScheduler();
-        } else if (nextTheme === "worldtree") {
-          bgmSystem.track = "harp";
-          localStorage.setItem("arelita_bgm_track", "harp");
-          updateBgmUI();
-          if (bgmSystem.isPlaying) startBgmScheduler();
-        } else if (nextTheme === "starry") {
-          bgmSystem.track = "astral";
-          localStorage.setItem("arelita_bgm_track", "astral");
-          updateBgmUI();
-          if (bgmSystem.isPlaying) startBgmScheduler();
-        }
-      });
+    function closeThemeDropdown() {
+      if (themeDropdown) themeDropdown.classList.add("hidden");
+      if (themeSelectWrap) themeSelectWrap.classList.remove("is-open");
+      if (themeToggleBtn) themeToggleBtn.setAttribute("aria-expanded", "false");
     }
+
+    function toggleThemeDropdown(e) {
+      if (e) e.stopPropagation();
+      if (!themeDropdown) return;
+      const isOpen = !themeDropdown.classList.contains("hidden");
+      if (isOpen) {
+        closeThemeDropdown();
+      } else {
+        themeDropdown.classList.remove("hidden");
+        if (themeSelectWrap) themeSelectWrap.classList.add("is-open");
+        if (themeToggleBtn) themeToggleBtn.setAttribute("aria-expanded", "true");
+        // Close BGM popover if open
+        const bgmPop = document.getElementById("bgmPopover");
+        if (bgmPop) bgmPop.classList.add("hidden");
+      }
+    }
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener("click", toggleThemeDropdown);
+    }
+
+    // Theme option items click
+    document.querySelectorAll(".theme-option-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const targetTheme = btn.dataset.themeVal;
+        if (targetTheme && targetTheme !== state.theme) {
+          applyTheme(targetTheme);
+          runIntroSplash({ theme: targetTheme, isThemeSwitch: true });
+
+          // Auto-harmonize default BGM soundtrack with matching theme
+          if (targetTheme === "beach") {
+            bgmSystem.track = "beach";
+            localStorage.setItem("arelita_bgm_track", "beach");
+            updateBgmUI();
+            if (bgmSystem.isPlaying) startBgmScheduler();
+          } else if (targetTheme === "bubble") {
+            bgmSystem.track = "harp";
+            localStorage.setItem("arelita_bgm_track", "harp");
+            updateBgmUI();
+            if (bgmSystem.isPlaying) startBgmScheduler();
+          } else if (targetTheme === "worldtree") {
+            bgmSystem.track = "harp";
+            localStorage.setItem("arelita_bgm_track", "harp");
+            updateBgmUI();
+            if (bgmSystem.isPlaying) startBgmScheduler();
+          } else if (targetTheme === "starry") {
+            bgmSystem.track = "astral";
+            localStorage.setItem("arelita_bgm_track", "astral");
+            updateBgmUI();
+            if (bgmSystem.isPlaying) startBgmScheduler();
+          }
+        }
+        closeThemeDropdown();
+      });
+    });
+
+    // Close dropdown on click outside
+    document.addEventListener("click", (e) => {
+      if (themeSelectWrap && !themeSelectWrap.contains(e.target)) {
+        closeThemeDropdown();
+      }
+    });
+
+    // Close dropdown on Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeThemeDropdown();
+      }
+    });
 
     // Floating header shadow & Back-to-top button visibility on scroll
     const siteHeader = document.getElementById("siteHeader");
@@ -3461,6 +3514,17 @@
       stage2: (s) => `SURFING ${s} TROPICAL BREEZE CHRONICLES...`,
       stage3: "BEACH RESORT ONLINE // 陽光海灘度假領域展開",
     },
+    bubble: {
+      badge: "🌸 SWEET PINK SAKURA // 夢幻粉紅櫻花領域",
+      kicker: "SAKURA RESONANCE // AWAKENING DREAMY PINK SAKURA REALM",
+      subtitle: "DREAMY PASTEL PINK, SAKURA PETALS & SWEET BLOSSOMS ARCHIVE",
+      telemetryLeft: "SWEETNESS // 100% SAKURA HARMONIC RESONANCE",
+      telemetryRight: "💖 SFX: SAKURA CELESTE & BUBBLE POPPING CHIMES",
+      coreSvg: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 28s-9-6.5-11.5-11.5C2.5 12 5.5 6 11 6c3 0 5 2.5 5 2.5S18 6 21 6c5.5 0 8.5 6 6.5 10.5C25 21.5 16 28 16 28z"/><circle cx="24" cy="6" r="3"/><circle cx="7" cy="22" r="2.5"/></svg>`,
+      stage1: (c) => `BREWING ${c} SWEET SAKURA DOSSIERS...`,
+      stage2: (s) => `BLOSSOMING ${s} DREAMY PINK CHRONICLES...`,
+      stage3: "PINK SAKURA REALM ONLINE // 夢幻粉紅櫻花領域展開",
+    },
     worldtree: {
       badge: "🌳 SACRED YGGDRASIL // 世界樹領域",
       kicker: "ROOT CONVERGENCE // AWAKENING YGGDRASIL CANOPY",
@@ -3652,6 +3716,30 @@
             type: "triangle",
             gain: 0.02,
             attack: 0.005,
+          });
+        });
+      } else if (theme === "bubble") {
+        // 🌸 Bubble: Sweet sparkling music box / celeste arpeggio + gentle bubble "bloop" pops
+        playToneHelper(ctx, master, 1200, now, 0.45, {
+          type: "sine",
+          endFreq: 2400,
+          gain: 0.045,
+          attack: 0.01,
+        });
+        // Bubble pop "bloops" (rapid upward pitch glides simulating bubbles forming and popping)
+        [587.33, 783.99, 880.0, 1046.5, 1318.51, 1567.98].forEach((f, idx) => {
+          const t = now + 0.04 + idx * 0.07;
+          playToneHelper(ctx, master, f, t, 0.28, {
+            type: "sine",
+            endFreq: f * 1.25,
+            gain: 0.065,
+            attack: 0.005,
+          });
+          // Sweet music-box harmonic overtone
+          playToneHelper(ctx, master, f * 2, t + 0.01, 0.45, {
+            type: "triangle",
+            gain: 0.035,
+            attack: 0.006,
           });
         });
       } else if (theme === "worldtree") {

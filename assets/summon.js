@@ -10658,7 +10658,7 @@
 
   // ==================== HEADER & THEME ACTIONS ====================
   function applySummonTheme(theme) {
-    const valid = ["ocean", "beach", "worldtree", "starry", "dark", "light"];
+    const valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
     summonState.theme = valid.includes(theme) ? theme : "ocean";
     document.documentElement.setAttribute("data-theme", summonState.theme);
     localStorage.setItem("arelita_theme", summonState.theme);
@@ -10672,6 +10672,9 @@
       } else if (summonState.theme === "beach") {
         iconEl.textContent = "🏖️";
         textEl.textContent = "假日海灘";
+      } else if (summonState.theme === "bubble") {
+        iconEl.textContent = "🌸";
+        textEl.textContent = "粉紅櫻花";
       } else if (summonState.theme === "worldtree") {
         iconEl.textContent = "🌳";
         textEl.textContent = "世界樹版";
@@ -10685,6 +10688,13 @@
         iconEl.textContent = "☀️";
         textEl.textContent = "白色版本";
       }
+    }
+
+    const wrap = document.getElementById("summonThemeSelectWrap");
+    if (wrap) {
+      wrap.querySelectorAll(".theme-option-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.themeVal === summonState.theme);
+      });
     }
   }
 
@@ -10765,18 +10775,48 @@
       });
     }
 
+    const themeWrap = document.getElementById("summonThemeSelectWrap");
     const themeBtn = document.getElementById("summonThemeToggleBtn");
-    if (themeBtn) {
-      themeBtn.addEventListener("click", () => {
-        const nextMap = {
-          ocean: "beach",
-          beach: "worldtree",
-          worldtree: "starry",
-          starry: "dark",
-          dark: "light",
-          light: "ocean"
-        };
-        applySummonTheme(nextMap[summonState.theme] || "ocean");
+    const themeDropdown = document.getElementById("summonThemeDropdown");
+
+    function closeSummonThemeDropdown() {
+      if (themeDropdown) themeDropdown.classList.add("hidden");
+      if (themeWrap) themeWrap.classList.remove("is-open");
+      if (themeBtn) themeBtn.setAttribute("aria-expanded", "false");
+    }
+
+    if (themeBtn && themeDropdown) {
+      themeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = !themeDropdown.classList.contains("hidden");
+        if (isOpen) {
+          closeSummonThemeDropdown();
+        } else {
+          themeDropdown.classList.remove("hidden");
+          if (themeWrap) themeWrap.classList.add("is-open");
+          themeBtn.setAttribute("aria-expanded", "true");
+        }
+      });
+
+      themeDropdown.querySelectorAll(".theme-option-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const targetTheme = btn.dataset.themeVal;
+          if (targetTheme) {
+            applySummonTheme(targetTheme);
+          }
+          closeSummonThemeDropdown();
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (themeWrap && !themeWrap.contains(e.target)) {
+          closeSummonThemeDropdown();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeSummonThemeDropdown();
       });
     }
 

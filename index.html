@@ -14,13 +14,13 @@
           localStorage.setItem("arelita_ocean_init", "1");
         }
         var saved = localStorage.getItem("arelita_theme");
-        if (saved === "light" || saved === "dark" || saved === "starry" || saved === "worldtree" || saved === "ocean" || saved === "beach") {
+        if (saved === "light" || saved === "dark" || saved === "starry" || saved === "worldtree" || saved === "ocean" || saved === "beach" || saved === "bubble") {
           document.documentElement.setAttribute("data-theme", saved);
         }
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="stylesheet" href="assets/styles.css?v=20261111_theme_fix" />
 </head>
 <body class="is-loading">
   <!-- Game-Portal Opening Intro Animation Overlay -->
@@ -80,6 +80,12 @@
         <span class="intro-prism p-2"></span>
         <span class="intro-prism p-3"></span>
         <span class="intro-prism p-4"></span>
+      </div>
+      <div class="intro-fx-bubble">
+        <div class="intro-bubble-glow"></div>
+        <span class="intro-pb pb-1"></span>
+        <span class="intro-pb pb-2"></span>
+        <span class="intro-pb pb-3"></span>
       </div>
     </div>
 
@@ -365,6 +371,46 @@
       <span class="beach-sparkle sp-7"></span>
     </div>
 
+    <!-- Pink Sakura Layer (粉紅櫻花版本專屬背景：夢幻浮動泡泡、粉櫻光暈與愛心星芒) -->
+    <div class="pink-bubble-layer">
+      <div class="pb-ambient-glow"></div>
+      
+      <!-- Rising Iridescent Pink Bubbles -->
+      <span class="pink-bubble pb-1"></span>
+      <span class="pink-bubble pb-2"></span>
+      <span class="pink-bubble pb-3"></span>
+      <span class="pink-bubble pb-4"></span>
+      <span class="pink-bubble pb-5"></span>
+      <span class="pink-bubble pb-6"></span>
+      <span class="pink-bubble pb-7"></span>
+      <span class="pink-bubble pb-8"></span>
+      <span class="pink-bubble pb-9"></span>
+      <span class="pink-bubble pb-10"></span>
+      <span class="pink-bubble pb-11"></span>
+      <span class="pink-bubble pb-12"></span>
+      <span class="pink-bubble pb-13"></span>
+      <span class="pink-bubble pb-14"></span>
+      <span class="pink-bubble pb-15"></span>
+
+      <!-- Floating Dreamy Hearts -->
+      <span class="pink-heart ph-1">💖</span>
+      <span class="pink-heart ph-2">💕</span>
+      <span class="pink-heart ph-3">🌸</span>
+      <span class="pink-heart ph-4">💖</span>
+      <span class="pink-heart ph-5">✨</span>
+      <span class="pink-heart ph-6">💕</span>
+
+      <!-- Twinkling Sparkles -->
+      <span class="pink-sparkle ps-1"></span>
+      <span class="pink-sparkle ps-2"></span>
+      <span class="pink-sparkle ps-3"></span>
+      <span class="pink-sparkle ps-4"></span>
+      <span class="pink-sparkle ps-5"></span>
+      <span class="pink-sparkle ps-6"></span>
+      <span class="pink-sparkle ps-7"></span>
+      <span class="pink-sparkle ps-8"></span>
+    </div>
+
     <div class="bg-watermark-text">ARELITA // CHRONICLES</div>
     <svg class="bg-astrolabe" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="300" cy="300" r="260" stroke="currentColor" stroke-width="1" stroke-dasharray="6 8" />
@@ -478,11 +524,75 @@
           <audio id="bgmCustomAudio" loop preload="auto"></audio>
         </div>
 
-        <!-- Summer Ocean / World Tree / Starry / Dark / Light Theme Switcher -->
-        <button id="themeToggleBtn" class="theme-toggle-btn" title="點擊切換：夏日海洋／世界樹版／星空版本／黑色版本／白色版本" aria-label="切換網頁主題版本">
-          <span class="theme-icon" id="themeToggleIcon">🌊</span>
-          <span class="theme-text" id="themeToggleText">夏日海洋</span>
-        </button>
+        <!-- Theme Selector with Dropdown Menu (條列式風格版本選單) -->
+        <div class="theme-select-wrap" id="themeSelectWrap">
+          <button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false" title="挑選風格版本" aria-label="挑選風格版本">
+            <span class="theme-icon" id="themeToggleIcon">🌊</span>
+            <span class="theme-text" id="themeToggleText">夏日海洋</span>
+            <span class="theme-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="theme-dropdown-menu hidden" id="themeDropdownMenu" role="menu" aria-label="風格版本選單">
+            <div class="theme-dropdown-header">風格版本挑選 // SELECT THEME</div>
+            <div class="theme-dropdown-list">
+              <button type="button" class="theme-option-btn" data-theme-val="ocean" role="menuitem">
+                <span class="theme-opt-icon">🌊</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">夏日海洋</span>
+                  <span class="theme-opt-desc">晴空碧海・珍珠水波</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="beach" role="menuitem">
+                <span class="theme-opt-icon">🏖️</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">假日海灘</span>
+                  <span class="theme-opt-desc">陽光沙灘・椰林漫步</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="bubble" role="menuitem">
+                <span class="theme-opt-icon">🌸</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">粉紅櫻花</span>
+                  <span class="theme-opt-desc">夢幻粉櫻・草莓糖霜</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="worldtree" role="menuitem">
+                <span class="theme-opt-icon">🌳</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">世界樹版</span>
+                  <span class="theme-opt-desc">世界命根・生命琥珀</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="starry" role="menuitem">
+                <span class="theme-opt-icon">🌌</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">星空版本</span>
+                  <span class="theme-opt-desc">星穹夜空・璀璨流星</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="dark" role="menuitem">
+                <span class="theme-opt-icon">🌙</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">黑色版本</span>
+                  <span class="theme-opt-desc">永夜黑曜・深黑之蝕</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="light" role="menuitem">
+                <span class="theme-opt-icon">☀️</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">白色版本</span>
+                  <span class="theme-opt-desc">聖潔白晝・晨曦之光</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -722,6 +832,16 @@
             <h3 class="hf-title">亞雷利塔全角色 Tier list（獨立自訂排名分頁）</h3>
             <p class="hf-desc">開啟獨立新分頁的自訂 Tier List 排行系統。支援點擊標題自由改名（戰力／顏值／喜好度隨心訂）、提供「標準字母 SS～F」與「狂野稱號 屌炸天～拉完了」雙版本自由切換、支援拖曳排位、一鍵官方套用與高清圖片匯出。</p>
             <div class="hf-link">開啟全角色 Tier list 分頁 ↗</div>
+          </a>
+
+          <a href="relations.html" target="_blank" rel="noopener" class="home-feature-card home-feature-compare">
+            <div class="hf-top">
+              <span class="hf-icon">🧬</span>
+              <span class="hf-code">09 // RELATIONSHIP ATLAS</span>
+            </div>
+            <h3 class="hf-title">角色關係全景圖譜（獨立互動圖表分頁）</h3>
+            <p class="hf-desc">開啟獨立新分頁的角色人際關係星圖與血脈圖譜。支援全 175 位角色動態力導向星網、十四大傳奇宗族血脈樹、魔風聯邦軍政最高階層樹、世界宿敵與盟約分析、雙向檢索速查表，並支援點擊任意角色直觀檢視個人完整人際羈絆檔案。</p>
+            <div class="hf-link">開啟角色關係圖譜分頁 ↗</div>
           </a>
         </div>
       </div>

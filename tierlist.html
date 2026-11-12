@@ -19,13 +19,13 @@
     (function () {
       try {
         var saved = localStorage.getItem("arelita_theme");
-        var valid = ["ocean", "beach", "worldtree", "starry", "dark", "light"];
+        var valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
         var theme = valid.indexOf(saved) !== -1 ? saved : "ocean";
         document.documentElement.setAttribute("data-theme", theme);
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="assets/styles.css?v=20261110_tierlist" />
+  <link rel="stylesheet" href="assets/styles.css?v=20261111_theme_fix" />
 </head>
 <body class="compare-page-body tierlist-page-body">
   <!-- Decorative Game-Portal Background Grid & Ambient Orbs -->
@@ -56,6 +56,46 @@
       <span class="beach-sparkle sp-2"></span>
       <span class="beach-sparkle sp-3"></span>
       <span class="beach-sparkle sp-4"></span>
+    </div>
+
+    <!-- Pink Sakura Layer (粉紅櫻花版本專屬背景：夢幻浮動泡泡、粉櫻光暈與愛心星芒) -->
+    <div class="pink-bubble-layer">
+      <div class="pb-ambient-glow"></div>
+      
+      <!-- Rising Iridescent Pink Bubbles -->
+      <span class="pink-bubble pb-1"></span>
+      <span class="pink-bubble pb-2"></span>
+      <span class="pink-bubble pb-3"></span>
+      <span class="pink-bubble pb-4"></span>
+      <span class="pink-bubble pb-5"></span>
+      <span class="pink-bubble pb-6"></span>
+      <span class="pink-bubble pb-7"></span>
+      <span class="pink-bubble pb-8"></span>
+      <span class="pink-bubble pb-9"></span>
+      <span class="pink-bubble pb-10"></span>
+      <span class="pink-bubble pb-11"></span>
+      <span class="pink-bubble pb-12"></span>
+      <span class="pink-bubble pb-13"></span>
+      <span class="pink-bubble pb-14"></span>
+      <span class="pink-bubble pb-15"></span>
+
+      <!-- Floating Dreamy Hearts -->
+      <span class="pink-heart ph-1">💖</span>
+      <span class="pink-heart ph-2">💕</span>
+      <span class="pink-heart ph-3">🌸</span>
+      <span class="pink-heart ph-4">💖</span>
+      <span class="pink-heart ph-5">✨</span>
+      <span class="pink-heart ph-6">💕</span>
+
+      <!-- Twinkling Sparkles -->
+      <span class="pink-sparkle ps-1"></span>
+      <span class="pink-sparkle ps-2"></span>
+      <span class="pink-sparkle ps-3"></span>
+      <span class="pink-sparkle ps-4"></span>
+      <span class="pink-sparkle ps-5"></span>
+      <span class="pink-sparkle ps-6"></span>
+      <span class="pink-sparkle ps-7"></span>
+      <span class="pink-sparkle ps-8"></span>
     </div>
     <div class="bg-watermark-text">ARELITA // TIER LIST</div>
   </div>
@@ -102,17 +142,81 @@
           <span>📷</span>
           <span>匯出為圖片</span>
         </button>
+        <div class="theme-select-wrap" id="tierlistThemeSelectWrap">
+          <button type="button" id="tierlistThemeToggleBtn" class="theme-toggle-btn" aria-haspopup="true" aria-expanded="false" title="挑選風格版本">
+            <span class="theme-icon" id="tierlistThemeIcon">🌊</span>
+            <span class="theme-text" id="tierlistThemeText">夏日海洋</span>
+            <span class="theme-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="theme-dropdown-menu hidden" id="tierlistThemeDropdown" role="menu" aria-label="風格版本選單">
+            <div class="theme-dropdown-header">風格版本挑選 // SELECT THEME</div>
+            <div class="theme-dropdown-list">
+              <button type="button" class="theme-option-btn" data-theme-val="ocean" role="menuitem">
+                <span class="theme-opt-icon">🌊</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">夏日海洋</span>
+                  <span class="theme-opt-desc">晴空碧海・珍珠水波</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="beach" role="menuitem">
+                <span class="theme-opt-icon">🏖️</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">假日海灘</span>
+                  <span class="theme-opt-desc">陽光沙灘・椰林漫步</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="bubble" role="menuitem">
+                <span class="theme-opt-icon">🌸</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">粉紅櫻花</span>
+                  <span class="theme-opt-desc">夢幻粉櫻・草莓糖霜</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="worldtree" role="menuitem">
+                <span class="theme-opt-icon">🌳</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">世界樹版</span>
+                  <span class="theme-opt-desc">世界命根・生命琥珀</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="starry" role="menuitem">
+                <span class="theme-opt-icon">🌌</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">星空版本</span>
+                  <span class="theme-opt-desc">星穹夜空・璀璨流星</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="dark" role="menuitem">
+                <span class="theme-opt-icon">🌙</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">黑色版本</span>
+                  <span class="theme-opt-desc">永夜黑曜・深黑之蝕</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="light" role="menuitem">
+                <span class="theme-opt-icon">☀️</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">白色版本</span>
+                  <span class="theme-opt-desc">聖潔白晝・晨曦之光</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- Navigation Links -->
-        <a href="compare.html" target="_blank" rel="noopener" class="compare-action-btn" title="於新分頁開啟雙視窗能力對比">
-          <span>⚖️</span>
-          <span>能力對比 ↗</span>
+        <a href="relations.html" target="_blank" rel="noopener" class="compare-action-btn" title="前往角色關係全景圖譜">
+          <span>🧬</span>
+          <span>關係圖譜 ↗</span>
         </a>
-        <a href="summon.html" target="_blank" rel="noopener" class="compare-action-btn" title="於新分頁開啟召喚模擬器">
-          <span>✨</span>
-          <span>召喚模擬 ↗</span>
-        </a>
-        <a href="index.html" class="compare-action-btn" title="返回主檔案庫首頁">
+        <a href="index.html" class="compare-action-btn primary-back-btn" title="返回主檔案庫首頁">
           <span>🏛️</span>
           <span>返回首頁</span>
         </a>
