@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="ocean">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>亞雷利塔・靈魂共鳴心理測驗｜ARELITA SOUL RESONANCE QUIZ</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="shortcut icon" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap"
+    rel="stylesheet" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("arelita_theme");
+        var valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
+        var theme = valid.indexOf(saved) !== -1 ? saved : "ocean";
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/styles.css?v=20261111_theme_fix" />
+  <link rel="stylesheet" href="assets/quiz.css" />
+</head>
+
+<body class="compare-page-body quiz-page-body">
+  <!-- Decorative Background Grid & Ambient Orbs -->
+  <div class="bg-grid-overlay" aria-hidden="true"></div>
+  <div class="bg-graphic-layer" aria-hidden="true">
+    <div class="bg-orb bg-orb-gold"></div>
+    <div class="bg-orb bg-orb-blue"></div>
+    <div class="bg-watermark-text">ARELITA // SOUL RESONANCE</div>
+  </div>
+
+  <!-- Fixed Site Header -->
+  <header class="site-header compare-site-header" id="quizHeader">
+    <div class="header-inner">
+      <a href="index.html" class="brand" title="返回亞雷利塔主檔案庫">
+        <div class="brand-emblem">
+          <span class="emblem-diamond">🔮</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
+            <span>亞雷利塔・靈魂共鳴心理測驗</span>
+            <span class="brand-sub-en">SOUL RESONANCE &amp; AFFINITY DIAGNOSTIC</span>
+          </div>
+          <div class="brand-subtitle">176 位角色性格特徵比對・六維靈魂雷達・本命陣營與屬性適性・專屬通行證匯出</div>
+        </div>
+      </a>
+
+      <div class="compare-header-controls">
+        <div class="quiz-mode-tabs">
+          <button type="button" class="compare-action-btn is-active" data-quizview="test">
+            <span>🔮</span>
+            <span>靈魂共鳴測驗</span>
+          </button>
+          <button type="button" class="compare-action-btn" data-quizview="explorer">
+            <span>🏷️</span>
+            <span>全角色萌點與喜好圖鑑</span>
+          </button>
+        </div>
+
+        <button type="button" id="btnToggleQuizSfx" class="compare-action-btn is-active" title="切換測驗音效">
+          <span id="quizSfxIcon">🔊</span>
+          <span id="quizSfxText">音效：ON</span>
+        </button>
+
+        <!-- Theme Selector -->
+        <div class="theme-select-wrap" id="quizThemeSelectWrap">
+          <button type="button" id="quizThemeToggleBtn" class="theme-toggle-btn" aria-haspopup="true"
+            aria-expanded="false" title="挑選風格版本">
+            <span class="theme-icon" id="quizThemeIcon">🌊</span>
+            <span class="theme-text" id="quizThemeText">夏日海洋</span>
+            <span class="theme-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="theme-dropdown-menu hidden" id="quizThemeDropdown" role="menu" aria-label="風格版本選單">
+            <div class="theme-dropdown-header">風格版本挑選 // SELECT THEME</div>
+            <div class="theme-dropdown-list">
+              <button type="button" class="theme-option-btn" data-theme-val="ocean" role="menuitem">
+                <span class="theme-opt-icon">🌊</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">夏日海洋</span>
+                  <span class="theme-opt-desc">晴空碧海・珍珠水波</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="beach" role="menuitem">
+                <span class="theme-opt-icon">🏖️</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">假日海灘</span>
+                  <span class="theme-opt-desc">陽光沙灘・椰林漫步</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="bubble" role="menuitem">
+                <span class="theme-opt-icon">🌸</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">粉紅櫻花</span>
+                  <span class="theme-opt-desc">夢幻粉櫻・草莓糖霜</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="worldtree" role="menuitem">
+                <span class="theme-opt-icon">🌳</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">世界樹版</span>
+                  <span class="theme-opt-desc">世界命根・生命琥珀</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="starry" role="menuitem">
+                <span class="theme-opt-icon">🌌</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">星空版本</span>
+                  <span class="theme-opt-desc">星穹夜空・璀璨流星</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="dark" role="menuitem">
+                <span class="theme-opt-icon">🌙</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">黑色版本</span>
+                  <span class="theme-opt-desc">永夜黑曜・深黑之蝕</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+              <button type="button" class="theme-option-btn" data-theme-val="light" role="menuitem">
+                <span class="theme-opt-icon">☀️</span>
+                <div class="theme-opt-info">
+                  <span class="theme-opt-name">白色版本</span>
+                  <span class="theme-opt-desc">聖潔白晝・晨曦之光</span>
+                </div>
+                <span class="theme-opt-check">✓</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <a href="index.html" class="compare-action-btn primary-back-btn" title="返回主檔案庫首頁">
+          <span>🏛️</span>
+          <span>主頁</span>
+        </a>
+        <a href="relations.html" class="compare-action-btn" title="前往角色關係全景圖譜">
+          <span>🧬</span>
+          <span>關係</span>
+        </a>
+        <a href="summon.html" class="compare-action-btn" title="前往角色召喚模擬器">
+          <span>✨</span>
+          <span>召喚</span>
+        </a>
+        <a href="tierlist.html" class="compare-action-btn" title="前往全角色戰力排行榜">
+          <span>🏆</span>
+          <span>排行</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="quiz-main">
+    <!-- ==================== VIEW 1: SOUL RESONANCE QUIZ ==================== -->
+    <section class="quiz-view active" id="quizViewTest">
+      <!-- STAGE A: INTRO / LANDING CARD -->
+      <div class="quiz-stage-card" id="quizStageIntro">
+        <div class="intro-sacred-halo" aria-hidden="true">
+          <svg class="halo-svg" viewBox="0 0 220 220" fill="none">
+            <circle cx="110" cy="110" r="100" stroke="currentColor" stroke-width="1" stroke-dasharray="4 6" opacity="0.6" />
+            <circle cx="110" cy="110" r="78" stroke="currentColor" stroke-width="1.2" opacity="0.8" />
+            <polygon points="110,22 186,154 34,154" stroke="currentColor" stroke-width="1" fill="none" opacity="0.65" />
+            <polygon points="110,198 186,66 34,66" stroke="currentColor" stroke-width="1" fill="none" opacity="0.65" />
+          </svg>
+          <div class="halo-center-gem">🔮</div>
+        </div>
+
+        <div class="quiz-kicker">CHRONICLES OF TRUTH // 尋真千卷・靈魂波長觀測儀</div>
+        <h1 class="quiz-hero-title">誰是你命定的亞雷利塔靈魂共鳴者？</h1>
+        <p class="quiz-hero-desc">
+          翻開三百年前流傳至今的《尋真千卷》，透過情境抉擇解析你的<strong>處世哲學、社交面具、內心反差、情感羈絆與日常品味</strong>。<br />
+          系統將與全檔案庫 <strong>176 位角色</strong>的真實性格、善惡傾向、喜好厭惡及 <strong>155 種屬性</strong>進行多維度向量比對，找出與你靈魂波長最契合的角色與命定夥伴！
+        </p>
+
+        <!-- Optional Traveler Name Input for Pass Card -->
+        <div class="traveler-name-box">
+          <label for="travelerNameInput">✍️ 簽署你的旅者名諱（選填，將印製於專屬靈魂通行證上）：</label>
+          <input type="text" id="travelerNameInput" placeholder="例如：尋真旅者 ／ 你的暱稱..." maxlength="20" autocomplete="off" />
+        </div>
+
+        <!-- Quiz Length Mode Selection -->
+        <div class="quiz-length-selector">
+          <span class="length-label">📜 選擇觀測深度：</span>
+          <div class="length-pills" id="quizLengthPills">
+            <button type="button" class="length-pill active" data-qcount="10">
+              <strong>✨ 標準共鳴診斷（10 題）</strong>
+              <small>精準核心情境・約 2 分鐘</small>
+            </button>
+            <button type="button" class="length-pill" data-qcount="14">
+              <strong>🌌 尋真深層解析（14 題全開）</strong>
+              <small>涵蓋隱藏怪癖與飲食品味・最完整比對</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="quiz-intro-actions">
+          <button type="button" class="quiz-primary-cta" id="btnStartQuiz">
+            <span>🔮 展開尋真千卷・開始靈魂診斷</span>
+          </button>
+        </div>
+
+        <div class="quiz-feature-badges">
+          <span>❖ 176 位角色真實性格比對</span>
+          <span>❖ 998 條人際關係自動配對最佳拍檔</span>
+          <span>❖ 六維靈魂雷達圖</span>
+          <span>❖ 一鍵匯出專屬靈魂通行證 PNG</span>
+        </div>
+      </div>
+
+      <!-- STAGE B: QUESTIONNAIRE FLOW -->
+      <div class="quiz-stage-card hidden" id="quizStageQuestions">
+        <div class="q-progress-header">
+          <div class="q-progress-top">
+            <span class="q-step-badge" id="qStepBadge">QUESTION 01 / 10</span>
+            <span class="q-category-tag" id="qCategoryTag">【處世與信念】</span>
+          </div>
+          <div class="q-progress-bar-track">
+            <div class="q-progress-bar-fill" id="qProgressBarFill" style="width: 10%;"></div>
+          </div>
+        </div>
+
+        <div class="q-card-body" id="qCardBody">
+          <p class="q-lore-scene" id="qLoreScene"></p>
+          <h2 class="q-title-text" id="qTitleText"></h2>
+
+          <div class="q-options-grid" id="qOptionsGrid">
+            <!-- Populated by quiz.js -->
+          </div>
+        </div>
+
+        <div class="q-nav-footer">
+          <button type="button" class="q-nav-btn" id="btnPrevQuestion">
+            <span>← 返回上一題</span>
+          </button>
+          <button type="button" class="q-nav-btn" id="btnRestartDuringQuiz">
+            <span>🔄 重新開始</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STAGE C: ANALYZING / RESONATING ANIMATION -->
+      <div class="quiz-stage-card hidden" id="quizStageAnalyzing">
+        <div class="analyzing-spinner-wrap">
+          <div class="analyzing-ring ring-1"></div>
+          <div class="analyzing-ring ring-2"></div>
+          <div class="analyzing-core">❖</div>
+        </div>
+        <h2 class="analyzing-title">正在與五界角色檔案庫進行靈魂波長共鳴...</h2>
+        <p class="analyzing-status" id="analyzingStatusText">解析善惡道德座標與 17 大屬性親和度...</p>
+      </div>
+
+      <!-- STAGE D: RESULT REPORT & PASS CARD -->
+      <div class="quiz-result-container hidden" id="quizStageResult">
+        <!-- Populated dynamically by quiz.js -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: PERSONALITY & AFFINITY EXPLORER ==================== -->
+    <section class="quiz-view" id="quizViewExplorer">
+      <div class="explorer-container">
+        <div class="explorer-header-card">
+          <div>
+            <h2>🏷️ 亞雷利塔全角色・性格萌點與日常喜好圖鑑</h2>
+            <p>點擊任一性格特質或日常飲食／興趣標籤，立即探索在《亞雷利塔》中擁有相同萌點或愛好的角色們！</p>
+          </div>
+          <div class="explorer-search-box">
+            <input type="search" id="explorerSearchInput" placeholder="搜尋角色姓名、個性、喜歡或討厭的事物（如：甜食、傲嬌、貓、茶、酒、劍）..." />
+          </div>
+        </div>
+
+        <div class="explorer-tags-section">
+          <div class="tag-group-row">
+            <span class="tag-group-label">🎭 性格與反差萌點：</span>
+            <div class="tag-pills-wrap" id="personalityTagPills"></div>
+          </div>
+          <div class="tag-group-row">
+            <span class="tag-group-label">🍰 飲食與日常愛好：</span>
+            <div class="tag-pills-wrap" id="hobbyTagPills"></div>
+          </div>
+        </div>
+
+        <div class="explorer-results-meta" id="explorerResultsMeta">
+          共找到 176 位角色
+        </div>
+
+        <div class="explorer-grid" id="explorerCharGrid">
+          <!-- Populated by quiz.js -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/relations_data.js"></script>
+  <script src="assets/quiz.js"></script>
+</body>
+
+</html>
