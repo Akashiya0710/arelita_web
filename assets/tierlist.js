@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 亞雷利塔 ARELITA // 角色戰力 Tier List 排行榜自訂系統
  * Character Power Tier List Maker (SS ~ F 8-Tier Architecture)
  */
@@ -381,7 +381,7 @@
     if (saved) {
       applyStateFromObject(saved);
     } else {
-      // Default: All 175 characters in unranked pool
+      // Default: All 176 characters in unranked pool
       resetToUnrankedPool();
     }
   }
@@ -455,7 +455,7 @@
     resetToUnrankedPool();
     saveCurrentStateToLocalStorage();
     renderAll();
-    showToast("🧹 已將所有 175 位角色清空並移回未分配池！");
+    showToast("🧹 已將所有 176 位角色清空並移回未分配池！");
   }
 
   function randomRankAll() {

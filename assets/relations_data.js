@@ -1,6 +1,6 @@
-﻿window.ARELITA_RELATIONS = {
+﻿window.ARELITA_RELATIONS = window.ARELITA_RELATIONS_DATA = {
     "generatedAt":  "2026-11-11 02:50:46",
-    "totalCharacters":  175,
+    "totalCharacters":  176,
     "totalRelationships":  150,
     "nodes":  [
                   {
@@ -2977,6 +2977,15 @@
                       "story":  "曾經的魔王，早在3000年前殞落，當時凱撒家族的長子，因年輕時，實力不如弟弟所以並未參加當年的魔神選拔，但靠著不斷的努力最後當上了魔界中煉獄惡魔帝國的魔王。\n————————————————————\n實力因為不斷的鍛鍊，最後超越當代三魔神。\n他原本是個賢王，人民也很愛戴他。\n但是因為他的實力過於恐怖，人民也漸漸開始懼怕他，以及其他大臣的煽風點火導致人民開啟革命。\n而安丁夏坦不希望傷害國民自行下台，但還是被大臣從背後捅了一刀險些死亡，但靠著頑強地生命力活了下來，凱撒家族也因為種種壓力被迫將他在族譜上除名。\n————————————————————\n在那之後，他的人生變得漫無目地，而內心也被埋下本不該有的復仇與憎恨的種子。",
                       "likes":  "無",
                       "dislikes":  "背叛與無意義之爭鬥。"
+                  },
+                  {
+                      "id":  "char-176",
+                      "name":  "清野 墨江",
+                      "realm":  "現界",
+                      "faction":  "東方滅魔館",
+                      "subFaction":  "",
+                      "title":  "東方不敗 墨仙",
+                      "power":  "古神一級"
                   }
               ],
     "links":  [
@@ -4329,6 +4338,18 @@
                       "type":  "comrade",
                       "label":  "三大福音同袍",
                       "desc":  "寂靜之音世界暗殺組織核心三使徒。"
+                  },
+                  {
+                      "source":  "char-57",
+                      "target":  "char-176",
+                      "type":  "subordinate",
+                      "label":  "左膀右臂 / 心腹副手"
+                  },
+                  {
+                      "source":  "char-58",
+                      "target":  "char-176",
+                      "type":  "guardian",
+                      "label":  "效忠主公 / 忠義護衛"
                   }
               ]
 };

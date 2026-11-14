@@ -7,9 +7,9 @@
   "use strict";
 
   // Check data
-  const relData = window.ARELITA_RELATIONS;
+  const relData = window.ARELITA_RELATIONS_DATA || window.ARELITA_RELATIONS;
   if (!relData || !relData.nodes) {
-    console.error("ARELITA_RELATIONS data not found.");
+    console.error("ARELITA_RELATIONS / ARELITA_RELATIONS_DATA not found.");
     return;
   }
 
