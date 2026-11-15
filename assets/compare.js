@@ -523,7 +523,7 @@
   }
 
   const compareState = {
-    theme: localStorage.getItem("arelita_theme") || "ocean",
+    theme: "pgr",
     leftCharId: "",
     rightCharId: "",
     leftPickerOpen: false,
@@ -2512,45 +2512,10 @@
     }
   }
 
-  function applyCompareTheme(theme) {
-    const valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
-    compareState.theme = valid.includes(theme) ? theme : "ocean";
-    document.documentElement.setAttribute("data-theme", compareState.theme);
-    localStorage.setItem("arelita_theme", compareState.theme);
-
-    const iconEl = document.getElementById("compareThemeIcon");
-    const textEl = document.getElementById("compareThemeText");
-    if (iconEl && textEl) {
-      if (compareState.theme === "ocean") {
-        iconEl.textContent = "🌊";
-        textEl.textContent = "夏日海洋";
-      } else if (compareState.theme === "beach") {
-        iconEl.textContent = "🏖️";
-        textEl.textContent = "假日海灘";
-      } else if (compareState.theme === "bubble") {
-        iconEl.textContent = "🌸";
-        textEl.textContent = "粉紅櫻花";
-      } else if (compareState.theme === "worldtree") {
-        iconEl.textContent = "🌳";
-        textEl.textContent = "世界樹版";
-      } else if (compareState.theme === "starry") {
-        iconEl.textContent = "🌌";
-        textEl.textContent = "星空版本";
-      } else if (compareState.theme === "dark") {
-        iconEl.textContent = "🌙";
-        textEl.textContent = "黑色版本";
-      } else {
-        iconEl.textContent = "☀️";
-        textEl.textContent = "白色版本";
-      }
-    }
-
-    const wrap = document.getElementById("compareThemeSelectWrap");
-    if (wrap) {
-      wrap.querySelectorAll(".theme-option-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.themeVal === compareState.theme);
-      });
-    }
+  function applyCompareTheme() {
+    compareState.theme = "pgr";
+    document.documentElement.setAttribute("data-theme", "pgr");
+    localStorage.setItem("arelita_theme", "pgr");
   }
 
   function initHeaderActions() {

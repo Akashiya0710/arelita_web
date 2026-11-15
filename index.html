@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="zh-Hant" data-theme="ocean">
+<html lang="zh-Hant" data-theme="pgr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -9,151 +9,177 @@
   <script>
     (function () {
       try {
-        if (!localStorage.getItem("arelita_ocean_init")) {
-          localStorage.setItem("arelita_theme", "ocean");
-          localStorage.setItem("arelita_ocean_init", "1");
-        }
-        var saved = localStorage.getItem("arelita_theme");
-        if (saved === "light" || saved === "dark" || saved === "starry" || saved === "worldtree" || saved === "ocean" || saved === "beach" || saved === "bubble") {
-          document.documentElement.setAttribute("data-theme", saved);
-        }
+        localStorage.setItem("arelita_theme", "pgr");
+        document.documentElement.setAttribute("data-theme", "pgr");
+        const pal = localStorage.getItem("arelita_pgr_palette") || "blue";
+        document.documentElement.setAttribute("data-pgr-palette", pal);
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="assets/styles.css?v=20261111_theme_fix" />
+  <link rel="stylesheet" href="assets/styles.css?v=20261115_pgr3" />
+  <link rel="stylesheet" href="assets/pgr-theme.css?v=20261116_pgr25" />
 </head>
 <body class="is-loading">
-  <!-- Game-Portal Opening Intro Animation Overlay -->
-  <div id="introSplash" class="intro-splash" data-intro-theme="ocean" role="status" aria-label="亞雷利塔檔案庫載入動畫">
-    <div class="intro-shutter intro-shutter-top"></div>
-    <div class="intro-shutter intro-shutter-bottom"></div>
+  <!-- Next-Gen Cyber-Tactical Holographic Visor & Diagonal Blast-Gate Opening Sequence -->
+  <div id="introSplash" class="intro-splash" data-intro-theme="pgr" role="status" aria-label="亞雷利塔檔案庫載入動畫">
+    <!-- 4 Interlocking Diagonal Mecha Blast Gates (Slice open diagonally on completion) -->
+    <div class="cyber-gate-panel cyber-gate-tl" aria-hidden="true"></div>
+    <div class="cyber-gate-panel cyber-gate-tr" aria-hidden="true"></div>
+    <div class="cyber-gate-panel cyber-gate-bl" aria-hidden="true"></div>
+    <div class="cyber-gate-panel cyber-gate-br" aria-hidden="true"></div>
 
-    <!-- Theme-Specific Ambient FX & Particle Backdrop inside Intro -->
-    <div class="intro-ambient-fx" aria-hidden="true">
-      <div class="intro-fx-ocean">
-        <span class="intro-sonar-wave s-1"></span>
-        <span class="intro-sonar-wave s-2"></span>
-        <span class="intro-sonar-wave s-3"></span>
-        <span class="intro-bubble b-1"></span>
-        <span class="intro-bubble b-2"></span>
-        <span class="intro-bubble b-3"></span>
-        <span class="intro-bubble b-4"></span>
-        <span class="intro-bubble b-5"></span>
-        <span class="intro-bubble b-6"></span>
+    <!-- Diagonal Laser Slash & Singularity Flash on Gate Unlock -->
+    <div class="cyber-laser-slash slash-main" aria-hidden="true"></div>
+    <div class="cyber-laser-slash slash-cross" aria-hidden="true"></div>
+    <div class="cyber-unlock-flash" aria-hidden="true"></div>
+
+    <!-- Full-Viewport Holographic HUD Backdrop -->
+    <div class="cyber-hud-backdrop" aria-hidden="true">
+      <div class="cyber-perspective-grid"></div>
+      <div class="cyber-horizon-beam"></div>
+      <div class="cyber-kinetic-watermark">ARELITA // WORLD ARCHIVE</div>
+
+      <!-- Top & Bottom Tactical Telemetry Framing Bars -->
+      <div class="cyber-frame-bar cyber-frame-top">
+        <div class="cyber-fb-left">
+          <span class="cyber-fb-dot"></span>
+          <span>SYS.BOOT // TACTICAL COMMAND OS v3.08</span>
+          <span class="cyber-fb-sep">//</span>
+          <span id="introHexStream">MEM.ADDR 0x00F4A9 // SYNCING</span>
+        </div>
+        <div class="cyber-fb-center">M.I.N.D. NEURAL LINK — DIRECT VISOR PROJECTION</div>
+        <div class="cyber-fb-right">
+          <span>SECURITY: OMEGA-01</span>
+          <span class="cyber-fb-sep">//</span>
+          <button type="button" class="cyber-skip-btn" id="introSkipBtn" title="跳過動畫">SKIP &gt;&gt;</button>
+        </div>
       </div>
-      <div class="intro-fx-beach">
-        <div class="intro-beach-sunburst"></div>
-        <span class="intro-beach-ripple br-1"></span>
-        <span class="intro-beach-ripple br-2"></span>
-        <span class="intro-beach-sparkle bs-1"></span>
-        <span class="intro-beach-sparkle bs-2"></span>
-        <span class="intro-beach-sparkle bs-3"></span>
-        <span class="intro-beach-sparkle bs-4"></span>
-        <span class="intro-beach-sparkle bs-5"></span>
+
+      <div class="cyber-frame-bar cyber-frame-bottom">
+        <div class="cyber-fb-left">
+          <span>COORDS // 35.6895° N, 139.6917° E</span>
+          <span class="cyber-fb-sep">//</span>
+          <span>REALM GATE: 05/05 ONLINE</span>
+        </div>
+        <div class="cyber-fb-center">TACTICAL ARCHIVE ONLINE // 戰術終端同步中</div>
+        <div class="cyber-fb-right">
+          <span>AUDIO SYNTH: ACTIVE</span>
+          <span class="cyber-fb-sep">//</span>
+          <span>VER 3.0 // ARCHIVE</span>
+        </div>
       </div>
-      <div class="intro-fx-worldtree">
-        <div class="intro-tree-halo"></div>
-        <span class="intro-mote m-1"></span>
-        <span class="intro-mote m-2"></span>
-        <span class="intro-mote m-3"></span>
-        <span class="intro-mote m-4"></span>
-        <span class="intro-mote m-5"></span>
-        <span class="intro-mote m-6"></span>
+
+      <!-- Side Vertical HUD Scales -->
+      <div class="cyber-side-scale side-left">
+        <span>100</span><span>080</span><span>060</span><span>040</span><span>020</span><span>000</span>
       </div>
-      <div class="intro-fx-starry">
-        <div class="intro-nebula-glow"></div>
-        <span class="intro-shooting-star st-1"></span>
-        <span class="intro-shooting-star st-2"></span>
-        <span class="intro-shooting-star st-3"></span>
-      </div>
-      <div class="intro-fx-dark">
-        <div class="intro-eclipse-corona"></div>
-        <span class="intro-ember e-1"></span>
-        <span class="intro-ember e-2"></span>
-        <span class="intro-ember e-3"></span>
-        <span class="intro-ember e-4"></span>
-        <span class="intro-ember e-5"></span>
-      </div>
-      <div class="intro-fx-light">
-        <div class="intro-sunburst-rays"></div>
-        <span class="intro-prism p-1"></span>
-        <span class="intro-prism p-2"></span>
-        <span class="intro-prism p-3"></span>
-        <span class="intro-prism p-4"></span>
-      </div>
-      <div class="intro-fx-bubble">
-        <div class="intro-bubble-glow"></div>
-        <span class="intro-pb pb-1"></span>
-        <span class="intro-pb pb-2"></span>
-        <span class="intro-pb pb-3"></span>
+      <div class="cyber-side-scale side-right">
+        <span>SYS</span><span>DAT</span><span>ELM</span><span>CHR</span><span>IMG</span><span>RDY</span>
       </div>
     </div>
 
-    <div class="intro-center-stage">
-      <div class="intro-corner intro-corner-tl"></div>
-      <div class="intro-corner intro-corner-tr"></div>
-      <div class="intro-corner intro-corner-bl"></div>
-      <div class="intro-corner intro-corner-br"></div>
-      <div class="intro-scanline-overlay" aria-hidden="true"></div>
+    <!-- Frameless Center Holographic Visor HUD (Zero boxy container) -->
+    <div class="cyber-visor-core">
+      <!-- Precision Sci-Fi Target Lock Reticle + Live SVG Circular Gauge -->
+      <div class="cyber-reticle-assembly">
+        <!-- Outer Caliper Crosshair Brackets (Snap inward on lock) -->
+        <div class="cyber-caliper cal-tl"></div>
+        <div class="cyber-caliper cal-tr"></div>
+        <div class="cyber-caliper cal-bl"></div>
+        <div class="cyber-caliper cal-br"></div>
 
-      <!-- Theme Mode Pill -->
-      <div class="intro-theme-pill" id="introThemePill">
-        <span class="intro-theme-pill-dot"></span>
-        <span id="introThemeBadge">🌊 ABYSSAL OCEAN REALM // 夏日海洋領域</span>
-      </div>
-
-      <!-- Multi-Layered Sacred Geometry & Theme Emblem -->
-      <div class="intro-emblem-wrap">
-        <span class="intro-shockwave sw-1"></span>
-        <span class="intro-shockwave sw-2"></span>
-
-        <!-- Outer Astrolabe Ring (Clockwise) -->
-        <svg class="intro-ring-svg intro-ring-outer" viewBox="0 0 240 240" fill="none">
-          <circle cx="120" cy="120" r="112" stroke="currentColor" stroke-width="1" stroke-dasharray="3 7" opacity="0.65" />
-          <circle cx="120" cy="120" r="102" stroke="currentColor" stroke-width="1.3" stroke-dasharray="28 10 6 10" />
-          <path d="M120 4 L124 16 L116 16 Z M120 236 L124 224 L116 224 Z M4 120 L16 124 L16 116 Z M236 120 L224 124 L224 116 Z" fill="currentColor" />
+        <!-- Rotating Segmented Radar SVG -->
+        <svg class="cyber-radar-svg radar-outer" viewBox="0 0 260 260" fill="none">
+          <circle cx="130" cy="130" r="122" stroke="rgba(255, 255, 255, 0.14)" stroke-width="1" stroke-dasharray="2 8" />
+          <circle cx="130" cy="130" r="112" stroke="rgba(224, 26, 34, 0.55)" stroke-width="1.5" stroke-dasharray="42 18 8 18" />
+          <path d="M130 2 L130 16 M130 244 L130 258 M2 130 L16 130 M244 130 L258 130" stroke="#ff2a32" stroke-width="2" />
         </svg>
 
-        <!-- Middle Sacred Hexagram Ring (Counter-Clockwise) -->
-        <svg class="intro-ring-svg intro-ring-mid" viewBox="0 0 240 240" fill="none">
-          <circle cx="120" cy="120" r="86" stroke="currentColor" stroke-width="1.2" opacity="0.8" />
-          <polygon points="120,34 194,163 46,163" stroke="currentColor" stroke-width="1" fill="none" opacity="0.75" />
-          <polygon points="120,206 194,77 46,77" stroke="currentColor" stroke-width="1" fill="none" opacity="0.75" />
-          <rect x="60" y="60" width="120" height="120" stroke="currentColor" stroke-width="0.8" stroke-dasharray="6 6" transform="rotate(45 120 120)" opacity="0.55" />
+        <svg class="cyber-radar-svg radar-inner" viewBox="0 0 260 260" fill="none">
+          <circle cx="130" cy="130" r="94" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1" stroke-dasharray="14 10 3 10" />
+          <polygon points="130,28 232,130 130,232 28,130" stroke="rgba(224, 26, 34, 0.35)" stroke-width="1" fill="none" />
         </svg>
 
-        <!-- Inner High-Speed Chrono Ring -->
-        <svg class="intro-ring-svg intro-ring-inner" viewBox="0 0 240 240" fill="none">
-          <circle cx="120" cy="120" r="60" stroke="currentColor" stroke-width="1.6" stroke-dasharray="18 14" />
-          <circle cx="120" cy="120" r="50" stroke="currentColor" stroke-width="0.9" stroke-dasharray="2 5" />
+        <!-- Dynamic Progress Arc Gauge SVG (Circumference ~ 628) -->
+        <svg class="cyber-arc-svg" viewBox="0 0 260 260" fill="none">
+          <circle cx="130" cy="130" r="100" stroke="rgba(255, 255, 255, 0.08)" stroke-width="3" />
+          <circle
+            id="introArcProgress"
+            cx="130"
+            cy="130"
+            r="100"
+            stroke="#e01a22"
+            stroke-width="3.5"
+            stroke-linecap="square"
+            stroke-dasharray="628.3"
+            stroke-dashoffset="628.3"
+          />
         </svg>
 
-        <!-- Theme-Specific Core Emblem (Dynamically swapped per theme) -->
-        <div class="intro-core-diamond" id="introCoreDiamond">
-          <div class="intro-core-icon" id="introCoreIcon">❖</div>
-        </div>
-      </div>
-
-      <div class="intro-kicker" id="introKicker">AQUA RESONANCE // SYNCHRONIZING CORAL ARCHIVE</div>
-      <h1 class="intro-title" id="introTitle">亞 雷 利 塔</h1>
-      <div class="intro-subtitle-en" id="introSubtitle">ARELITA OFFICIAL WORLD &amp; CHARACTER ARCHIVE</div>
-
-      <div class="intro-progress-box">
-        <div class="intro-telemetry-row" id="introTelemetry">
-          <span>SYS.NODE // 05-REALMS</span>
-          <span id="introSfxIndicator">🔊 THEME AUDIO SYNCHRONIZED</span>
-        </div>
-        <div class="intro-progress-track">
-          <div class="intro-progress-bar" id="introProgressBar"></div>
-          <div class="intro-progress-segments" aria-hidden="true"></div>
-        </div>
-        <div class="intro-progress-meta">
-          <span id="introStatusText">SYNCING WORLD RECORDS...</span>
-          <span id="introPercentText">0%</span>
+        <!-- Center Digital Percentage & Equalizer Readout -->
+        <div class="cyber-reticle-readout">
+          <div class="cyber-sync-tag" id="introThemeBadge">SYNC RATIO</div>
+          <div class="cyber-pct-num" id="introPercentText">00<span class="pct-unit">%</span></div>
+          <div class="cyber-eq-bars" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
         </div>
       </div>
 
-      <div class="intro-skip-hint">CLICK ANYWHERE TO ENTER &amp; CHIME // 點擊任意處展開領域（切換風格亦可觸發專屬動畫與音效）</div>
+      <!-- Wide-Screen Cinematic Typography Lockup -->
+      <div class="cyber-title-lockup">
+        <div class="cyber-kicker-line">
+          <span class="kicker-bracket">[</span>
+          <span id="introKicker">M.I.N.D. BEACON // SYNCHRONIZING WORLD ARCHIVE</span>
+          <span class="kicker-bracket">]</span>
+        </div>
+
+        <h1 class="cyber-main-title" id="introTitle" data-text="亞 雷 利 塔">亞 雷 利 塔</h1>
+        <div class="cyber-sub-en" id="introSubtitle">A R E L I T A &nbsp; // &nbsp; W O R L D &nbsp; A R C H I V E</div>
+      </div>
+
+      <!-- Full-Width Horizon Dual-Wing Laser Progress Track -->
+      <div class="cyber-horizon-progress">
+        <div class="cyber-hp-track">
+          <div class="cyber-hp-bar" id="introProgressBar"></div>
+          <div class="cyber-hp-glint"></div>
+        </div>
+        <div class="cyber-hp-status-row">
+          <span class="cyber-hp-status" id="introStatusText">INITIALIZING TACTICAL ARCHIVE...</span>
+          <span class="cyber-hp-telemetry" id="introTelemetry">SYS.SIGNAL // LINK 100% STABLE</span>
+        </div>
+      </div>
+
+      <!-- 4 Subsystem Node Verification Indicators -->
+      <div class="cyber-node-grid">
+        <div class="cyber-node-chip" data-intro-node="1">
+          <span class="node-dot"></span>
+          <span class="node-code">01 // REALMS</span>
+          <span class="node-state">5 SECTORS</span>
+        </div>
+        <div class="cyber-node-chip" data-intro-node="2">
+          <span class="node-dot"></span>
+          <span class="node-code">02 // CONSTRUCTS</span>
+          <span class="node-state">176 DOSSIERS</span>
+        </div>
+        <div class="cyber-node-chip" data-intro-node="3">
+          <span class="node-dot"></span>
+          <span class="node-code">03 // ELEMENTS</span>
+          <span class="node-state">155 LAWS</span>
+        </div>
+        <div class="cyber-node-chip" data-intro-node="4">
+          <span class="node-dot"></span>
+          <span class="node-code">04 // ILLUSTRATION</span>
+          <span class="node-state">36 CUTOUTS</span>
+        </div>
+      </div>
+
+      <!-- Interactive Engagement Prompt (Lights up when loading hits 100%) -->
+      <div class="cyber-click-prompt" id="introClickPrompt" aria-hidden="true">
+        <span class="prompt-glitch-tag">[ READY ]</span>
+        <span class="prompt-text">點擊任意處進入終端 // CLICK TO INITIALIZE</span>
+        <span class="prompt-reticle">◈</span>
+      </div>
     </div>
   </div>
 
@@ -162,255 +188,6 @@
   <div class="bg-graphic-layer" aria-hidden="true">
     <div class="bg-orb bg-orb-gold"></div>
     <div class="bg-orb bg-orb-blue"></div>
-
-    <!-- Starry Sky & Shooting Meteors Layer (Active in Starry Theme) -->
-    <div class="starry-sky-layer">
-      <div class="starfield-dots starfield-sm"></div>
-      <div class="starfield-dots starfield-md"></div>
-      <span class="meteor m-1"></span>
-      <span class="meteor m-2"></span>
-      <span class="meteor m-3"></span>
-      <span class="meteor m-4"></span>
-      <span class="meteor m-5"></span>
-      <span class="meteor m-6"></span>
-      <span class="meteor m-7"></span>
-      <span class="meteor m-8"></span>
-    </div>
-
-    <!-- Sacred World Tree Layer (Active in World Tree Theme) -->
-    <div class="worldtree-layer">
-      <div class="sacred-canopy-rays"></div>
-      <svg class="worldtree-silhouette" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="wtGoldGreen" x1="400" y1="60" x2="400" y2="760" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#fde047" stop-opacity="0.55" />
-            <stop offset="45%" stop-color="#34d399" stop-opacity="0.4" />
-            <stop offset="100%" stop-color="#eab308" stop-opacity="0.28" />
-          </linearGradient>
-        </defs>
-        <!-- Sacred Halo Rings -->
-        <circle cx="400" cy="340" r="260" stroke="url(#wtGoldGreen)" stroke-width="1.2" stroke-dasharray="6 8" />
-        <circle cx="400" cy="340" r="190" stroke="url(#wtGoldGreen)" stroke-width="1" />
-        <circle cx="400" cy="340" r="115" stroke="url(#wtGoldGreen)" stroke-width="0.9" stroke-dasharray="3 6" />
-        <!-- World Tree Trunk & Sweeping Canopy Branches -->
-        <path d="M400 720 C400 580 400 440 400 280" stroke="url(#wtGoldGreen)" stroke-width="6" stroke-linecap="round" />
-        <path d="M388 720 C395 570 396 450 382 320 C350 230 260 175 180 150" stroke="url(#wtGoldGreen)" stroke-width="3.2" stroke-linecap="round" />
-        <path d="M412 720 C405 570 404 450 418 320 C450 230 540 175 620 150" stroke="url(#wtGoldGreen)" stroke-width="3.2" stroke-linecap="round" />
-        <path d="M394 400 C340 310 250 265 150 260" stroke="url(#wtGoldGreen)" stroke-width="2.4" stroke-linecap="round" />
-        <path d="M406 400 C460 310 550 265 650 260" stroke="url(#wtGoldGreen)" stroke-width="2.4" stroke-linecap="round" />
-        <path d="M396 310 C360 210 310 135 250 95" stroke="url(#wtGoldGreen)" stroke-width="2.2" stroke-linecap="round" />
-        <path d="M404 310 C440 210 490 135 550 95" stroke="url(#wtGoldGreen)" stroke-width="2.2" stroke-linecap="round" />
-        <path d="M400 280 C400 190 400 120 400 65" stroke="url(#wtGoldGreen)" stroke-width="2.6" stroke-linecap="round" />
-        <!-- Sacred Roots -->
-        <path d="M388 700 C355 735 290 760 220 770" stroke="url(#wtGoldGreen)" stroke-width="2.4" stroke-linecap="round" />
-        <path d="M412 700 C445 735 510 760 580 770" stroke="url(#wtGoldGreen)" stroke-width="2.4" stroke-linecap="round" />
-        <path d="M396 710 C375 745 340 770 300 782" stroke="url(#wtGoldGreen)" stroke-width="1.8" stroke-linecap="round" />
-        <path d="M404 710 C425 745 460 770 500 782" stroke="url(#wtGoldGreen)" stroke-width="1.8" stroke-linecap="round" />
-        <!-- Crown Diamond Star -->
-        <polygon points="400,42 414,72 444,86 414,100 400,130 386,100 356,86 386,72" fill="rgba(253, 224, 71, 0.25)" stroke="#fde047" stroke-width="1.2" />
-      </svg>
-      <!-- Rising Golden & Emerald Life Motes -->
-      <span class="tree-mote tm-1"></span>
-      <span class="tree-mote tm-2"></span>
-      <span class="tree-mote tm-3"></span>
-      <span class="tree-mote tm-4"></span>
-      <span class="tree-mote tm-5"></span>
-      <span class="tree-mote tm-6"></span>
-      <span class="tree-mote tm-7"></span>
-      <span class="tree-mote tm-8"></span>
-      <span class="tree-mote tm-9"></span>
-      <span class="tree-mote tm-10"></span>
-    </div>
-
-    <!-- Summer Ocean Layer (Active in Ocean Theme) -->
-    <div class="summer-ocean-layer">
-      <div class="ocean-sun-rays"></div>
-      <svg class="ocean-waves-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path class="ocean-wave wave-back" fill="rgba(34, 211, 238, 0.08)" d="M0,192L60,181.3C120,171,240,149,360,154.7C480,160,600,192,720,197.3C840,203,960,181,1080,165.3C1200,149,1320,139,1380,133.3L1440,128L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
-        <path class="ocean-wave wave-mid" fill="rgba(56, 189, 248, 0.1)" d="M0,224L80,213.3C160,203,320,181,480,186.7C640,192,800,224,960,224C1120,224,1280,192,1360,176L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
-        <path class="ocean-wave wave-front" fill="rgba(103, 232, 249, 0.09)" d="M0,256L60,250.7C120,245,240,235,360,240C480,245,600,267,720,266.7C840,267,960,245,1080,234.7C1200,224,1320,224,1380,224L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
-      </svg>
-      <!-- Rising Sea Bubbles & Sunlit Foam -->
-      <span class="ocean-bubble ob-1"></span>
-      <span class="ocean-bubble ob-2"></span>
-      <span class="ocean-bubble ob-3"></span>
-      <span class="ocean-bubble ob-4"></span>
-      <span class="ocean-bubble ob-5"></span>
-      <span class="ocean-bubble ob-6"></span>
-      <span class="ocean-bubble ob-7"></span>
-      <span class="ocean-bubble ob-8"></span>
-      <span class="ocean-bubble ob-9"></span>
-      <span class="ocean-bubble ob-10"></span>
-    </div>
-
-    <!-- Sunny Holiday Beach Layer (Active in Beach Theme) -->
-    <div class="beach-layer">
-      <!-- Radiant Summer Sun & Sky Halo Rings + Fluffy Clouds -->
-      <div class="beach-sun-wrap">
-        <div class="beach-sun-corona"></div>
-        <div class="beach-sun-rays"></div>
-        <div class="beach-sun-core"></div>
-      </div>
-
-      <svg class="beach-sky-svg" viewBox="0 0 1440 420" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Celestial Sky Halo Ellipses -->
-        <ellipse cx="1060" cy="145" rx="340" ry="72" stroke="rgba(255, 255, 255, 0.35)" stroke-width="1.5" fill="none" />
-        <ellipse cx="1060" cy="145" rx="235" ry="48" stroke="rgba(186, 242, 255, 0.45)" stroke-width="1.2" stroke-dasharray="8 6" fill="none" />
-        <ellipse cx="380" cy="110" rx="260" ry="52" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1.2" fill="none" />
-        <!-- Soft Summer Cumulus Clouds -->
-        <path fill="rgba(255, 255, 255, 0.42)" d="M920,320 C920,285 950,260 985,265 C1000,230 1045,215 1080,235 C1110,210 1160,225 1175,260 C1210,260 1235,285 1235,320 Z" />
-        <path fill="rgba(255, 255, 255, 0.32)" d="M140,290 C140,265 165,245 195,250 C210,222 250,215 278,235 C305,225 335,245 340,275 C365,278 380,295 380,315 L140,315 Z" />
-      </svg>
-
-      <!-- Left Tropical Swaying Palm Tree -->
-      <svg class="beach-palm beach-palm-left" viewBox="0 0 400 650" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="palmTrunkGradL" x1="50" y1="650" x2="280" y2="110" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#624b34" />
-            <stop offset="55%" stop-color="#8f6e49" />
-            <stop offset="100%" stop-color="#b58d5d" />
-          </linearGradient>
-          <linearGradient id="palmLeafGrad1L" x1="100" y1="50" x2="350" y2="250" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#92e65a" />
-            <stop offset="58%" stop-color="#4ab552" />
-            <stop offset="100%" stop-color="#267d49" />
-          </linearGradient>
-          <linearGradient id="palmLeafGrad2L" x1="280" y1="100" x2="400" y2="10" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#7ce04f" />
-            <stop offset="100%" stop-color="#2e8b57" />
-          </linearGradient>
-        </defs>
-        <path d="M40 650 C60 520 90 380 140 260 C170 190 220 140 280 110" stroke="url(#palmTrunkGradL)" stroke-width="26" stroke-linecap="round" />
-        <path d="M45 610 C55 608 65 612 70 615" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
-        <path d="M60 540 C72 538 84 542 90 545" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
-        <path d="M80 460 C94 458 106 462 112 465" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
-        <path d="M105 380 C120 378 132 382 138 385" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3.5" stroke-linecap="round" />
-        <path d="M140 290 C156 288 168 292 174 295" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3.5" stroke-linecap="round" />
-        <path d="M190 200 C206 198 218 202 224 205" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3" stroke-linecap="round" />
-        <circle cx="270" cy="125" r="10" fill="#5c7a35" />
-        <circle cx="282" cy="132" r="9" fill="#708f40" />
-        <circle cx="265" cy="138" r="8.5" fill="#4f6b2c" />
-        <g class="palm-fronds-group">
-          <path d="M280 110 C240 60 170 40 100 65 C60 80 30 110 10 140" stroke="#4ab552" stroke-width="4" stroke-linecap="round" />
-          <path d="M280 110 Q190 50 100 65 Q50 90 10 140 Q60 110 120 90 Q200 80 280 110Z" fill="url(#palmLeafGrad1L)" opacity="0.92" />
-          <path d="M280 110 C300 40 340 15 390 10" stroke="#3da35d" stroke-width="3.5" stroke-linecap="round" />
-          <path d="M280 110 Q330 20 390 10 Q350 45 320 80 Q300 100 280 110Z" fill="url(#palmLeafGrad2L)" opacity="0.88" />
-          <path d="M280 110 C340 100 385 140 400 200" stroke="#4ab552" stroke-width="3.5" stroke-linecap="round" />
-          <path d="M280 110 Q360 110 400 200 Q360 160 320 145 Q295 125 280 110Z" fill="url(#palmLeafGrad1L)" opacity="0.88" />
-          <path d="M280 110 C210 110 150 150 110 220" stroke="#3da35d" stroke-width="3.5" stroke-linecap="round" />
-          <path d="M280 110 Q190 130 110 220 Q160 180 220 150 Q260 130 280 110Z" fill="url(#palmLeafGrad2L)" opacity="0.9" />
-          <path d="M280 110 C260 160 250 220 250 270" stroke="#267d49" stroke-width="3" stroke-linecap="round" />
-          <path d="M280 110 Q240 180 250 270 Q270 210 280 170 Q285 135 280 110Z" fill="url(#palmLeafGrad1L)" opacity="0.86" />
-        </g>
-      </svg>
-
-      <!-- Soft Blue-Grey Palm Frond Shadow on the Sand -->
-      <svg class="beach-palm-shadow" viewBox="0 0 420 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill="rgba(78, 112, 132, 0.55)" d="M0,165 Q90,120 210,130 Q140,95 65,105 Q155,75 265,95 Q195,62 120,68 Q220,48 330,78 Q260,92 195,112 Q295,108 380,142 Q270,135 180,148 Q245,158 310,175 L0,180 Z" />
-      </svg>
-
-      <!-- Right Tropical Swaying Palm Tree -->
-      <svg class="beach-palm beach-palm-right" viewBox="0 0 400 650" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="palmTrunkGradR" x1="50" y1="650" x2="280" y2="110" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#624b34" />
-            <stop offset="55%" stop-color="#8f6e49" />
-            <stop offset="100%" stop-color="#b58d5d" />
-          </linearGradient>
-          <linearGradient id="palmLeafGrad1R" x1="100" y1="50" x2="350" y2="250" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#92e65a" />
-            <stop offset="58%" stop-color="#4ab552" />
-            <stop offset="100%" stop-color="#267d49" />
-          </linearGradient>
-          <linearGradient id="palmLeafGrad2R" x1="280" y1="100" x2="400" y2="10" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#7ce04f" />
-            <stop offset="100%" stop-color="#2e8b57" />
-          </linearGradient>
-        </defs>
-        <path d="M40 650 C60 520 90 380 140 260 C170 190 220 140 280 110" stroke="url(#palmTrunkGradR)" stroke-width="26" stroke-linecap="round" />
-        <path d="M45 610 C55 608 65 612 70 615" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
-        <path d="M60 540 C72 538 84 542 90 545" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
-        <path d="M80 460 C94 458 106 462 112 465" stroke="rgba(74, 53, 32, 0.42)" stroke-width="4" stroke-linecap="round" />
-        <path d="M105 380 C120 378 132 382 138 385" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3.5" stroke-linecap="round" />
-        <path d="M140 290 C156 288 168 292 174 295" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3.5" stroke-linecap="round" />
-        <path d="M190 200 C206 198 218 202 224 205" stroke="rgba(74, 53, 32, 0.42)" stroke-width="3" stroke-linecap="round" />
-        <circle cx="270" cy="125" r="10" fill="#5c7a35" />
-        <circle cx="282" cy="132" r="9" fill="#708f40" />
-        <circle cx="265" cy="138" r="8.5" fill="#4f6b2c" />
-        <g class="palm-fronds-group">
-          <path d="M280 110 C240 60 170 40 100 65 C60 80 30 110 10 140" stroke="#4ab552" stroke-width="4" stroke-linecap="round" />
-          <path d="M280 110 Q190 50 100 65 Q50 90 10 140 Q60 110 120 90 Q200 80 280 110Z" fill="url(#palmLeafGrad1R)" opacity="0.92" />
-          <path d="M280 110 C300 40 340 15 390 10" stroke="#3da35d" stroke-width="3.5" stroke-linecap="round" />
-          <path d="M280 110 Q330 20 390 10 Q350 45 320 80 Q300 100 280 110Z" fill="url(#palmLeafGrad2R)" opacity="0.88" />
-          <path d="M280 110 C340 100 385 140 400 200" stroke="#4ab552" stroke-width="3.5" stroke-linecap="round" />
-          <path d="M280 110 Q360 110 400 200 Q360 160 320 145 Q295 125 280 110Z" fill="url(#palmLeafGrad1R)" opacity="0.88" />
-          <path d="M280 110 C210 110 150 150 110 220" stroke="#3da35d" stroke-width="3.5" stroke-linecap="round" />
-          <path d="M280 110 Q190 130 110 220 Q160 180 220 150 Q260 130 280 110Z" fill="url(#palmLeafGrad2R)" opacity="0.9" />
-          <path d="M280 110 C260 160 250 220 250 270" stroke="#267d49" stroke-width="3" stroke-linecap="round" />
-          <path d="M280 110 Q240 180 250 270 Q270 210 280 170 Q285 135 280 110Z" fill="url(#palmLeafGrad1R)" opacity="0.86" />
-        </g>
-      </svg>
-
-      <!-- Multi-layered Rolling Beach Surf Waves -->
-      <svg class="beach-waves-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path class="beach-wave wave-deep" fill="rgba(28, 165, 201, 0.24)" d="M0,192L60,181.3C120,171,240,149,360,154.7C480,160,600,192,720,197.3C840,203,960,181,1080,165.3C1200,149,1320,139,1380,133.3L1440,128L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
-        <path class="beach-wave wave-aqua" fill="rgba(92, 224, 212, 0.32)" d="M0,224L80,213.3C160,203,320,181,480,186.7C640,192,800,224,960,224C1120,224,1280,192,1360,176L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
-        <path class="beach-wave wave-foam" fill="rgba(255, 255, 255, 0.52)" d="M0,250L60,246C120,242,240,234,360,238C480,242,600,260,720,260C840,260,960,242,1080,233C1200,224,1320,224,1380,224L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
-      </svg>
-
-      <!-- Warm Golden Sand Shore -->
-      <div class="beach-shore-sand"></div>
-
-      <!-- Sun Sparkles -->
-      <span class="beach-sparkle sp-1"></span>
-      <span class="beach-sparkle sp-2"></span>
-      <span class="beach-sparkle sp-3"></span>
-      <span class="beach-sparkle sp-4"></span>
-      <span class="beach-sparkle sp-5"></span>
-      <span class="beach-sparkle sp-6"></span>
-      <span class="beach-sparkle sp-7"></span>
-    </div>
-
-    <!-- Pink Sakura Layer (粉紅櫻花版本專屬背景：夢幻浮動泡泡、粉櫻光暈與愛心星芒) -->
-    <div class="pink-bubble-layer">
-      <div class="pb-ambient-glow"></div>
-      
-      <!-- Rising Iridescent Pink Bubbles -->
-      <span class="pink-bubble pb-1"></span>
-      <span class="pink-bubble pb-2"></span>
-      <span class="pink-bubble pb-3"></span>
-      <span class="pink-bubble pb-4"></span>
-      <span class="pink-bubble pb-5"></span>
-      <span class="pink-bubble pb-6"></span>
-      <span class="pink-bubble pb-7"></span>
-      <span class="pink-bubble pb-8"></span>
-      <span class="pink-bubble pb-9"></span>
-      <span class="pink-bubble pb-10"></span>
-      <span class="pink-bubble pb-11"></span>
-      <span class="pink-bubble pb-12"></span>
-      <span class="pink-bubble pb-13"></span>
-      <span class="pink-bubble pb-14"></span>
-      <span class="pink-bubble pb-15"></span>
-
-      <!-- Floating Dreamy Hearts -->
-      <span class="pink-heart ph-1">💖</span>
-      <span class="pink-heart ph-2">💕</span>
-      <span class="pink-heart ph-3">🌸</span>
-      <span class="pink-heart ph-4">💖</span>
-      <span class="pink-heart ph-5">✨</span>
-      <span class="pink-heart ph-6">💕</span>
-
-      <!-- Twinkling Sparkles -->
-      <span class="pink-sparkle ps-1"></span>
-      <span class="pink-sparkle ps-2"></span>
-      <span class="pink-sparkle ps-3"></span>
-      <span class="pink-sparkle ps-4"></span>
-      <span class="pink-sparkle ps-5"></span>
-      <span class="pink-sparkle ps-6"></span>
-      <span class="pink-sparkle ps-7"></span>
-      <span class="pink-sparkle ps-8"></span>
-    </div>
-
     <div class="bg-watermark-text">ARELITA // CHRONICLES</div>
     <svg class="bg-astrolabe" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="300" cy="300" r="260" stroke="currentColor" stroke-width="1" stroke-dasharray="6 8" />
@@ -523,82 +300,95 @@
           </div>
           <audio id="bgmCustomAudio" loop preload="auto"></audio>
         </div>
-
-        <!-- Theme Selector with Dropdown Menu (條列式風格版本選單) -->
-        <div class="theme-select-wrap" id="themeSelectWrap">
-          <button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-haspopup="true" aria-expanded="false" title="挑選風格版本" aria-label="挑選風格版本">
-            <span class="theme-icon" id="themeToggleIcon">🌊</span>
-            <span class="theme-text" id="themeToggleText">夏日海洋</span>
-            <span class="theme-caret" aria-hidden="true">▾</span>
-          </button>
-          <div class="theme-dropdown-menu hidden" id="themeDropdownMenu" role="menu" aria-label="風格版本選單">
-            <div class="theme-dropdown-header">風格版本挑選 // SELECT THEME</div>
-            <div class="theme-dropdown-list">
-              <button type="button" class="theme-option-btn" data-theme-val="ocean" role="menuitem">
-                <span class="theme-opt-icon">🌊</span>
-                <div class="theme-opt-info">
-                  <span class="theme-opt-name">夏日海洋</span>
-                  <span class="theme-opt-desc">晴空碧海・珍珠水波</span>
-                </div>
-                <span class="theme-opt-check">✓</span>
-              </button>
-              <button type="button" class="theme-option-btn" data-theme-val="beach" role="menuitem">
-                <span class="theme-opt-icon">🏖️</span>
-                <div class="theme-opt-info">
-                  <span class="theme-opt-name">假日海灘</span>
-                  <span class="theme-opt-desc">陽光沙灘・椰林漫步</span>
-                </div>
-                <span class="theme-opt-check">✓</span>
-              </button>
-              <button type="button" class="theme-option-btn" data-theme-val="bubble" role="menuitem">
-                <span class="theme-opt-icon">🌸</span>
-                <div class="theme-opt-info">
-                  <span class="theme-opt-name">粉紅櫻花</span>
-                  <span class="theme-opt-desc">夢幻粉櫻・草莓糖霜</span>
-                </div>
-                <span class="theme-opt-check">✓</span>
-              </button>
-              <button type="button" class="theme-option-btn" data-theme-val="worldtree" role="menuitem">
-                <span class="theme-opt-icon">🌳</span>
-                <div class="theme-opt-info">
-                  <span class="theme-opt-name">世界樹版</span>
-                  <span class="theme-opt-desc">世界命根・生命琥珀</span>
-                </div>
-                <span class="theme-opt-check">✓</span>
-              </button>
-              <button type="button" class="theme-option-btn" data-theme-val="starry" role="menuitem">
-                <span class="theme-opt-icon">🌌</span>
-                <div class="theme-opt-info">
-                  <span class="theme-opt-name">星空版本</span>
-                  <span class="theme-opt-desc">星穹夜空・璀璨流星</span>
-                </div>
-                <span class="theme-opt-check">✓</span>
-              </button>
-              <button type="button" class="theme-option-btn" data-theme-val="dark" role="menuitem">
-                <span class="theme-opt-icon">🌙</span>
-                <div class="theme-opt-info">
-                  <span class="theme-opt-name">黑色版本</span>
-                  <span class="theme-opt-desc">永夜黑曜・深黑之蝕</span>
-                </div>
-                <span class="theme-opt-check">✓</span>
-              </button>
-              <button type="button" class="theme-option-btn" data-theme-val="light" role="menuitem">
-                <span class="theme-opt-icon">☀️</span>
-                <div class="theme-opt-info">
-                  <span class="theme-opt-name">白色版本</span>
-                  <span class="theme-opt-desc">聖潔白晝・晨曦之光</span>
-                </div>
-                <span class="theme-opt-check">✓</span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </header>
 
+  <!-- PGR Giant Watermark & Left Vertical Tactical Navigation Rail -->
+  <div class="pgr-bg-watermark pgr-hud-only" id="pgrBgWatermark" aria-hidden="true">ARELITA</div>
+
+  <!-- PGR Top-Left Slanted Game Brand Logo -->
+  <div class="pgr-top-brand pgr-hud-only" id="pgrTopBrand" role="button" tabindex="0" title="返回首頁 HOME">
+    <div class="pgr-tb-main">ARELITA</div>
+    <div class="pgr-tb-sub">WORLD ARCHIVE</div>
+  </div>
+
+  <!-- PGR Top-Right Minimal Tactical Controls (Theme, Search, Audio) -->
+  <div class="pgr-top-controls pgr-hud-only" id="pgrTopControls">
+    <!-- Tactical Palette Switcher (Crimson Red / Azure Blue) -->
+    <button type="button" class="pgr-hud-btn pgr-palette-btn" id="pgrPaletteToggleBtn" title="切換戰術色系：黑紅緋紅 // 湛藍電氣">
+      <span class="pgr-palette-dot" id="pgrPaletteDot"></span>
+      <span class="pgr-palette-text" id="pgrPaletteText">AZURE BLUE</span>
+    </button>
+    <div class="pgr-quick-search">
+      <span class="pgr-qs-icon">⌕</span>
+      <input type="search" id="pgrSearchMirror" placeholder="SEARCH CONSTRUCT / ELEMENT..." autocomplete="off" />
+    </div>
+    <div class="pgr-audio-btn-group">
+      <button type="button" class="pgr-hud-btn" id="pgrAudioMirrorBtn" title="點擊開啟／關閉背景音樂 BGM">
+        <span>♪</span>
+        <span id="pgrAudioMirrorText">AUDIO OFF</span>
+      </button>
+      <button type="button" class="pgr-hud-btn pgr-hud-btn-icon" id="pgrAudioMenuMirrorBtn" title="開啟音樂曲目與音量控制面板">▾</button>
+    </div>
+  </div>
+
+  <aside class="pgr-left-rail pgr-hud-only" id="pgrLeftRail" aria-label="戰術側邊導覽列">
+    <button type="button" class="pgr-rail-toggle" id="pgrRailToggleBtn" title="收合／展開戰術導覽列">
+      <span class="pgr-hamburger-lines"><i></i><i></i><i></i></span>
+    </button>
+    <div class="pgr-rail-list">
+      <button type="button" class="pgr-rail-item active" data-pgr-tab="home">
+        <span class="pgr-rail-en">HOME</span>
+        <span class="pgr-rail-zh">首頁導覽</span>
+      </button>
+      <button type="button" class="pgr-rail-item" data-pgr-tab="characters">
+        <span class="pgr-rail-en">DATA</span>
+        <span class="pgr-rail-zh">角色陣營圖鑑</span>
+      </button>
+      <button type="button" class="pgr-rail-item" data-pgr-tab="world">
+        <span class="pgr-rail-en">WORLD</span>
+        <span class="pgr-rail-zh">世界觀與設定</span>
+      </button>
+      <button type="button" class="pgr-rail-item" data-pgr-tab="attributes">
+        <span class="pgr-rail-en">ELEMENTS</span>
+        <span class="pgr-rail-zh">全屬性圖鑑</span>
+      </button>
+      <button type="button" class="pgr-rail-item" data-pgr-tab="stories">
+        <span class="pgr-rail-en">CHRONICLES</span>
+        <span class="pgr-rail-zh">劇情文庫</span>
+      </button>
+      <button type="button" class="pgr-rail-item" data-pgr-tab="gallery">
+        <span class="pgr-rail-en">ILLUSTRATION</span>
+        <span class="pgr-rail-zh">角色立繪畫廊</span>
+      </button>
+      <button type="button" class="pgr-rail-item" data-pgr-tab="others">
+        <span class="pgr-rail-en">OTHERS</span>
+        <span class="pgr-rail-zh">關係圖與擴充系統</span>
+      </button>
+    </div>
+  </aside>
+
   <!-- Main Workspace Container -->
   <main class="main-container">
+    <!-- PGR Section Telemetry Header (Exact pgr.kurogame.net top bar) -->
+    <div class="pgr-section-header pgr-hud-only" id="pgrSectionHeader" aria-hidden="true">
+      <div class="pgr-sh-line-left"></div>
+      <div class="pgr-sh-center">
+        <span class="pgr-sh-event-code" id="pgrEventLeft">EVENT 01</span>
+        <div class="pgr-sh-title-block">
+          <h2 class="pgr-sh-main-title" id="pgrSectionTitle">FEATURES</h2>
+          <div class="pgr-sh-sub-bar">
+            <span class="pgr-sh-sub-text">TACTICAL ARCHIVE // ARELITA</span>
+          </div>
+          <div class="pgr-sh-dots">∵</div>
+        </div>
+        <span class="pgr-sh-event-code" id="pgrEventRight">EVENT 01</span>
+      </div>
+      <div class="pgr-sh-line-right"></div>
+      <div class="pgr-sh-page-counter" id="pgrPageCounter">PAGE - <strong>01</strong> / 07</div>
+    </div>
+
     <!-- Graphic Design Portal Banner -->
     <section class="portal-hero-strip" aria-label="亞雷利塔世界觀導覽橫幅">
       <div class="hero-corner hero-corner-tl"></div>
@@ -644,9 +434,28 @@
 
     <!-- ==================== TAB 0: HOME PORTAL (CAROUSEL & ARCHIVE GUIDE) ==================== -->
     <section id="tab-home" class="tab-panel active">
-      <!-- 5-Slide Interactive Worldview Carousel -->
-      <div class="home-carousel-wrap" id="homeCarousel">
-        <div class="carousel-viewport">
+      <div class="pgr-home-stage-outer">
+        <!-- Left Flanking Ghost Preview Card (PGR #Features 01) -->
+        <div class="pgr-side-preview prev pgr-hud-only" id="pgrSidePreviewLeft" title="上一張世界觀展示">
+          <div class="pgr-sp-arrow"><span class="pgr-sp-chev">◀◀</span><span>PREV // ARCHIVE</span></div>
+          <div class="pgr-sp-card">
+            <img id="pgrSidePrevImg" src="assets/banners/watercolor-5-celestial-truth.jpg" alt="Previous Slide" />
+            <div class="pgr-sp-overlay">
+              <span class="pgr-sp-num" id="pgrSidePrevNum">05</span>
+              <span class="pgr-sp-sub" id="pgrSidePrevTitle">CELESTIAL SANCTUM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5-Slide Interactive Worldview Carousel -->
+        <div class="home-carousel-wrap" id="homeCarousel">
+          <div class="pgr-frame-corner tl pgr-hud-only"></div>
+          <div class="pgr-frame-corner tr pgr-hud-only"></div>
+          <div class="pgr-frame-corner bl pgr-hud-only"></div>
+          <div class="pgr-frame-corner br pgr-hud-only"></div>
+          <div class="pgr-frame-brand-tag pgr-hud-only">TACTICAL ARCHIVE // ARELITA</div>
+          <div class="pgr-frame-ver-tag pgr-hud-only">VER 3.0 // ARCHIVE</div>
+          <div class="carousel-viewport">
           <!-- Slide 1: World Tree & Five Realms -->
           <div class="carousel-slide active" data-slide-index="0">
             <img src="assets/banners/watercolor-1-worldtree.jpg" alt="世界樹與五界門扉・水彩奇幻藝術" class="carousel-bg-img" />
@@ -740,6 +549,54 @@
           <button class="carousel-dot" data-slide-to="3" aria-label="第 4 張：深淵之口與萬寂虛域"></button>
           <button class="carousel-dot" data-slide-to="4" aria-label="第 5 張：天界浮島與極真圃"></button>
         </div>
+      </div>
+
+        <!-- Right Flanking Ghost Preview Card (PGR #Features 02) -->
+        <div class="pgr-side-preview next pgr-hud-only" id="pgrSidePreviewRight" title="下一張世界觀展示">
+          <div class="pgr-sp-arrow"><span>NEXT // ARCHIVE</span><span class="pgr-sp-chev">▶▶</span></div>
+          <div class="pgr-sp-card">
+            <img id="pgrSideNextImg" src="assets/banners/watercolor-2-mofeng.jpg" alt="Next Slide" />
+            <div class="pgr-sp-overlay">
+              <span class="pgr-sp-num" id="pgrSideNextNum">02</span>
+              <span class="pgr-sp-sub" id="pgrSideNextTitle">MOFENG FEDERATION</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PGR Spaced Caption & Tactical Quick-Launch Dock (Replaces bulky feature grid in PGR mode) -->
+      <div class="pgr-home-caption pgr-hud-only">
+        <div class="pgr-hc-line-row">
+          <span class="pgr-hc-long-line"></span>
+        </div>
+        <div class="pgr-hc-spaced-text">T H E &nbsp;&nbsp; A R E L I T A &nbsp;&nbsp; W O R L D &nbsp;&nbsp; A R C H I V E</div>
+      </div>
+
+      <div class="pgr-home-dock pgr-hud-only">
+        <button type="button" class="pgr-dock-btn" data-goto-tab="characters">
+          <span class="pgr-db-code">01 // DATA</span>
+          <span class="pgr-db-title">CONSTRUCTS 角色檔案 (176)</span>
+        </button>
+        <button type="button" class="pgr-dock-btn" data-goto-tab="gallery">
+          <span class="pgr-db-code">02 // ILLUSTRATION</span>
+          <span class="pgr-db-title">CHARACTER ILLUSTRATION 角色立繪 (36)</span>
+        </button>
+        <a href="relations.html" class="pgr-dock-btn">
+          <span class="pgr-db-code">03 // NETWORK</span>
+          <span class="pgr-db-title">RELATIONS 角色關係圖譜 ↗</span>
+        </a>
+        <a href="compare.html" class="pgr-dock-btn">
+          <span class="pgr-db-code">04 // COMBAT</span>
+          <span class="pgr-db-title">COMPARE 戰力能力對比 ↗</span>
+        </a>
+        <a href="tierlist.html" class="pgr-dock-btn">
+          <span class="pgr-db-code">05 // RANKING</span>
+          <span class="pgr-db-title">TIER LIST 全角色排行 ↗</span>
+        </a>
+        <a href="summon.html" class="pgr-dock-btn">
+          <span class="pgr-db-code">06 // TERMINAL</span>
+          <span class="pgr-db-title">SUMMON 角色召喚模擬 ↗</span>
+        </a>
       </div>
 
       <!-- Website Purpose & Archive Modules Introduction -->
@@ -840,18 +697,8 @@
               <span class="hf-code">09 // RELATIONSHIP ATLAS</span>
             </div>
             <h3 class="hf-title">角色關係全景圖譜（獨立互動圖表分頁）</h3>
-            <p class="hf-desc">開啟獨立新分頁的角色人際關係星圖。支援全 176 位角色動態力導向星網、魔風聯邦軍政最高階層樹、世界宿敵與盟約分析、雙向檢索速查表，並支援點擊任意角色直觀檢視個人完整人際羈絆檔案。</p>
+            <p class="hf-desc">開啟獨立新分頁的角色人際關係星圖。支援全 177 位角色單人球體關係圖、魔風聯邦軍政最高階層樹、雙向檢索速查表，並支援點擊任意角色直觀檢視個人完整人際羈絆檔案。</p>
             <div class="hf-link">開啟角色關係圖譜分頁 ↗</div>
-          </a>
-
-          <a href="quiz.html" target="_blank" rel="noopener" class="home-feature-card home-feature-compare">
-            <div class="hf-top">
-              <span class="hf-icon">🔮</span>
-              <span class="hf-code">10 // SOUL RESONANCE QUIZ</span>
-            </div>
-            <h3 class="hf-title">尋真千卷・靈魂共鳴心理測驗（獨立診斷分頁）</h3>
-            <p class="hf-desc">開啟獨立新分頁的亞雷利塔角色相性診斷與萌點探索系統。透過 10～14 題世界觀情境抉擇，比對全 176 位角色的真實個性、善惡傾向、飲食日常喜好與 155 種屬性，繪製六維靈魂雷達圖、配對命定夥伴與宿敵，並支援匯出專屬「靈魂共鳴通行證」圖片。</p>
-            <div class="hf-link">開啟靈魂共鳴心理測驗分頁 ↗</div>
           </a>
         </div>
       </div>
@@ -859,7 +706,82 @@
 
     <!-- ==================== TAB 1: CHARACTER DIRECTORY BY FACTION ==================== -->
     <section id="tab-characters" class="tab-panel">
-      <div class="workspace-layout">
+      <!-- PGR #Data Construct Spotlight Stage (Exact pgr.kurogame.net/#Data layout) -->
+      <div class="pgr-construct-stage pgr-hud-only" id="pgrConstructStage">
+        <!-- Diagonal Top-Right Slash Badge -->
+        <button type="button" class="pgr-char-select-slash" id="pgrScrollToRosterBtn" title="點擊展開下方全 176 位角色完整目錄">
+          <span class="pgr-css-sq">■</span>
+          <span class="pgr-css-main">CHARACTER</span>
+          <span class="pgr-css-sub">◀◀◀ ALL 176 ROSTER</span>
+        </button>
+
+        <!-- Angled Neon Spotlight Beam & Background Character Watermark -->
+        <div class="pgr-cs-beam" id="pgrCsBeam"></div>
+        <div class="pgr-cs-bg-name" id="pgrCsBgName">AKAYA FUZUKU</div>
+
+        <div class="pgr-cs-inner">
+          <!-- Left Column: Construct Dossier Info -->
+          <div class="pgr-cs-left">
+            <div class="pgr-cs-title-box">
+              <div class="pgr-cs-vert-bar" id="pgrCsVertBar"></div>
+              <div class="pgr-cs-title-content">
+                <h2 class="pgr-cs-name" id="pgrCsName">赤夜 風竹</h2>
+                <div class="pgr-cs-omniframe-row">
+                  <span class="pgr-cs-omni-line"></span>
+                  <span class="pgr-cs-omni-text" id="pgrCsEpithet">OMNIFRAME // 極惡之師</span>
+                  <span class="pgr-cs-omni-line"></span>
+                  <span class="pgr-cs-emblem">❖</span>
+                </div>
+                <p class="pgr-cs-bio" id="pgrCsBio">載入角色戰術檔案中...</p>
+              </div>
+            </div>
+
+            <div class="pgr-cs-specs">
+              <div class="pgr-cs-spec-item">
+                <span class="pgr-cs-chevron">▶</span>
+                <span>FACTION: <strong id="pgrCsFaction">魔風聯邦</strong></span>
+              </div>
+              <div class="pgr-cs-spec-item">
+                <span class="pgr-cs-chevron">▶</span>
+                <span>TIER: <strong id="pgrCsTier">現象級</strong></span>
+              </div>
+              <div class="pgr-cs-spec-item">
+                <span class="pgr-cs-chevron">▶</span>
+                <span>RACE: <strong id="pgrCsRace">惡魔</strong></span>
+              </div>
+            </div>
+
+            <div class="pgr-cs-attrs" id="pgrCsAttrs"></div>
+
+            <div class="pgr-cs-actions">
+              <button type="button" class="pgr-cs-btn primary" id="pgrCsOpenModalBtn">
+                <span>❖ FULL DOSSIER // 檢視完整能力與神權</span>
+              </button>
+              <a href="relations.html" class="pgr-cs-btn secondary" id="pgrCsRelLink">
+                <span>🧬 RELATIONS // 角色關係星圖 ↗</span>
+              </a>
+            </div>
+
+            <!-- PGR Square Pagination & Prev/Next Controls + Construct Quick-Select Strip -->
+            <div class="pgr-cs-pagination">
+              <button type="button" class="pgr-cs-nav-btn" id="pgrCsPrevBtn" title="上一位立繪角色">◀</button>
+              <span class="pgr-cs-page-num" id="pgrCsPageNum">■ 01 / 36 ■</span>
+              <button type="button" class="pgr-cs-nav-btn" id="pgrCsNextBtn" title="下一位立繪角色">▶</button>
+              <div class="pgr-cs-avatar-strip" id="pgrCsAvatarStrip" aria-label="立繪角色快速切換列"></div>
+            </div>
+          </div>
+
+          <!-- Right Column: Full Character Illustration Cutout + Slanted Tag -->
+          <div class="pgr-cs-right">
+            <div class="pgr-cs-art-wrap" id="pgrCsArtWrap" title="點擊檢視高解析原圖">
+              <img id="pgrCsPortrait" src="" alt="Character Portrait" />
+            </div>
+            <div class="pgr-cs-slanted-ribbon" id="pgrCsRibbon">MOFENG FEDERATION // SUPREME</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="workspace-layout" id="pgrFullRosterSection">
         <!-- Left Sidebar: Faction Directory Tree -->
         <aside class="sidebar" id="factionSidebar">
           <div class="sidebar-header">
@@ -1035,7 +957,22 @@
 
     <!-- ==================== TAB 4: CHARACTER PORTRAIT GALLERY ==================== -->
     <section id="tab-gallery" class="tab-panel">
-      <div class="workspace-layout">
+      <!-- PGR #Wallpapers 4-Column Asymmetric Bento Showcase (Exact pgr.kurogame.net/#Wallpapers layout) -->
+      <div class="pgr-wallpapers-stage pgr-hud-only" id="pgrWallpapersStage">
+        <div class="pgr-wp-bento" id="pgrWallpapersBento">
+          <!-- Populated dynamically by app.js with 4 asymmetric columns (2 stacked left, 2 tall center pillars, 2 stacked right + MORE ▶ button) -->
+        </div>
+        <div class="pgr-wp-controls-bar">
+          <div class="pgr-wp-batch-info" id="pgrWpBatchInfo">立繪展示分組 // 01 / 06（展示 36 幅角色立繪中之第 1-6 幅）</div>
+          <div class="pgr-wp-ctrl-btns">
+            <button type="button" class="pgr-wp-ctrl-btn" id="pgrWpPrevBatchBtn">◀ 上一組 PREV</button>
+            <button type="button" class="pgr-wp-ctrl-btn primary" id="pgrWpNextBatchBtn">下一組 NEXT ▶</button>
+            <button type="button" class="pgr-wp-ctrl-btn" id="pgrWpToggleAllBtn">🗂️ 展開下方全 36 幅分類畫廊 ▼</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="workspace-layout" id="pgrGalleryArchiveSection">
         <!-- Left Sidebar: Gallery Faction Categories -->
         <aside class="sidebar" id="gallerySidebar">
           <div class="sidebar-header">
@@ -1062,7 +999,75 @@
         </div>
       </div>
     </section>
+
+    <!-- ==================== TAB 5: PGR #OTHERS VERTICAL SPLIT COLUMNS ==================== -->
+    <section id="tab-others" class="tab-panel">
+      <div class="pgr-others-stage">
+        <a href="relations.html" class="pgr-other-col col-crimson">
+          <div class="pgr-oc-bg" style="background-image:url('assets/banners/watercolor-2-mofeng.jpg');"></div>
+          <div class="pgr-oc-hazard"></div>
+          <div class="pgr-oc-content">
+            <span class="pgr-oc-num">01 // NETWORK</span>
+            <h3 class="pgr-oc-title">RELATIONS</h3>
+            <div class="pgr-oc-sub"><span class="line"></span><span>角色關係全景圖譜</span><span class="line"></span></div>
+            <p class="pgr-oc-desc">177 位角色單人球體關係圖、依關係變色連線、自由拖曳防重疊與魔國軍政階層</p>
+          </div>
+        </a>
+
+        <a href="compare.html" class="pgr-other-col col-blue">
+          <div class="pgr-oc-bg" style="background-image:url('assets/banners/watercolor-3-dragon-island.jpg');"></div>
+          <div class="pgr-oc-hazard"></div>
+          <div class="pgr-oc-content">
+            <span class="pgr-oc-num">02 // COMBAT</span>
+            <h3 class="pgr-oc-title">COMPARE</h3>
+            <div class="pgr-oc-sub"><span class="line"></span><span>角色能力雙視窗對比</span><span class="line"></span></div>
+            <p class="pgr-oc-desc">左右雙視窗即時對比全 176 名角色的強度階級、種族、屬性與完整神權術式</p>
+          </div>
+        </a>
+
+        <a href="tierlist.html" class="pgr-other-col col-cyan">
+          <div class="pgr-oc-bg" style="background-image:url('assets/banners/watercolor-4-abyss-void.jpg');"></div>
+          <div class="pgr-oc-hazard"></div>
+          <div class="pgr-oc-content">
+            <span class="pgr-oc-num">03 // RANKING</span>
+            <h3 class="pgr-oc-title">TIER LIST</h3>
+            <div class="pgr-oc-sub"><span class="line"></span><span>全角色戰力排行榜</span><span class="line"></span></div>
+            <p class="pgr-oc-desc">支援官方強度一鍵套用、自由拖曳排位、雙稱號切換與高清排名圖匯出</p>
+          </div>
+        </a>
+
+        <a href="summon.html" class="pgr-other-col col-gold">
+          <div class="pgr-oc-bg" style="background-image:url('assets/banners/watercolor-1-worldtree.jpg');"></div>
+          <div class="pgr-oc-hazard"></div>
+          <div class="pgr-oc-content">
+            <span class="pgr-oc-num">04 // TERMINAL</span>
+            <h3 class="pgr-oc-title">SUMMON</h3>
+            <div class="pgr-oc-sub"><span class="line"></span><span>角色召喚模擬系統</span><span class="line"></span></div>
+            <p class="pgr-oc-desc">自訂種族與善惡傾向進行單抽或十連抽，觸發 7 階專屬召喚動畫與音效</p>
+          </div>
+        </a>
+      </div>
+    </section>
   </main>
+
+  <!-- PGR Persistent Bottom Tactical HUD Bar -->
+  <footer class="pgr-bottom-hud pgr-hud-only" aria-hidden="true">
+    <div class="pgr-bh-left">
+      <span class="pgr-bh-arrows">▶ ▶ ▶</span>
+      <span class="pgr-bh-brand">ARELITA FORCE // TACTICAL TERMINAL</span>
+      <div class="pgr-bh-line"></div>
+    </div>
+    <div class="pgr-bh-center">
+      <div class="pgr-bh-caution-tri"></div>
+      <span class="pgr-bh-caution-text">▽ CAUTION</span>
+    </div>
+    <div class="pgr-bh-right">
+      <div class="pgr-bh-line"></div>
+      <span class="pgr-bh-serial">SYS.VER // ARL-177-PGR</span>
+      <span class="pgr-bh-slashes">////////////////</span>
+      <span class="pgr-bh-corner">◢</span>
+    </div>
+  </footer>
 
   <!-- Floating Back-to-Top Button -->
   <button id="backToTopBtn" class="back-to-top-btn" title="回到網頁最頂部" aria-label="回到網頁最頂部">
@@ -1090,6 +1095,6 @@
   </div>
 
   <script src="assets/data.js"></script>
-  <script src="assets/app.js"></script>
+  <script src="assets/app.js?v=20261116_pgr25"></script>
 </body>
 </html>

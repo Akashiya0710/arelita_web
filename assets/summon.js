@@ -10657,45 +10657,10 @@
   }
 
   // ==================== HEADER & THEME ACTIONS ====================
-  function applySummonTheme(theme) {
-    const valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
-    summonState.theme = valid.includes(theme) ? theme : "ocean";
-    document.documentElement.setAttribute("data-theme", summonState.theme);
-    localStorage.setItem("arelita_theme", summonState.theme);
-
-    const iconEl = document.getElementById("summonThemeIcon");
-    const textEl = document.getElementById("summonThemeText");
-    if (iconEl && textEl) {
-      if (summonState.theme === "ocean") {
-        iconEl.textContent = "🌊";
-        textEl.textContent = "夏日海洋";
-      } else if (summonState.theme === "beach") {
-        iconEl.textContent = "🏖️";
-        textEl.textContent = "假日海灘";
-      } else if (summonState.theme === "bubble") {
-        iconEl.textContent = "🌸";
-        textEl.textContent = "粉紅櫻花";
-      } else if (summonState.theme === "worldtree") {
-        iconEl.textContent = "🌳";
-        textEl.textContent = "世界樹版";
-      } else if (summonState.theme === "starry") {
-        iconEl.textContent = "🌌";
-        textEl.textContent = "星空版本";
-      } else if (summonState.theme === "dark") {
-        iconEl.textContent = "🌙";
-        textEl.textContent = "黑色版本";
-      } else {
-        iconEl.textContent = "☀️";
-        textEl.textContent = "白色版本";
-      }
-    }
-
-    const wrap = document.getElementById("summonThemeSelectWrap");
-    if (wrap) {
-      wrap.querySelectorAll(".theme-option-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.themeVal === summonState.theme);
-      });
-    }
+  function applySummonTheme() {
+    summonState.theme = "pgr";
+    document.documentElement.setAttribute("data-theme", "pgr");
+    localStorage.setItem("arelita_theme", "pgr");
   }
 
   function initSummonHeaderAndActions() {

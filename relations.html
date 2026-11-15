@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="zh-Hant" data-theme="ocean">
+<html lang="zh-Hant" data-theme="pgr">
 
 <head>
     <meta charset="UTF-8" />
@@ -15,15 +15,16 @@
     <script>
         (function () {
             try {
-                var saved = localStorage.getItem("arelita_theme");
-                var valid = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
-                var theme = valid.indexOf(saved) !== -1 ? saved : "ocean";
-                document.documentElement.setAttribute("data-theme", theme);
+                localStorage.setItem("arelita_theme", "pgr");
+                document.documentElement.setAttribute("data-theme", "pgr");
+                const pal = localStorage.getItem("arelita_pgr_palette") || "blue";
+                document.documentElement.setAttribute("data-pgr-palette", pal);
             } catch (e) { }
         })();
     </script>
-    <link rel="stylesheet" href="assets/styles.css?v=20261111_theme_fix" />
+    <link rel="stylesheet" href="assets/styles.css?v=20261115_pgr3" />
     <link rel="stylesheet" href="assets/relations.css" />
+    <link rel="stylesheet" href="assets/pgr-theme.css?v=20261116_pgr25" />
 </head>
 
 <body class="compare-page-body rel-body">
@@ -60,84 +61,9 @@
                     </button>
                 </div>
 
-                <!-- Theme Selector -->
-                <div class="theme-select-wrap" id="relThemeSelectWrap">
-                    <button type="button" id="relThemeToggleBtn" class="theme-toggle-btn" aria-haspopup="true"
-                        aria-expanded="false" title="挑選風格版本">
-                        <span class="theme-icon" id="relThemeIcon">🌊</span>
-                        <span class="theme-text" id="relThemeText">夏日海洋</span>
-                        <span class="theme-caret" aria-hidden="true">▾</span>
-                    </button>
-                    <div class="theme-dropdown-menu hidden" id="relThemeDropdown" role="menu" aria-label="風格版本選單">
-                        <div class="theme-dropdown-header">風格版本挑選 // SELECT THEME</div>
-                        <div class="theme-dropdown-list">
-                            <button type="button" class="theme-option-btn" data-theme-val="ocean" role="menuitem">
-                                <span class="theme-opt-icon">🌊</span>
-                                <div class="theme-opt-info">
-                                    <span class="theme-opt-name">夏日海洋</span>
-                                    <span class="theme-opt-desc">晴空碧海・珍珠水波</span>
-                                </div>
-                                <span class="theme-opt-check">✓</span>
-                            </button>
-                            <button type="button" class="theme-option-btn" data-theme-val="beach" role="menuitem">
-                                <span class="theme-opt-icon">🏖️</span>
-                                <div class="theme-opt-info">
-                                    <span class="theme-opt-name">假日海灘</span>
-                                    <span class="theme-opt-desc">陽光沙灘・椰林漫步</span>
-                                </div>
-                                <span class="theme-opt-check">✓</span>
-                            </button>
-                            <button type="button" class="theme-option-btn" data-theme-val="bubble" role="menuitem">
-                                <span class="theme-opt-icon">🌸</span>
-                                <div class="theme-opt-info">
-                                    <span class="theme-opt-name">粉紅櫻花</span>
-                                    <span class="theme-opt-desc">夢幻粉櫻・草莓糖霜</span>
-                                </div>
-                                <span class="theme-opt-check">✓</span>
-                            </button>
-                            <button type="button" class="theme-option-btn" data-theme-val="worldtree" role="menuitem">
-                                <span class="theme-opt-icon">🌳</span>
-                                <div class="theme-opt-info">
-                                    <span class="theme-opt-name">世界樹版</span>
-                                    <span class="theme-opt-desc">世界命根・生命琥珀</span>
-                                </div>
-                                <span class="theme-opt-check">✓</span>
-                            </button>
-                            <button type="button" class="theme-option-btn" data-theme-val="starry" role="menuitem">
-                                <span class="theme-opt-icon">🌌</span>
-                                <div class="theme-opt-info">
-                                    <span class="theme-opt-name">星空版本</span>
-                                    <span class="theme-opt-desc">星穹夜空・璀璨流星</span>
-                                </div>
-                                <span class="theme-opt-check">✓</span>
-                            </button>
-                            <button type="button" class="theme-option-btn" data-theme-val="dark" role="menuitem">
-                                <span class="theme-opt-icon">🌙</span>
-                                <div class="theme-opt-info">
-                                    <span class="theme-opt-name">黑色版本</span>
-                                    <span class="theme-opt-desc">永夜黑曜・深黑之蝕</span>
-                                </div>
-                                <span class="theme-opt-check">✓</span>
-                            </button>
-                            <button type="button" class="theme-option-btn" data-theme-val="light" role="menuitem">
-                                <span class="theme-opt-icon">☀️</span>
-                                <div class="theme-opt-info">
-                                    <span class="theme-opt-name">白色版本</span>
-                                    <span class="theme-opt-desc">聖潔白晝・晨曦之光</span>
-                                </div>
-                                <span class="theme-opt-check">✓</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
                 <a href="index.html" class="compare-action-btn primary-back-btn" title="返回主檔案庫首頁">
                     <span>🏛️</span>
                     <span>主頁</span>
-                </a>
-                <a href="quiz.html" class="compare-action-btn" title="前往靈魂共鳴心理測驗">
-                    <span>🔮</span>
-                    <span>測驗</span>
                 </a>
                 <a href="compare.html" class="compare-action-btn" title="前往角色能力對比">
                     <span>⚖️</span>
@@ -146,6 +72,10 @@
                 <a href="tierlist.html" class="compare-action-btn" title="前往全角色戰力排行榜">
                     <span>🏆</span>
                     <span>排行</span>
+                </a>
+                <a href="summon.html" class="compare-action-btn" title="前往角色召喚模擬器">
+                    <span>✨</span>
+                    <span>召喚</span>
                 </a>
             </div>
         </div>
@@ -269,6 +199,25 @@
             </div>
         </section>
     </main>
+
+    <!-- PGR Persistent Bottom Tactical HUD Bar -->
+    <footer class="pgr-bottom-hud pgr-hud-only" aria-hidden="true">
+        <div class="pgr-bh-left">
+            <span class="pgr-bh-arrows">▶ ▶ ▶</span>
+            <span class="pgr-bh-brand">ARELITA FORCE // CONSTRUCT RELATIONSHIP MATRIX</span>
+            <div class="pgr-bh-line"></div>
+        </div>
+        <div class="pgr-bh-center">
+            <div class="pgr-bh-caution-tri"></div>
+            <span class="pgr-bh-caution-text">▽ CAUTION</span>
+        </div>
+        <div class="pgr-bh-right">
+            <div class="pgr-bh-line"></div>
+            <span class="pgr-bh-serial">LINK.NODES // 177-CONSTRUCTS</span>
+            <span class="pgr-bh-slashes">////////////////</span>
+            <span class="pgr-bh-corner">◢</span>
+        </div>
+    </footer>
 
     <script src="assets/relations_data.js"></script>
     <script src="assets/relations.js"></script>

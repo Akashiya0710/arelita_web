@@ -678,10 +678,12 @@
         ctx.translate(width / 2 + camera.x, height / 2 + camera.y);
         ctx.scale(camera.scale, camera.scale);
 
+        const isPgr = document.documentElement.getAttribute('data-theme') === 'pgr';
+
         // 1. Subtle radial guide rings around centerNode
         const ringRadii = new Set(spokeNodes.map((n) => n.radius));
         ctx.lineWidth = 1 / camera.scale;
-        ctx.strokeStyle = 'rgba(148, 163, 184, 0.08)';
+        ctx.strokeStyle = isPgr ? 'rgba(224, 26, 34, 0.16)' : 'rgba(148, 163, 184, 0.08)';
         ctx.setLineDash([5, 7]);
         ringRadii.forEach((r) => {
             ctx.beginPath();
@@ -733,9 +735,15 @@
                 node.y,
                 r
             );
-            grad.addColorStop(0, isHovered ? '#233b63' : '#182a47');
-            grad.addColorStop(0.7, isHovered ? '#11203a' : '#0c1629');
-            grad.addColorStop(1, '#070d19');
+            if (isPgr) {
+                grad.addColorStop(0, isHovered ? '#34161b' : '#232733');
+                grad.addColorStop(0.7, isHovered ? '#1d1014' : '#13161d');
+                grad.addColorStop(1, '#090a0d');
+            } else {
+                grad.addColorStop(0, isHovered ? '#233b63' : '#182a47');
+                grad.addColorStop(0.7, isHovered ? '#11203a' : '#0c1629');
+                grad.addColorStop(1, '#070d19');
+            }
 
             ctx.beginPath();
             ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
@@ -772,10 +780,10 @@
             const px = node.x - pillW / 2;
             const py = node.y + r + 5;
 
-            ctx.fillStyle = isHovered ? '#162847' : 'rgba(11, 19, 36, 0.92)';
+            ctx.fillStyle = isHovered ? (isPgr ? '#281014' : '#162847') : (isPgr ? 'rgba(13, 15, 20, 0.94)' : 'rgba(11, 19, 36, 0.92)');
             ctx.strokeStyle = hexToRgba(nodeColor, 0.55);
             ctx.lineWidth = 1.1;
-            roundRect(ctx, px, py, pillW, pillH, 9);
+            roundRect(ctx, px, py, pillW, pillH, isPgr ? 2 : 9);
             ctx.fill();
             ctx.stroke();
 
@@ -788,9 +796,10 @@
 
         // 4. Draw Center Hub Sphere (Selected Character)
         const cr = centerNode.r || 50;
+        const centerAccent = isPgr ? '#e01a22' : centerNode.color;
         ctx.beginPath();
         ctx.arc(centerNode.x, centerNode.y, cr + 8, 0, Math.PI * 2);
-        ctx.fillStyle = hexToRgba(centerNode.color, 0.2);
+        ctx.fillStyle = hexToRgba(centerAccent, 0.22);
         ctx.fill();
 
         const cGrad = ctx.createRadialGradient(
@@ -801,16 +810,22 @@
             centerNode.y,
             cr
         );
-        cGrad.addColorStop(0, '#1e3a5f');
-        cGrad.addColorStop(0.75, '#0f172a');
-        cGrad.addColorStop(1, '#080e1a');
+        if (isPgr) {
+            cGrad.addColorStop(0, '#451218');
+            cGrad.addColorStop(0.75, '#191b24');
+            cGrad.addColorStop(1, '#090a0d');
+        } else {
+            cGrad.addColorStop(0, '#1e3a5f');
+            cGrad.addColorStop(0.75, '#0f172a');
+            cGrad.addColorStop(1, '#080e1a');
+        }
 
         ctx.beginPath();
         ctx.arc(centerNode.x, centerNode.y, cr, 0, Math.PI * 2);
         ctx.fillStyle = cGrad;
         ctx.fill();
         ctx.lineWidth = 3.5;
-        ctx.strokeStyle = centerNode.color;
+        ctx.strokeStyle = centerAccent;
         ctx.stroke();
 
         ctx.font = '900 14px "Noto Sans TC", sans-serif';
@@ -820,7 +835,7 @@
         ctx.fillText(centerNode.name, centerNode.x, centerNode.y - 7);
 
         ctx.font = '700 10.5px "Noto Sans TC", sans-serif';
-        ctx.fillStyle = '#38bdf8';
+        ctx.fillStyle = isPgr ? '#ff4d55' : '#38bdf8';
         ctx.fillText(centerNode.faction, centerNode.x, centerNode.y + 13);
 
         ctx.restore();
@@ -1176,62 +1191,9 @@
         btn.addEventListener('click', () => switchView(btn.dataset.view));
     });
 
-    // ==================== THEME SELECTOR ====================
-    function initThemeSelector() {
-        const toggleBtn = document.getElementById('relThemeToggleBtn');
-        const dropdown = document.getElementById('relThemeDropdown');
-        const iconSpan = document.getElementById('relThemeIcon');
-        const textSpan = document.getElementById('relThemeText');
-        if (!toggleBtn || !dropdown) return;
-
-        const themeMeta = {
-            ocean: { icon: '🌊', text: '夏日海洋' },
-            beach: { icon: '🏖️', text: '假日海灘' },
-            bubble: { icon: '🌸', text: '粉紅櫻花' },
-            worldtree: { icon: '🌳', text: '世界樹版' },
-            starry: { icon: '🌌', text: '星空版本' },
-            dark: { icon: '🌙', text: '黑色版本' },
-            light: { icon: '☀️', text: '白色版本' }
-        };
-
-        function applyTheme(themeKey) {
-            const meta = themeMeta[themeKey] || themeMeta.ocean;
-            document.documentElement.setAttribute('data-theme', themeKey);
-            localStorage.setItem('arelita_theme', themeKey);
-            if (iconSpan) iconSpan.textContent = meta.icon;
-            if (textSpan) textSpan.textContent = meta.text;
-            dropdown.querySelectorAll('.theme-option-btn').forEach((btn) => {
-                btn.classList.toggle('active', btn.dataset.themeVal === themeKey);
-            });
-            scheduleRender();
-        }
-
-        const current = document.documentElement.getAttribute('data-theme') || 'ocean';
-        applyTheme(current);
-
-        toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdown.classList.toggle('hidden');
-        });
-
-        dropdown.querySelectorAll('.theme-option-btn').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const val = btn.dataset.themeVal;
-                if (val) {
-                    applyTheme(val);
-                    dropdown.classList.add('hidden');
-                }
-            });
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!toggleBtn.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-    }
-
-    initThemeSelector();
+    // ==================== THEME LOCK (PGR TACTICAL) ====================
+    document.documentElement.setAttribute('data-theme', 'pgr');
+    localStorage.setItem('arelita_theme', 'pgr');
 
     // ==================== HELPERS ====================
     function roundRect(ctx, x, y, w, h, r) {

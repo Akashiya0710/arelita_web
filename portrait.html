@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" data-theme="dark">
+<html lang="zh-Hant" data-theme="pgr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>角色立繪高解析度檢視器｜亞雷利塔 ARELITA</title>
+  <title>角色立繪高解析度檢視器｜亞雷利塔 ARELITA 戰術終端</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="shortcut icon" href="assets/favicon.svg" />
   <script>
     (function () {
       try {
-        var saved = localStorage.getItem("arelita_theme");
-        if (saved === "light" || saved === "dark" || saved === "starry") {
-          document.documentElement.setAttribute("data-theme", saved);
-        }
+        localStorage.setItem("arelita_theme", "pgr");
+        document.documentElement.setAttribute("data-theme", "pgr");
+        const pal = localStorage.getItem("arelita_pgr_palette") || "blue";
+        document.documentElement.setAttribute("data-pgr-palette", pal);
       } catch (e) {}
     })();
   </script>
@@ -20,27 +20,35 @@
     :root,
     body.bg-dark,
     body.bg-checker {
-      --bg-canvas: #080b11;
-      --bg-toolbar: rgba(13, 18, 28, 0.92);
-      --border-color: rgba(228, 184, 88, 0.42);
+      --bg-canvas: #090a0d;
+      --bg-toolbar: rgba(11, 13, 18, 0.96);
+      --border-color: rgba(224, 26, 34, 0.55);
       --border-subtle: rgba(255, 255, 255, 0.14);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --accent-gold: #e4b858;
-      --accent-gold-soft: rgba(228, 184, 88, 0.16);
-      --btn-bg: #161e2e;
+      --text-primary: #f4f6fa;
+      --text-secondary: #98a2b3;
+      --accent-crimson: #e01a22;
+      --accent-crimson-soft: rgba(224, 26, 34, 0.16);
+      --btn-bg: #13161f;
     }
 
     body.bg-light {
-      --bg-canvas: #eef2f7;
-      --bg-toolbar: rgba(255, 255, 255, 0.94);
-      --border-color: rgba(176, 125, 26, 0.45);
-      --border-subtle: rgba(15, 23, 42, 0.15);
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --accent-gold: #b07d1a;
-      --accent-gold-soft: rgba(176, 125, 26, 0.12);
-      --btn-bg: #f1f5f9;
+      --bg-canvas: #e5e7eb;
+      --bg-toolbar: rgba(15, 18, 24, 0.96);
+      --border-color: rgba(224, 26, 34, 0.6);
+      --border-subtle: rgba(255, 255, 255, 0.16);
+      --text-primary: #f4f6fa;
+      --text-secondary: #98a2b3;
+      --accent-crimson: #e01a22;
+      --accent-crimson-soft: rgba(224, 26, 34, 0.18);
+      --btn-bg: #181c26;
+    }
+
+    html[data-pgr-palette="blue"],
+    html[data-pgr-palette="blue"] body.bg-dark,
+    html[data-pgr-palette="blue"] body.bg-checker {
+      --border-color: rgba(0, 210, 255, 0.55);
+      --accent-crimson: #00f0ff;
+      --accent-crimson-soft: rgba(0, 240, 255, 0.18);
     }
 
     * {
@@ -59,25 +67,30 @@
       user-select: none;
     }
 
-    /* Canvas Background Modes */
+    /* Canvas Background Modes (PGR Tactical Terminal) */
     body.bg-dark {
-      background: radial-gradient(circle at 50% 45%, #161d2b 0%, #070a10 85%);
+      background-color: #090a0d;
+      background-image:
+        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 72% 28%, rgba(224, 26, 34, 0.12), transparent 52%),
+        radial-gradient(circle at 50% 50%, #12151e 0%, #07080b 88%);
+      background-size: 24px 24px, 100% 100%, 100% 100%;
     }
     body.bg-light {
-      background: radial-gradient(circle at 50% 45%, #ffffff 0%, #dde4ee 85%);
+      background: radial-gradient(circle at 50% 45%, #f8fafc 0%, #cbd5e1 88%);
     }
     body.bg-checker {
-      background-color: #12161f;
+      background-color: #0e1017;
       background-image:
-        linear-gradient(45deg, #1b2230 25%, transparent 25%),
-        linear-gradient(-45deg, #1b2230 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #1b2230 75%),
-        linear-gradient(-45deg, transparent 75%, #1b2230 75%);
+        linear-gradient(45deg, #171b26 25%, transparent 25%),
+        linear-gradient(-45deg, #171b26 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #171b26 75%),
+        linear-gradient(-45deg, transparent 75%, #171b26 75%);
       background-size: 28px 28px;
       background-position: 0 0, 0 14px, 14px -14px, -14px 0;
     }
 
-    /* Top Floating Control Bar */
+    /* Top Floating Tactical Control Bar */
     .viewer-header {
       position: fixed;
       top: 0;
@@ -85,7 +98,8 @@
       right: 0;
       height: 64px;
       background: var(--bg-toolbar);
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.65);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -95,10 +109,20 @@
       flex-wrap: nowrap;
     }
 
+    .viewer-header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 240px;
+      height: 2px;
+      background: linear-gradient(90deg, #e01a22, transparent);
+    }
+
     .viewer-title-box {
       display: flex;
       align-items: center;
-      gap: 0.7rem;
+      gap: 0.75rem;
       flex: 1;
       min-width: 0;
       overflow: hidden;
@@ -107,12 +131,11 @@
     .viewer-badge {
       font-size: 0.66rem;
       font-weight: 800;
-      letter-spacing: 0.12em;
-      color: var(--accent-gold);
-      background: var(--accent-gold-soft);
-      border: 1px solid var(--border-color);
-      padding: 0.18rem 0.52rem;
-      border-radius: 4px;
+      letter-spacing: 0.14em;
+      color: #ffffff;
+      background: #e01a22;
+      padding: 0.22rem 0.65rem;
+      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
       flex-shrink: 0;
       white-space: nowrap;
     }
@@ -120,6 +143,7 @@
     .viewer-title {
       font-size: 1.02rem;
       font-weight: 800;
+      letter-spacing: 0.04em;
       color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
@@ -139,10 +163,11 @@
       background: var(--btn-bg);
       color: var(--text-primary);
       border: 1px solid var(--border-subtle);
-      border-radius: 5px;
-      padding: 0.36rem 0.68rem;
-      font-size: 0.8rem;
-      font-weight: 600;
+      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+      padding: 0.38rem 0.72rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
       font-family: inherit;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -156,21 +181,22 @@
 
     .ctrl-btn:hover,
     .ctrl-btn.active {
-      border-color: var(--accent-gold);
-      color: var(--accent-gold);
-      background: var(--accent-gold-soft);
+      border-color: var(--accent-crimson);
+      color: #ffffff;
+      background: rgba(224, 26, 34, 0.24);
+      box-shadow: 0 0 12px rgba(224, 26, 34, 0.35);
     }
 
     .zoom-readout {
-      min-width: 60px;
+      min-width: 64px;
       text-align: center;
-      font-size: 0.82rem;
-      font-weight: 800;
-      color: var(--accent-gold);
-      background: var(--accent-gold-soft);
-      border: 1px solid var(--border-color);
-      border-radius: 5px;
-      padding: 0.32rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: #ff4d55;
+      background: rgba(224, 26, 34, 0.14);
+      border: 1px solid rgba(224, 26, 34, 0.55);
+      padding: 0.34rem 0.5rem;
       flex-shrink: 0;
     }
 
@@ -187,7 +213,7 @@
       top: 64px;
       left: 0;
       right: 0;
-      bottom: 0;
+      bottom: 28px;
       overflow: hidden;
       cursor: grab;
     }
@@ -222,33 +248,58 @@
     /* Bottom Floating Help Pill */
     .viewer-footer-hint {
       position: fixed;
-      bottom: 1.2rem;
+      bottom: 2.4rem;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--bg-toolbar);
-      border: 1px solid var(--border-color);
-      border-radius: 99px;
-      padding: 0.42rem 1.2rem;
-      font-size: 0.78rem;
+      background: rgba(11, 13, 18, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-left: 3px solid #e01a22;
+      padding: 0.42rem 1.25rem;
+      font-size: 0.76rem;
+      letter-spacing: 0.04em;
       color: var(--text-secondary);
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.1rem;
       z-index: 90;
       pointer-events: none;
       white-space: nowrap;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
     }
 
     .viewer-footer-hint strong {
-      color: var(--accent-gold);
+      color: #ff4d55;
+    }
+
+    /* PGR Bottom Tactical HUD Bar */
+    .pgr-viewer-bottom-hud {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 28px;
+      background: rgba(9, 10, 13, 0.96);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      color: rgba(255, 255, 255, 0.42);
+      z-index: 100;
+      pointer-events: none;
+    }
+    .pgr-viewer-bottom-hud .caution {
+      color: #e01a22;
     }
   </style>
 </head>
 <body class="bg-dark">
   <header class="viewer-header">
     <div class="viewer-title-box">
-      <span class="viewer-badge">PORTRAIT INSPECTOR // 立繪細節檢視</span>
+      <span class="viewer-badge">CHARACTER ILLUSTRATION // 立繪細節檢視</span>
       <h1 class="viewer-title" id="charTitle">角色立繪檢視</h1>
     </div>
 
@@ -262,13 +313,14 @@
 
       <div class="ctrl-divider"></div>
 
-      <button class="ctrl-btn active" data-bg="bg-dark" title="曜黑背景">🌑 深色底</button>
+      <button class="ctrl-btn active" data-bg="bg-dark" title="戰雙黑曜網格底">🌑 戰術黑底</button>
       <button class="ctrl-btn" data-bg="bg-checker" title="透明棋盤格背景">🏁 網格底</button>
       <button class="ctrl-btn" data-bg="bg-light" title="純白背景">☀️ 淺色底</button>
 
       <div class="ctrl-divider"></div>
 
       <a class="ctrl-btn" id="rawImgLink" href="#" target="_blank" title="直接開啟原始 PNG 圖檔">🖼️ 原始圖檔</a>
+      <a class="ctrl-btn" href="index.html" title="返回亞雷利塔主檔案庫">🏛️ 主檔案庫</a>
     </div>
   </header>
 
@@ -279,10 +331,16 @@
   </main>
 
   <div class="viewer-footer-hint">
-    <span>🖱️ <strong>滾輪上下</strong>：自由無段縮放細節（20% ～ 600%）</span>
+    <span>🖱️ <strong>滾輪上下</strong>：自由無段縮放細節（15% ～ 600%）</span>
     <span>✋ <strong>左鍵按住拖曳</strong>：自由移動畫面位置</span>
     <span>🖱️ <strong>雙擊畫面</strong>：快速放大／還原</span>
   </div>
+
+  <footer class="pgr-viewer-bottom-hud" aria-hidden="true">
+    <span>▶ ▶ ▶ ARELITA FORCE // CHARACTER ILLUSTRATION TERMINAL</span>
+    <span class="caution">▽ CAUTION // HIGH-RESOLUTION OPTICAL FEED</span>
+    <span>SYS.VER // ARL-36-HD //////////////// ◢</span>
+  </footer>
 
   <script>
     (function () {

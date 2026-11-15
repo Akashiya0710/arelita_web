@@ -366,7 +366,8 @@
 
   // Application State
   const state = {
-    theme: localStorage.getItem("arelita_theme") || "ocean", // 'ocean' | 'worldtree' | 'starry' | 'dark' | 'light'
+    theme: "pgr",
+    pgrPalette: localStorage.getItem("arelita_pgr_palette") || "blue",
     activeTab: "home",
     renderedTabs: new Set(["home"]),
     mobileDefaultCollapsedApplied: false,
@@ -1304,15 +1305,49 @@
     const dots = Array.from(carouselEl.querySelectorAll(".carousel-dot"));
     const prevBtn = document.getElementById("carouselPrevBtn");
     const nextBtn = document.getElementById("carouselNextBtn");
+    const sidePrevCard = document.getElementById("pgrSidePreviewLeft");
+    const sideNextCard = document.getElementById("pgrSidePreviewRight");
+    const sidePrevImg = document.getElementById("pgrSidePrevImg");
+    const sideNextImg = document.getElementById("pgrSideNextImg");
+    const sidePrevNum = document.getElementById("pgrSidePrevNum");
+    const sideNextNum = document.getElementById("pgrSideNextNum");
+    const sidePrevTitle = document.getElementById("pgrSidePrevTitle");
+    const sideNextTitle = document.getElementById("pgrSideNextTitle");
     if (slides.length === 0) return;
 
     let currentIdx = 0;
     let autoTimer = null;
 
+    function getSlideMeta(idx) {
+      const sl = slides[(idx + slides.length) % slides.length];
+      if (!sl) return { src: "", label: "ARCHIVE" };
+      const img = sl.querySelector(".carousel-bg-img, img");
+      const badge = sl.querySelector(".carousel-badge");
+      const rawBadge = badge ? badge.textContent.split("//")[0].trim() : "ARCHIVE";
+      return {
+        src: img ? img.getAttribute("src") || "" : "",
+        label: rawBadge
+      };
+    }
+
+    function updateSidePreviews() {
+      const prevIdx = (currentIdx - 1 + slides.length) % slides.length;
+      const nextIdx = (currentIdx + 1) % slides.length;
+      const prevMeta = getSlideMeta(prevIdx);
+      const nextMeta = getSlideMeta(nextIdx);
+      if (sidePrevImg && prevMeta.src) sidePrevImg.src = prevMeta.src;
+      if (sideNextImg && nextMeta.src) sideNextImg.src = nextMeta.src;
+      if (sidePrevNum) sidePrevNum.textContent = String(prevIdx + 1).padStart(2, "0");
+      if (sideNextNum) sideNextNum.textContent = String(nextIdx + 1).padStart(2, "0");
+      if (sidePrevTitle) sidePrevTitle.textContent = prevMeta.label;
+      if (sideNextTitle) sideNextTitle.textContent = nextMeta.label;
+    }
+
     function goToSlide(idx) {
       currentIdx = (idx + slides.length) % slides.length;
       slides.forEach((sl, i) => sl.classList.toggle("active", i === currentIdx));
       dots.forEach((dt, i) => dt.classList.toggle("active", i === currentIdx));
+      updateSidePreviews();
     }
 
     function startAutoPlay() {
@@ -1343,6 +1378,18 @@
         startAutoPlay();
       });
     }
+    if (sidePrevCard) {
+      sidePrevCard.addEventListener("click", () => {
+        goToSlide(currentIdx - 1);
+        startAutoPlay();
+      });
+    }
+    if (sideNextCard) {
+      sideNextCard.addEventListener("click", () => {
+        goToSlide(currentIdx + 1);
+        startAutoPlay();
+      });
+    }
     dots.forEach((dot) => {
       dot.addEventListener("click", () => {
         const idx = Number(dot.getAttribute("data-slide-to") || 0);
@@ -1360,11 +1407,12 @@
         const target = el.getAttribute("data-goto-tab");
         if (target) {
           switchTab(target);
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.scrollTo(0, 0);
         }
       });
     });
 
+    updateSidePreviews();
     startAutoPlay();
   }
 
@@ -2734,6 +2782,12 @@
   function openCharacterModal(charId) {
     const c = characters.find((item) => item.id === charId);
     if (!c) return;
+    if (c.image && pgrConstructList.length) {
+      const spIdx = pgrConstructList.findIndex((item) => item.id === c.id);
+      if (spIdx >= 0 && spIdx !== pgrConstructIdx) {
+        renderPgrConstructSpotlight(spIdx);
+      }
+    }
     const modal = document.getElementById("characterModal");
     const body = document.getElementById("modalBodyContent");
     body.innerHTML = renderCharacterShowcaseCard(c, true);
@@ -3092,10 +3146,16 @@
     const statusText = document.getElementById("bgmStatusText");
     const volSlider = document.getElementById("bgmVolumeSlider");
     const volValue = document.getElementById("bgmVolValue");
+    const pgrAudioBtn = document.getElementById("pgrAudioMirrorBtn");
+    const pgrAudioText = document.getElementById("pgrAudioMirrorText");
 
     if (toggleBtn && statusText) {
       toggleBtn.classList.toggle("playing", bgmSystem.isPlaying);
       statusText.textContent = bgmSystem.isPlaying ? "BGM ON" : "BGM OFF";
+    }
+    if (pgrAudioBtn && pgrAudioText) {
+      pgrAudioBtn.classList.toggle("playing", bgmSystem.isPlaying);
+      pgrAudioText.textContent = bgmSystem.isPlaying ? "AUDIO ON" : "AUDIO OFF";
     }
     if (volSlider && volValue) {
       const pct = Math.round(bgmSystem.volume * 100);
@@ -3194,127 +3254,21 @@
   }
 
   // ==================== THEME & SCROLL CONTROLS ====================
-  function applyTheme(theme) {
-    const validThemes = ["ocean", "beach", "bubble", "worldtree", "starry", "dark", "light"];
-    state.theme = validThemes.includes(theme) ? theme : "ocean";
-    document.documentElement.setAttribute("data-theme", state.theme);
-    localStorage.setItem("arelita_theme", state.theme);
-
-    const iconEl = document.getElementById("themeToggleIcon");
-    const textEl = document.getElementById("themeToggleText");
-    if (iconEl && textEl) {
-      if (state.theme === "ocean") {
-        iconEl.textContent = "🌊";
-        textEl.textContent = "夏日海洋";
-      } else if (state.theme === "beach") {
-        iconEl.textContent = "🏖️";
-        textEl.textContent = "假日海灘";
-      } else if (state.theme === "bubble") {
-        iconEl.textContent = "🌸";
-        textEl.textContent = "粉紅櫻花";
-      } else if (state.theme === "worldtree") {
-        iconEl.textContent = "🌳";
-        textEl.textContent = "世界樹版";
-      } else if (state.theme === "starry") {
-        iconEl.textContent = "🌌";
-        textEl.textContent = "星空版本";
-      } else if (state.theme === "dark") {
-        iconEl.textContent = "🌙";
-        textEl.textContent = "黑色版本";
-      } else {
-        iconEl.textContent = "☀️";
-        textEl.textContent = "白色版本";
-      }
-    }
-
-    // Update active highlight in theme dropdown menu
-    document.querySelectorAll(".theme-option-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.themeVal === state.theme);
-    });
+  function applyTheme() {
+    state.theme = "pgr";
+    document.documentElement.setAttribute("data-theme", "pgr");
+    localStorage.setItem("arelita_theme", "pgr");
+    const pal = localStorage.getItem("arelita_pgr_palette") || "blue";
+    state.pgrPalette = pal;
+    document.documentElement.setAttribute("data-pgr-palette", pal);
   }
 
   // ==================== EVENT LISTENERS ====================
   function initEventListeners() {
-    // Theme Dropdown Selector (條列式風格版本選單)
-    const themeSelectWrap = document.getElementById("themeSelectWrap");
-    const themeToggleBtn = document.getElementById("themeToggleBtn");
-    const themeDropdown = document.getElementById("themeDropdownMenu");
-
-    function closeThemeDropdown() {
-      if (themeDropdown) themeDropdown.classList.add("hidden");
-      if (themeSelectWrap) themeSelectWrap.classList.remove("is-open");
-      if (themeToggleBtn) themeToggleBtn.setAttribute("aria-expanded", "false");
+    const bgmPop = document.getElementById("bgmPopover");
+    if (bgmPop && bgmPop.parentElement !== document.body) {
+      document.body.appendChild(bgmPop);
     }
-
-    function toggleThemeDropdown(e) {
-      if (e) e.stopPropagation();
-      if (!themeDropdown) return;
-      const isOpen = !themeDropdown.classList.contains("hidden");
-      if (isOpen) {
-        closeThemeDropdown();
-      } else {
-        themeDropdown.classList.remove("hidden");
-        if (themeSelectWrap) themeSelectWrap.classList.add("is-open");
-        if (themeToggleBtn) themeToggleBtn.setAttribute("aria-expanded", "true");
-        // Close BGM popover if open
-        const bgmPop = document.getElementById("bgmPopover");
-        if (bgmPop) bgmPop.classList.add("hidden");
-      }
-    }
-
-    if (themeToggleBtn) {
-      themeToggleBtn.addEventListener("click", toggleThemeDropdown);
-    }
-
-    // Theme option items click
-    document.querySelectorAll(".theme-option-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const targetTheme = btn.dataset.themeVal;
-        if (targetTheme && targetTheme !== state.theme) {
-          applyTheme(targetTheme);
-          runIntroSplash({ theme: targetTheme, isThemeSwitch: true });
-
-          // Auto-harmonize default BGM soundtrack with matching theme
-          if (targetTheme === "beach") {
-            bgmSystem.track = "beach";
-            localStorage.setItem("arelita_bgm_track", "beach");
-            updateBgmUI();
-            if (bgmSystem.isPlaying) startBgmScheduler();
-          } else if (targetTheme === "bubble") {
-            bgmSystem.track = "harp";
-            localStorage.setItem("arelita_bgm_track", "harp");
-            updateBgmUI();
-            if (bgmSystem.isPlaying) startBgmScheduler();
-          } else if (targetTheme === "worldtree") {
-            bgmSystem.track = "harp";
-            localStorage.setItem("arelita_bgm_track", "harp");
-            updateBgmUI();
-            if (bgmSystem.isPlaying) startBgmScheduler();
-          } else if (targetTheme === "starry") {
-            bgmSystem.track = "astral";
-            localStorage.setItem("arelita_bgm_track", "astral");
-            updateBgmUI();
-            if (bgmSystem.isPlaying) startBgmScheduler();
-          }
-        }
-        closeThemeDropdown();
-      });
-    });
-
-    // Close dropdown on click outside
-    document.addEventListener("click", (e) => {
-      if (themeSelectWrap && !themeSelectWrap.contains(e.target)) {
-        closeThemeDropdown();
-      }
-    });
-
-    // Close dropdown on Escape
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        closeThemeDropdown();
-      }
-    });
 
     // Floating header shadow & Back-to-top button visibility on scroll
     const siteHeader = document.getElementById("siteHeader");
@@ -3346,6 +3300,37 @@
       });
     });
 
+    // PGR Left Tactical Rail items & collapse toggle
+    document.querySelectorAll(".pgr-rail-item[data-pgr-tab]").forEach((railBtn) => {
+      railBtn.addEventListener("click", () => {
+        const target = railBtn.getAttribute("data-pgr-tab");
+        if (target) {
+          switchTab(target);
+          window.scrollTo(0, 0);
+        }
+      });
+    });
+
+    // Pre-warm characters tab on pointer hover so clicking DATA is instant 0ms
+    const prewarmDataTriggers = document.querySelectorAll(
+      '.pgr-rail-item[data-pgr-tab="characters"], [data-goto-tab="characters"], [data-quick-tab="characters"], .pgr-bottom-chip:first-child'
+    );
+    prewarmDataTriggers.forEach((el) => {
+      el.addEventListener("pointerenter", () => {
+        if (!state.renderedTabs.has("characters")) {
+          ensureTabRendered("characters");
+        }
+      }, { once: true, passive: true });
+    });
+
+    const pgrRailToggleBtn = document.getElementById("pgrRailToggleBtn");
+    const pgrLeftRail = document.getElementById("pgrLeftRail");
+    if (pgrRailToggleBtn && pgrLeftRail) {
+      pgrRailToggleBtn.addEventListener("click", () => {
+        pgrLeftRail.classList.toggle("is-collapsed");
+      });
+    }
+
     document.querySelectorAll("[data-quick-tab]").forEach((card) => {
       card.addEventListener("click", () => {
         const target = card.getAttribute("data-quick-tab");
@@ -3356,6 +3341,81 @@
     document.getElementById("brandHome").addEventListener("click", () => {
       switchTab("home");
     });
+
+    const pgrTopBrand = document.getElementById("pgrTopBrand");
+    if (pgrTopBrand) {
+      pgrTopBrand.addEventListener("click", () => {
+        switchTab("home");
+        window.scrollTo(0, 0);
+      });
+    }
+
+    const pgrSearchMirror = document.getElementById("pgrSearchMirror");
+    if (pgrSearchMirror) {
+      pgrSearchMirror.addEventListener("input", () => {
+        const q = pgrSearchMirror.value;
+        const mainSearch = document.getElementById("globalSearchInput");
+        const mainClear = document.getElementById("clearSearchBtn");
+        if (mainSearch) mainSearch.value = q;
+        state.searchQuery = q;
+        if (mainClear) mainClear.classList.toggle("hidden", !q);
+        if (state.activeTab !== "characters") {
+          switchTab("characters");
+        } else {
+          renderCharacters();
+        }
+        const rosterSec = document.getElementById("pgrFullRosterSection");
+        if (q && rosterSec) {
+          rosterSec.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    }
+
+    function updatePaletteUI() {
+      const isBlue = (document.documentElement.getAttribute("data-pgr-palette") || "blue") === "blue";
+      const paletteText = document.getElementById("pgrPaletteText");
+      if (paletteText) {
+        paletteText.textContent = isBlue ? "AZURE BLUE" : "CRIMSON RED";
+      }
+      const paletteBtn = document.getElementById("pgrPaletteToggleBtn");
+      if (paletteBtn) {
+        paletteBtn.setAttribute(
+          "title",
+          isBlue ? "目前為【戰術湛藍】模式，點擊切換為【戰術黑紅】" : "目前為【戰術黑紅】模式，點擊切換為【戰術湛藍】"
+        );
+      }
+    }
+
+    const pgrPaletteToggleBtn = document.getElementById("pgrPaletteToggleBtn");
+    if (pgrPaletteToggleBtn) {
+      pgrPaletteToggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const cur = document.documentElement.getAttribute("data-pgr-palette") || "blue";
+        const next = cur === "blue" ? "crimson" : "blue";
+        localStorage.setItem("arelita_pgr_palette", next);
+        location.reload();
+      });
+      updatePaletteUI();
+    }
+
+    const pgrAudioMirrorBtn = document.getElementById("pgrAudioMirrorBtn");
+    if (pgrAudioMirrorBtn) {
+      pgrAudioMirrorBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setBgmPlaying(!bgmSystem.isPlaying);
+      });
+    }
+
+    const pgrAudioMenuMirrorBtn = document.getElementById("pgrAudioMenuMirrorBtn");
+    if (pgrAudioMenuMirrorBtn) {
+      pgrAudioMenuMirrorBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const pop = document.getElementById("bgmPopover");
+        if (pop) {
+          pop.classList.toggle("hidden");
+        }
+      });
+    }
 
     const attrSearchInput = document.getElementById("attrSearchInput");
     if (attrSearchInput) {
@@ -3452,10 +3512,308 @@
     });
   }
 
+  // ==================== PGR #DATA CONSTRUCT SPOTLIGHT & #ILLUSTRATION BENTO ====================
+  // Tactical cyber SFX synthesizer helper (All button click sounds removed as requested)
+  function playTacticalSfx(type = "switch") {
+    // Disabled: button click sounds removed
+    return;
+  }
+
+  let pgrConstructList = [];
+  let pgrConstructIdx = 0;
+  let pgrConstructBound = false;
+
+  function renderPgrConstructAvatarStrip() {
+    const stripEl = document.getElementById("pgrCsAvatarStrip");
+    if (!stripEl || !pgrConstructList.length) return;
+    if (!stripEl.hasChildNodes()) {
+      stripEl.innerHTML = pgrConstructList
+        .map((c, i) => {
+          const src = getPortraitUrl(c.image);
+          return `<button type="button" class="pgr-cs-avatar-chip ${i === pgrConstructIdx ? "active" : ""}" data-cs-idx="${i}" title="${esc(c.name)} (${esc(c.faction)})">
+            <img src="${esc(src)}" alt="${esc(c.name)}" loading="lazy" />
+          </button>`;
+        })
+        .join("");
+      stripEl.querySelectorAll(".pgr-cs-avatar-chip").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.getAttribute("data-cs-idx") || 0);
+          renderPgrConstructSpotlight(idx);
+        });
+      });
+      if (!stripEl.hasAttribute("data-wheel-bound")) {
+        stripEl.setAttribute("data-wheel-bound", "1");
+        stripEl.addEventListener("wheel", (e) => {
+          if (e.deltaY) {
+            e.preventDefault();
+            stripEl.scrollLeft += e.deltaY;
+          }
+        }, { passive: false });
+      }
+    } else {
+      stripEl.querySelectorAll(".pgr-cs-avatar-chip").forEach((btn, i) => {
+        const isActive = i === pgrConstructIdx;
+        btn.classList.toggle("active", isActive);
+        if (isActive && typeof btn.scrollIntoView === "function") {
+          try {
+            btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+          } catch (e) {}
+        }
+      });
+    }
+  }
+
+  function renderPgrConstructSpotlight(idx) {
+    if (!pgrConstructList.length) {
+      pgrConstructList = characters.filter((c) => c.image);
+      const defaultIdx = pgrConstructList.findIndex((c) => c.name.includes("赤夜 風竹"));
+      if (defaultIdx >= 0) pgrConstructIdx = defaultIdx;
+    }
+    if (!pgrConstructList.length) return;
+
+    pgrConstructIdx = ((idx % pgrConstructList.length) + pgrConstructList.length) % pgrConstructList.length;
+    const c = pgrConstructList[pgrConstructIdx];
+    const prof = c.profile || {};
+    const firstId = Array.isArray(c.identities) && c.identities.length ? c.identities[0] : null;
+    const epithet = prof["稱號"] || "OMNIFRAME CONSTRUCT";
+    const race = prof["種族"] || "未知種族";
+    const rawAttr = prof["屬性"] || "";
+    const bioRaw =
+      c.story ||
+      (firstId && (firstId.personality || firstId.appearance || firstId.notes)) ||
+      prof["性格"] ||
+      prof["備註"] ||
+      `${c.name}，隸屬於「${c.realm}・${c.faction}${c.subFaction ? " (" + c.subFaction + ")" : ""}」，實力位階為 ${c.power || "未知"}。`;
+    const bioText = String(bioRaw).replace(/\s+/g, " ").trim().slice(0, 145) + (String(bioRaw).length > 145 ? "…" : "");
+
+    const nameEl = document.getElementById("pgrCsName");
+    const epEl = document.getElementById("pgrCsEpithet");
+    const bioEl = document.getElementById("pgrCsBio");
+    const facEl = document.getElementById("pgrCsFaction");
+    const tierEl = document.getElementById("pgrCsTier");
+    const raceEl = document.getElementById("pgrCsRace");
+    const attrsEl = document.getElementById("pgrCsAttrs");
+    const imgEl = document.getElementById("pgrCsPortrait");
+    const ribEl = document.getElementById("pgrCsRibbon");
+    const bgNameEl = document.getElementById("pgrCsBgName");
+    const pageEl = document.getElementById("pgrCsPageNum");
+    const relLink = document.getElementById("pgrCsRelLink");
+
+    if (nameEl) nameEl.innerHTML = formatCharacterDisplayName(c.name);
+    if (epEl) epEl.textContent = `OMNIFRAME // ${epithet}`;
+    if (bioEl) bioEl.textContent = bioText;
+    if (facEl) facEl.textContent = `${c.realm}・${c.faction}${c.subFaction ? " / " + c.subFaction : ""}`;
+    if (tierEl) tierEl.textContent = c.power || "UNRANKED";
+    if (raceEl) raceEl.textContent = race;
+    if (attrsEl) {
+      attrsEl.innerHTML = renderAttributeBadgesHtml(rawAttr, true);
+      bindCharacterCardInteractions(attrsEl);
+    }
+    if (imgEl) {
+      const SPOT_TRANS_MODES = ["spot-trans-holo", "spot-trans-glitch", "spot-trans-slice", "spot-trans-zoom"];
+      SPOT_TRANS_MODES.forEach((m) => imgEl.classList.remove(m));
+      imgEl.classList.remove("is-switching");
+      void imgEl.offsetWidth;
+      const transMode = SPOT_TRANS_MODES[Math.abs(pgrConstructIdx) % SPOT_TRANS_MODES.length];
+      imgEl.src = getPortraitUrl(c.image);
+      imgEl.alt = c.name;
+      imgEl.classList.add("is-switching", transMode);
+    }
+    if (ribEl) {
+      ribEl.textContent = `ARELITA // ${c.faction} // ${c.name} // ${c.power || "CONSTRUCT"}`;
+    }
+    if (bgNameEl) {
+      bgNameEl.textContent = c.faction || "CONSTRUCT";
+    }
+    if (pageEl) {
+      const curStr = String(pgrConstructIdx + 1).padStart(2, "0");
+      const totStr = String(pgrConstructList.length).padStart(2, "0");
+      pageEl.textContent = `■ ${curStr} / ${totStr} ■`;
+    }
+    if (relLink) {
+      relLink.href = `relations.html?char=${encodeURIComponent(c.name)}`;
+    }
+    renderPgrConstructAvatarStrip();
+  }
+
+  function initPgrConstructSpotlight() {
+    if (!pgrConstructList.length) {
+      pgrConstructList = characters.filter((c) => c.image);
+      const defaultIdx = pgrConstructList.findIndex((c) => c.name.includes("赤夜 風竹"));
+      if (defaultIdx >= 0) pgrConstructIdx = defaultIdx;
+    }
+    renderPgrConstructSpotlight(pgrConstructIdx);
+    if (pgrConstructBound) return;
+    pgrConstructBound = true;
+
+    const prevBtn = document.getElementById("pgrCsPrevBtn");
+    const nextBtn = document.getElementById("pgrCsNextBtn");
+    const openModalBtn = document.getElementById("pgrCsOpenModalBtn");
+    const artWrap = document.getElementById("pgrCsArtWrap");
+    const scrollRosterBtn = document.getElementById("pgrScrollToRosterBtn");
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        renderPgrConstructSpotlight(pgrConstructIdx - 1);
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        renderPgrConstructSpotlight(pgrConstructIdx + 1);
+      });
+    }
+    if (openModalBtn) {
+      openModalBtn.addEventListener("click", () => {
+        const c = pgrConstructList[pgrConstructIdx];
+        if (c) openCharacterModal(c.id);
+      });
+    }
+    if (artWrap) {
+      artWrap.addEventListener("click", () => {
+        const c = pgrConstructList[pgrConstructIdx];
+        if (c && c.image) {
+          const ep = (c.profile && c.profile["稱號"]) || "";
+          openLightbox(c.image, `${c.name}${ep ? " — " + ep : ""}`);
+        }
+      });
+    }
+    if (scrollRosterBtn) {
+      scrollRosterBtn.addEventListener("click", () => {
+        const sec = document.getElementById("pgrFullRosterSection");
+        if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }
+
+  let pgrWpBatchIdx = 0;
+  let pgrWpBound = false;
+  let pgrTransMode = 0;
+  const PGR_BENTO_MODES = ["trans-glitch", "trans-laser-wipe", "trans-warp-zoom", "trans-teleport"];
+
+  function renderPgrWallpapersBento(batchIdx = 0) {
+    const bentoEl = document.getElementById("pgrWallpapersBento");
+    if (!bentoEl) return;
+    const list = characters.filter((c) => c.image);
+    if (!list.length) return;
+
+    const batchSize = 6;
+    const totalBatches = Math.ceil(list.length / batchSize);
+    pgrWpBatchIdx = ((batchIdx % totalBatches) + totalBatches) % totalBatches;
+
+    const start = pgrWpBatchIdx * batchSize;
+    const items = [];
+    for (let i = 0; i < batchSize; i++) {
+      items.push(list[(start + i) % list.length]);
+    }
+
+    function renderWpCard(c, isMoreSlot = false) {
+      const ep = (c.profile && c.profile["稱號"]) || "";
+      const caption = `${c.name}${ep ? " — " + ep : ""}`;
+      const src = getPortraitUrl(c.image);
+      return `
+        <div class="pgr-wp-card" data-lightbox-src="${esc(c.image)}" data-lightbox-caption="${esc(caption)}">
+          <div class="pgr-wp-reticle tl"></div>
+          <div class="pgr-wp-reticle tr"></div>
+          <div class="pgr-wp-reticle bl"></div>
+          <div class="pgr-wp-reticle br"></div>
+          <div class="pgr-wp-scanline" aria-hidden="true"></div>
+          <div class="pgr-wp-frame-dots"></div>
+          <img src="${esc(src)}" alt="${esc(c.name)}" loading="lazy" decoding="async" />
+          <div class="pgr-wp-card-caption">
+            <span class="pgr-wp-card-name">${formatCharacterDisplayName(c.name)}</span>
+            <span class="pgr-wp-card-sub">${esc(c.faction)}</span>
+          </div>
+          ${isMoreSlot ? `<button type="button" class="pgr-wp-more-badge" data-pgr-wp-more="1">查看更多 MORE ▶</button>` : ""}
+        </div>
+      `;
+    }
+
+    // Dynamic cycling transitions on the bento grid (different dynamic effects each switch)
+    const transMode = PGR_BENTO_MODES[pgrTransMode % PGR_BENTO_MODES.length];
+    pgrTransMode++;
+    PGR_BENTO_MODES.forEach((m) => bentoEl.classList.remove(m));
+    void bentoEl.offsetWidth;
+    bentoEl.classList.add(transMode);
+
+    bentoEl.innerHTML = `
+      <div class="pgr-wp-col-stack">
+        ${renderWpCard(items[0], false)}
+        ${renderWpCard(items[1], false)}
+      </div>
+      <div class="pgr-wp-col-tall">
+        ${renderWpCard(items[2], false)}
+      </div>
+      <div class="pgr-wp-col-tall">
+        ${renderWpCard(items[3], false)}
+      </div>
+      <div class="pgr-wp-col-stack">
+        ${renderWpCard(items[4], false)}
+        ${renderWpCard(items[5], true)}
+      </div>
+    `;
+
+    const infoEl = document.getElementById("pgrWpBatchInfo");
+    if (infoEl) {
+      const startNum = pgrWpBatchIdx * batchSize + 1;
+      const endNum = Math.min((pgrWpBatchIdx + 1) * batchSize, list.length);
+      infoEl.textContent = `立繪展示分組 // ${String(pgrWpBatchIdx + 1).padStart(2, "0")} / ${String(totalBatches).padStart(2, "0")}（目前顯示 36 幅角色立繪中之第 ${startNum}-${endNum} 幅）`;
+    }
+
+    bentoEl.querySelectorAll(".pgr-wp-card").forEach((card) => {
+      card.addEventListener("click", (e) => {
+        if (e.target.closest("[data-pgr-wp-more]")) return;
+        const src = card.getAttribute("data-lightbox-src");
+        const cap = card.getAttribute("data-lightbox-caption");
+        if (src) openLightbox(src, cap);
+      });
+    });
+
+    const moreBtn = bentoEl.querySelector("[data-pgr-wp-more]");
+    if (moreBtn) {
+      moreBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const archiveSec = document.getElementById("pgrGalleryArchiveSection");
+        if (archiveSec) archiveSec.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }
+
+  function initPgrWallpapersBento() {
+    renderPgrWallpapersBento(pgrWpBatchIdx);
+    if (pgrWpBound) return;
+    pgrWpBound = true;
+
+    const prevBtn = document.getElementById("pgrWpPrevBatchBtn");
+    const nextBtn = document.getElementById("pgrWpNextBatchBtn");
+    const toggleAllBtn = document.getElementById("pgrWpToggleAllBtn");
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        renderPgrWallpapersBento(pgrWpBatchIdx - 1);
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        renderPgrWallpapersBento(pgrWpBatchIdx + 1);
+      });
+    }
+    if (toggleAllBtn) {
+      toggleAllBtn.addEventListener("click", () => {
+        const archiveSec = document.getElementById("pgrGalleryArchiveSection");
+        if (archiveSec) archiveSec.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }
+
   function ensureTabRendered(tabName) {
     if (state.renderedTabs.has(tabName)) return;
     state.renderedTabs.add(tabName);
     if (tabName === "characters") {
+      try {
+        initPgrConstructSpotlight();
+      } catch (e) {
+        console.error("Spotlight init error:", e);
+      }
       renderFactionTree();
       renderCharacters();
     } else if (tabName === "world") {
@@ -3469,14 +3827,48 @@
       renderStoryNav();
       renderStoryContent();
     } else if (tabName === "gallery") {
+      try {
+        initPgrWallpapersBento();
+      } catch (e) {
+        console.error("Illustration Bento init error:", e);
+      }
       renderGalleryNav();
       renderGallery();
     }
   }
 
+  const PGR_TAB_TELEMETRY = {
+    home: { code: "EVENT 01", title: "FEATURES // 系統概覽", page: "01", watermark: "ARELITA" },
+    characters: { code: "EVENT 02", title: "DATA // CONSTRUCTS 角色檔案", page: "02", watermark: "CONSTRUCTS" },
+    world: { code: "EVENT 03", title: "WORLD LORE // 世界觀與設定", page: "03", watermark: "WORLD" },
+    attributes: { code: "EVENT 04", title: "ELEMENTS // 全屬性圖鑑", page: "04", watermark: "ELEMENTS" },
+    stories: { code: "EVENT 05", title: "CHRONICLES // 劇情文庫", page: "05", watermark: "CHRONICLES" },
+    gallery: { code: "EVENT 06", title: "CHARACTER ILLUSTRATION // 角色形象立繪", page: "06", watermark: "ILLUSTRATION" },
+    others: { code: "EVENT 07", title: "OTHERS // 關係圖與擴充系統", page: "07", watermark: "SYSTEMS" }
+  };
+
+  function updatePgrSectionHud(tabName) {
+    const meta = PGR_TAB_TELEMETRY[tabName] || PGR_TAB_TELEMETRY.home;
+    const evL = document.getElementById("pgrEventLeft");
+    const evR = document.getElementById("pgrEventRight");
+    const titleEl = document.getElementById("pgrSectionTitle");
+    const pageEl = document.getElementById("pgrPageCounter");
+    const wmEl = document.getElementById("pgrBgWatermark");
+    if (evL) evL.textContent = meta.code;
+    if (evR) evR.textContent = meta.code;
+    if (titleEl) titleEl.textContent = meta.title;
+    if (pageEl) pageEl.innerHTML = `PAGE - <strong>${meta.page}</strong> / 07`;
+    if (wmEl) wmEl.textContent = meta.watermark;
+
+    document.querySelectorAll(".pgr-rail-item[data-pgr-tab]").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-pgr-tab") === tabName);
+    });
+  }
+
   function switchTab(tabName) {
     state.activeTab = tabName;
     ensureTabRendered(tabName);
+    updatePgrSectionHud(tabName);
     document.querySelectorAll(".nav-tab").forEach((b) => {
       const isActive = b.getAttribute("data-tab") === tabName;
       b.classList.toggle("active", isActive);
@@ -3493,6 +3885,17 @@
 
   // ==================== OPENING INTRO SPLASH & 5-THEME SFX SYNTHESIZER ====================
   const INTRO_THEME_CONFIGS = {
+    pgr: {
+      badge: "⚔️ ARELITA TACTICAL TERMINAL // 黑紅戰術終端",
+      kicker: "TACTICAL COMMAND // SYNCHRONIZING ARELITA DATABASE",
+      subtitle: "OBSIDIAN & CRIMSON TACTICAL CONSTRUCT ARCHIVE",
+      telemetryLeft: "SYS.SIGNAL // SERUM LINK 100% STABLE",
+      telemetryRight: "🔊 SFX: TACTICAL CYBER PULSE & LOCK",
+      coreSvg: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="16,2 29,16 16,30 3,16"/><line x1="16" y1="8" x2="16" y2="24"/><line x1="8" y1="16" x2="24" y2="16"/></svg>`,
+      stage1: (c) => `DECRYPTING ${c} CONSTRUCT DOSSIERS...`,
+      stage2: (s) => `VERIFYING ${s} COMBAT CHRONICLES...`,
+      stage3: "TACTICAL TERMINAL ONLINE // 戰雙黑紅戰術終端連線完成",
+    },
     ocean: {
       badge: "🌊 ABYSSAL OCEAN REALM // 夏日海洋領域",
       kicker: "AQUA RESONANCE // SYNCHRONIZING CORAL SANCTUARY",
@@ -3573,15 +3976,142 @@
   };
 
   let sfxAudioCtx = null;
+  let sfxMasterGain = null;
   let cachedNoiseBuffer = null;
+  let slashAudioObj = null;
+
+  function createSlashWavBlobUrl() {
+    try {
+      const sampleRate = 44100;
+      const duration = 0.42;
+      const numSamples = Math.floor(sampleRate * duration);
+      const buffer = new Int16Array(numSamples);
+
+      let pSweep1 = 0;
+      let pSweep2 = 0;
+      let pSheen = 0;
+      let prevNoise = 0;
+
+      for (let i = 0; i < numSamples; i++) {
+        const t = i / sampleRate;
+
+        // 1. Cyber Laser Beam FM Sweep (科技光子光束下行掃頻: 5600Hz -> 520Hz)
+        const sweepFreq = 5600 * Math.pow(520 / 5600, Math.min(1, t / 0.14));
+        const modIndex = 1.6 * Math.exp(-t * 22);
+        const fmMod = Math.sin(2 * Math.PI * sweepFreq * 2.0 * t) * modIndex;
+        pSweep1 += (2 * Math.PI * (sweepFreq + fmMod * 500)) / sampleRate;
+        const laserWave = Math.sin(pSweep1) * 0.32 * Math.exp(-t * 14);
+
+        // 2. Dual-Chamber Plasma Sheen (電漿諧振音 2400Hz + 3600Hz，剔除雜亂噪音)
+        pSweep2 += (2 * Math.PI * 2400 * Math.pow(680 / 2400, Math.min(1, t / 0.12))) / sampleRate;
+        pSheen += (2 * Math.PI * 3600) / sampleRate;
+        const sheenWave = (Math.sin(pSweep2) * 0.16 + Math.sin(pSheen) * 0.08) * Math.exp(-t * 18);
+
+        // 3. Ethereal High-Pass Cyber Dissipation (光羽高通消散微風，無低頻轟鳴)
+        const rawNoise = Math.random() * 2 - 1;
+        const hpNoise = (rawNoise - prevNoise * 0.88);
+        prevNoise = rawNoise;
+        const noiseWave = hpNoise * 0.10 * Math.exp(-t * 9);
+
+        // 4. Subtle Tactile Thump (極短戰術底音，乾淨清脆不震耳)
+        const thump = Math.sin(2 * Math.PI * 130 * Math.pow(55 / 130, Math.min(1, t / 0.06)) * t) * 0.14 * Math.exp(-t * 35);
+
+        let sample = laserWave + sheenWave + noiseWave + thump;
+        // Soft clipping for velvet smooth output
+        sample = Math.tanh(sample * 1.1) * 0.72;
+        buffer[i] = sample < 0 ? sample * 32768 : sample * 32767;
+      }
+
+      const header = new ArrayBuffer(44);
+      const view = new DataView(header);
+      const writeStr = (offset, s) => {
+        for (let j = 0; j < s.length; j++) view.setUint8(offset + j, s.charCodeAt(j));
+      };
+      writeStr(0, "RIFF");
+      view.setUint32(4, 36 + numSamples * 2, true);
+      writeStr(8, "WAVE");
+      writeStr(12, "fmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeStr(36, "data");
+      view.setUint32(40, numSamples * 2, true);
+
+      const blob = new Blob([header, buffer], { type: "audio/wav" });
+      return URL.createObjectURL(blob);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  try {
+    const slashUrl = createSlashWavBlobUrl();
+    if (slashUrl) {
+      slashAudioObj = new Audio(slashUrl);
+      slashAudioObj.volume = 0.38;
+      slashAudioObj.preload = "auto";
+    }
+  } catch (e) {}
 
   function getSfxContext() {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return null;
     if (!sfxAudioCtx) {
-      sfxAudioCtx = new AudioCtx();
+      try {
+        sfxAudioCtx = new AudioCtx();
+        sfxMasterGain = sfxAudioCtx.createGain();
+        sfxMasterGain.gain.setValueAtTime(0.95, sfxAudioCtx.currentTime);
+
+        const comp = sfxAudioCtx.createDynamicsCompressor();
+        comp.threshold.setValueAtTime(-12, sfxAudioCtx.currentTime);
+        comp.knee.setValueAtTime(16, sfxAudioCtx.currentTime);
+        comp.ratio.setValueAtTime(6, sfxAudioCtx.currentTime);
+        comp.attack.setValueAtTime(0.003, sfxAudioCtx.currentTime);
+        comp.release.setValueAtTime(0.15, sfxAudioCtx.currentTime);
+
+        sfxMasterGain.connect(comp);
+        comp.connect(sfxAudioCtx.destination);
+      } catch (e) {
+        return null;
+      }
+    }
+    if (sfxAudioCtx && sfxAudioCtx.state === "suspended") {
+      sfxAudioCtx.resume().catch(() => {});
     }
     return sfxAudioCtx;
+  }
+
+  // Pre-initialize Web Audio Context eagerly on script load
+  try {
+    getSfxContext();
+  } catch (e) {}
+
+  function getSfxDestination() {
+    const ctx = getSfxContext();
+    if (!ctx) return null;
+    return sfxMasterGain || ctx.destination;
+  }
+
+  function unlockAudioEngine() {
+    try {
+      const ctx = getSfxContext();
+      if (ctx && ctx.state === "suspended") {
+        ctx.resume().catch(() => {});
+      }
+      if (bgmSystem && bgmSystem.ctx && bgmSystem.ctx.state === "suspended") {
+        bgmSystem.ctx.resume().catch(() => {});
+      }
+    } catch (e) {}
+  }
+
+  // Register window-level user gesture unlockers
+  if (typeof window !== "undefined") {
+    window.addEventListener("pointerdown", unlockAudioEngine, { passive: true });
+    window.addEventListener("keydown", unlockAudioEngine, { passive: true });
   }
 
   function getCachedNoiseBuffer(ctx) {
@@ -3599,26 +4129,33 @@
   }
 
   function playToneHelper(ctx, dest, freq, startTime, duration, opts = {}) {
+    if (!ctx) return;
+    const out = dest || getSfxDestination();
+    if (!out) return;
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    const t0 = Math.max(ctx.currentTime + 0.002, (startTime || 0));
+    const attack = Math.max(0.004, opts.attack || 0.02);
+    const dur = Math.max(attack + 0.015, duration || 0.1);
+    const peak = Math.max(0.01, opts.gain || 0.18);
+
     osc.type = opts.type || "sine";
-    osc.frequency.setValueAtTime(freq, startTime);
+    osc.frequency.setValueAtTime(Math.max(20, freq || 440), t0);
     if (opts.endFreq) {
-      osc.frequency.exponentialRampToValueAtTime(opts.endFreq, startTime + duration);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(20, opts.endFreq), t0 + dur);
     }
 
-    const peak = opts.gain || 0.08;
-    const attack = opts.attack || 0.02;
-    gain.gain.setValueAtTime(0.0001, startTime);
-    gain.gain.linearRampToValueAtTime(peak, startTime + attack);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.linearRampToValueAtTime(peak, t0 + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
 
     if (opts.filterFreq) {
       const filter = ctx.createBiquadFilter();
       filter.type = opts.filterType || "lowpass";
-      filter.frequency.setValueAtTime(opts.filterFreq, startTime);
+      filter.frequency.setValueAtTime(Math.max(40, opts.filterFreq), t0);
       if (opts.filterEndFreq) {
-        filter.frequency.exponentialRampToValueAtTime(opts.filterEndFreq, startTime + duration);
+        filter.frequency.exponentialRampToValueAtTime(Math.max(40, opts.filterEndFreq), t0 + dur);
       }
       osc.connect(filter);
       filter.connect(gain);
@@ -3626,55 +4163,165 @@
       osc.connect(gain);
     }
 
-    gain.connect(dest);
-    osc.start(startTime);
-    osc.stop(startTime + duration + 0.04);
+    gain.connect(out);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.05);
   }
 
   function playNoiseBurstHelper(ctx, dest, startTime, duration, opts = {}) {
+    if (!ctx) return;
+    const out = dest || getSfxDestination();
+    if (!out) return;
+
     const noise = ctx.createBufferSource();
     noise.buffer = getCachedNoiseBuffer(ctx);
+    if (!noise.buffer) return;
+
+    const t0 = Math.max(ctx.currentTime + 0.002, (startTime || 0));
+    const dur = Math.max(0.03, duration || 0.1);
+    const peak = Math.max(0.01, opts.gain || 0.16);
 
     const filter = ctx.createBiquadFilter();
     filter.type = opts.filterType || "bandpass";
-    filter.frequency.setValueAtTime(opts.startFreq || 400, startTime);
+    filter.frequency.setValueAtTime(Math.max(40, opts.startFreq || 400), t0);
     if (opts.endFreq) {
-      filter.frequency.exponentialRampToValueAtTime(opts.endFreq, startTime + duration);
+      filter.frequency.exponentialRampToValueAtTime(Math.max(40, opts.endFreq), t0 + dur);
     }
     filter.Q.value = opts.Q || 2.5;
 
     const gain = ctx.createGain();
-    const peak = opts.gain || 0.05;
-    gain.gain.setValueAtTime(0.0001, startTime);
-    gain.gain.linearRampToValueAtTime(peak, startTime + duration * 0.25);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.linearRampToValueAtTime(peak, t0 + dur * 0.2);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
 
     noise.connect(filter);
     filter.connect(gain);
-    gain.connect(dest);
-    noise.start(startTime);
-    noise.stop(startTime + duration + 0.02);
+    gain.connect(out);
+    noise.start(t0);
+    noise.stop(t0 + dur + 0.03);
+  }
+
+  let slashSfxPlayed = false;
+
+  function isAudioUnlocked() {
+    try {
+      const ctx = getSfxContext();
+      return Boolean(ctx && ctx.state === "running");
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function playLaserCrossSlashSfx() {
+    if (slashSfxPlayed) return;
+    slashSfxPlayed = true;
+
+    let playedViaAudio = false;
+    // 1. Play high-precision synthesized Cyber Laser WAV via native Audio element
+    try {
+      if (slashAudioObj) {
+        slashAudioObj.currentTime = 0;
+        slashAudioObj.volume = 0.38;
+        const p = slashAudioObj.play();
+        if (p && typeof p.then === "function") {
+          p.then(() => { playedViaAudio = true; }).catch(() => {
+            // If browser autoplay policies reject, fallback to Web Audio API
+            playLaserWebAudioFallback();
+          });
+          return;
+        } else {
+          playedViaAudio = true;
+          return;
+        }
+      }
+    } catch (e) {}
+
+    playLaserWebAudioFallback();
+  }
+
+  function playLaserWebAudioFallback() {
+    // 2. High-precision Web Audio API cyber laser slash fallback (Clean Sci-Fi / Gentle Volume)
+    try {
+      const ctx = getSfxContext();
+      if (!ctx || ctx.state !== "running") return;
+      const out = getSfxDestination();
+      const now = ctx.currentTime + 0.002;
+
+      // Part A: Digital laser beam sweep (5600Hz -> 520Hz)
+      playToneHelper(ctx, out, 5600, now, 0.15, {
+        type: "sine",
+        endFreq: 520,
+        gain: 0.16,
+        attack: 0.001,
+        filterFreq: 6800,
+      });
+
+      // Part B: Plasma harmonic sheen (2400Hz -> 900Hz)
+      playToneHelper(ctx, out, 2400, now, 0.12, {
+        type: "triangle",
+        endFreq: 900,
+        gain: 0.12,
+        attack: 0.001,
+        filterFreq: 4500,
+      });
+
+      // Part C: High-pass ethereal dissipation shimmer
+      playNoiseBurstHelper(ctx, out, now, 0.18, {
+        filterType: "highpass",
+        startFreq: 2600,
+        endFreq: 1800,
+        gain: 0.06,
+      });
+    } catch (e) {}
+  }
+
+  function playTacticalSfxInternal(type = "switch") {
+    // Disabled: all UI button sounds removed
+    return;
   }
 
   function playThemeIntroSfx(themeName) {
     try {
       const ctx = getSfxContext();
       if (!ctx) return false;
-      if (ctx.state === "suspended") {
-        ctx.resume().catch(() => {});
-      }
-      if (ctx.state !== "running") {
-        return false;
-      }
+      const now = ctx.currentTime + 0.01;
+      const master = getSfxDestination();
+      if (!master) return false;
 
-      const now = ctx.currentTime + 0.02;
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0.65, now);
-      master.connect(ctx.destination);
+      const theme = themeName || state.theme || "pgr";
 
-      const theme = themeName || state.theme || "ocean";
-
-      if (theme === "ocean") {
+      if (theme === "pgr") {
+        // ⚔️ PGR Tactical Terminal: Cyber telemetry lock pulse + sub-bass serum resonance + crystalline metallic arpeggio
+        playToneHelper(ctx, master, 110.0, now, 0.95, {
+          type: "sawtooth",
+          endFreq: 55.0,
+          gain: 0.22,
+          attack: 0.01,
+          filterFreq: 420,
+          filterEndFreq: 140,
+        });
+        playNoiseBurstHelper(ctx, master, now, 0.55, {
+          filterType: "bandpass",
+          startFreq: 1200,
+          endFreq: 3200,
+          Q: 3.2,
+          gain: 0.16,
+        });
+        [440.0, 523.25, 659.25, 880.0, 1046.5, 1318.51, 1760.0].forEach((f, idx) => {
+          const t = now + 0.04 + idx * 0.055;
+          playToneHelper(ctx, master, f, t, 0.38, {
+            type: "triangle",
+            gain: 0.06,
+            attack: 0.005,
+            filterFreq: 3200,
+          });
+          playToneHelper(ctx, master, f * 2, t, 0.18, {
+            type: "sine",
+            gain: 0.025,
+            attack: 0.004,
+          });
+        });
+      } else if (theme === "ocean") {
         // 🌊 Ocean: Deep submarine sonar ping + ocean wave wash + Lydian aqua-harp & bubble chimes
         playNoiseBurstHelper(ctx, master, now, 1.15, {
           filterType: "bandpass",
@@ -3846,13 +4493,15 @@
   function runIntroSplash(options = {}) {
     const splash = document.getElementById("introSplash");
     const bar = document.getElementById("introProgressBar");
+    const arcEl = document.getElementById("introArcProgress");
     const pctEl = document.getElementById("introPercentText");
     const statusEl = document.getElementById("introStatusText");
     const badgeEl = document.getElementById("introThemeBadge");
     const kickerEl = document.getElementById("introKicker");
     const subtitleEl = document.getElementById("introSubtitle");
-    const coreIconEl = document.getElementById("introCoreIcon");
     const telemetryEl = document.getElementById("introTelemetry");
+    const hexStreamEl = document.getElementById("introHexStream");
+    const nodeChips = splash ? Array.from(splash.querySelectorAll("[data-intro-node]")) : [];
 
     if (!splash) {
       document.body.classList.remove("is-loading");
@@ -3860,46 +4509,45 @@
       return;
     }
 
-    // Cancel any previous running intro animation when switching themes rapidly
     if (typeof activeIntroCleanup === "function") {
       activeIntroCleanup();
       activeIntroCleanup = null;
     }
 
-    const currentTheme = options.theme || state.theme || "ocean";
-    const isThemeSwitch = Boolean(options.isThemeSwitch);
-    const cfg = INTRO_THEME_CONFIGS[currentTheme] || INTRO_THEME_CONFIGS.ocean;
+    const currentTheme = "pgr";
+    const cfg = INTRO_THEME_CONFIGS.pgr;
+    const ARC_CIRCUMFERENCE = 628.3;
 
-    // Apply theme-specific visual identity to the splash overlay
     splash.setAttribute("data-intro-theme", currentTheme);
-    if (badgeEl) badgeEl.textContent = cfg.badge;
-    if (kickerEl) kickerEl.textContent = cfg.kicker;
-    if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
-    if (coreIconEl) coreIconEl.innerHTML = cfg.coreSvg;
+    if (badgeEl) badgeEl.textContent = "SYNC RATIO";
+    if (kickerEl) kickerEl.textContent = "M.I.N.D. BEACON // SYNCHRONIZING WORLD ARCHIVE";
+    if (subtitleEl) subtitleEl.innerHTML = "A R E L I T A &nbsp; // &nbsp; W O R L D &nbsp; A R C H I V E";
     if (telemetryEl) {
-      telemetryEl.innerHTML = `<span>${cfg.telemetryLeft}</span><span>${cfg.telemetryRight}</span>`;
+      telemetryEl.textContent = "SYS.SIGNAL // LINK 100% STABLE";
     }
 
-    // Reset splash state so it can play both on initial boot and on theme switch
     document.body.classList.add("intro-active");
-    splash.classList.remove("is-removed", "is-exiting");
+    splash.classList.remove("is-removed", "is-exiting", "is-unlocked", "is-ready");
     if (bar) bar.style.transform = "scaleX(0)";
-    if (pctEl) pctEl.textContent = "0%";
+    if (arcEl) arcEl.style.strokeDashoffset = String(ARC_CIRCUMFERENCE);
+    if (pctEl) pctEl.innerHTML = `00<span class="pct-unit">%</span>`;
+    nodeChips.forEach((chip) => chip.classList.remove("is-locked"));
+
     const stage1Text = cfg.stage1(characters.length);
     const stage2Text = cfg.stage2(stories.length);
-    const stage3Text = cfg.stage3;
+    const stage3Text = "ACCESS GRANTED // 點擊任意處進入終端";
     if (statusEl) statusEl.textContent = stage1Text;
 
-    // Attempt to play the theme's unique synthesized sound effect immediately
-    let sfxPlayed = playThemeIntroSfx(currentTheme);
-
+    slashSfxPlayed = false;
     let finished = false;
+    let waitingForClickAt100 = false;
+    let userInteracted = false;
     let rafId = null;
     let removeTimerId = null;
     let failsafeTimerId = null;
-    let lastPct = 0;
+    let lastPct = -1;
     let lastStage = 1;
-    const duration = isThemeSwitch ? 680 : 900;
+    const duration = 1250;
     const startTime = performance.now();
 
     function finishIntro() {
@@ -3908,23 +4556,41 @@
       if (rafId) cancelAnimationFrame(rafId);
       if (failsafeTimerId) clearTimeout(failsafeTimerId);
 
-      // If browser blocked autoplay on initial page load, play the chime on the user's click/tap!
-      if (!sfxPlayed) {
-        sfxPlayed = playThemeIntroSfx(currentTheme);
-      }
+      unlockAudioEngine();
 
       if (bar) bar.style.transform = "scaleX(1)";
-      if (pctEl && lastPct !== 100) pctEl.textContent = "100%";
-      if (statusEl && lastStage !== 3) statusEl.textContent = stage3Text;
+      if (arcEl) arcEl.style.strokeDashoffset = "0";
+      if (pctEl) pctEl.innerHTML = `100<span class="pct-unit">%</span>`;
+      if (statusEl) statusEl.textContent = "ACCESS GRANTED // 終端載入完成";
+      if (badgeEl) badgeEl.textContent = "LINK START";
+      if (hexStreamEl) hexStreamEl.textContent = "MEM.ADDR 0xFFFFFF // VERIFIED";
+      nodeChips.forEach((chip) => chip.classList.add("is-locked"));
 
-      splash.classList.add("is-exiting");
+      splash.classList.remove("is-ready");
+      splash.classList.add("is-unlocked");
       document.body.classList.remove("is-loading");
       document.body.classList.add("is-loaded");
+
+      // EXACT MOMENT: When the red laser cross slash bursts across the screen (.is-exiting)
+      splash.classList.add("is-exiting");
+      playLaserCrossSlashSfx();
 
       removeTimerId = setTimeout(() => {
         splash.classList.add("is-removed");
         document.body.classList.remove("intro-active");
-      }, 680);
+        if (typeof window !== "undefined") {
+          const prewarmRoster = () => {
+            if (!state.renderedTabs.has("characters")) {
+              ensureTabRendered("characters");
+            }
+          };
+          if ("requestIdleCallback" in window) {
+            requestIdleCallback(prewarmRoster, { timeout: 1200 });
+          } else {
+            setTimeout(prewarmRoster, 200);
+          }
+        }
+      }, 650);
     }
 
     function tick(nowTs) {
@@ -3935,11 +4601,35 @@
       const pct = Math.max(0, Math.min(100, Math.round(eased * 100)));
 
       if (bar) bar.style.transform = `scaleX(${eased.toFixed(4)})`;
+      if (arcEl) {
+        const offset = ARC_CIRCUMFERENCE * (1 - eased);
+        arcEl.style.strokeDashoffset = offset.toFixed(2);
+      }
+
       if (pct !== lastPct) {
         lastPct = pct;
-        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (pctEl) {
+          const numStr = String(pct).padStart(2, "0");
+          pctEl.innerHTML = `${numStr}<span class="pct-unit">%</span>`;
+        }
+        if (hexStreamEl) {
+          const hexVal = Math.floor(eased * 0xffffff)
+            .toString(16)
+            .toUpperCase()
+            .padStart(6, "0");
+          hexStreamEl.textContent = `MEM.ADDR 0x${hexVal} // SYNCING`;
+        }
+
+        // Progressive node chips confirmation (visual only)
+        nodeChips.forEach((chip, idx) => {
+          const threshold = (idx + 1) * 22;
+          if (pct >= threshold && !chip.classList.contains("is-locked")) {
+            chip.classList.add("is-locked");
+          }
+        });
       }
-      const currentStage = pct < 42 ? 1 : pct < 84 ? 2 : 3;
+
+      const currentStage = pct < 42 ? 1 : pct < 86 ? 2 : 3;
       if (currentStage !== lastStage) {
         lastStage = currentStage;
         if (statusEl) {
@@ -3950,20 +4640,72 @@
       if (rawProgress < 1) {
         rafId = requestAnimationFrame(tick);
       } else {
-        setTimeout(finishIntro, 80);
+        // Reached 100%
+        if (bar) bar.style.transform = "scaleX(1)";
+        if (arcEl) arcEl.style.strokeDashoffset = "0";
+        if (pctEl) pctEl.innerHTML = `100<span class="pct-unit">%</span>`;
+        nodeChips.forEach((chip) => chip.classList.add("is-locked"));
+
+        // If audio is already unlocked by user interaction or browser autoplay allowance:
+        if (userInteracted || isAudioUnlocked()) {
+          finishIntro();
+        } else {
+          // If browser is holding AudioContext suspended due to lack of prior user gesture:
+          // Hold at 100% and prompt user to click anywhere to engage terminal with full sound
+          waitingForClickAt100 = true;
+          splash.classList.add("is-ready");
+          if (statusEl) statusEl.textContent = "ACCESS GRANTED // 點擊任意處進入終端";
+          if (badgeEl) badgeEl.textContent = "LINK START";
+          if (hexStreamEl) hexStreamEl.textContent = "MEM.ADDR 0xFFFFFF // VERIFIED";
+
+          // Backup failsafe: after 6 seconds, transition anyway (zero zombie sounds scheduled)
+          failsafeTimerId = setTimeout(() => {
+            if (!finished) finishIntro();
+          }, 6000);
+        }
       }
     }
 
-    const onSplashInteract = () => {
-      if (!sfxPlayed) {
-        sfxPlayed = playThemeIntroSfx(currentTheme);
-      }
+    const onSkipClick = (e) => {
+      if (e) e.stopPropagation();
+      userInteracted = true;
+      unlockAudioEngine();
       finishIntro();
     };
 
-    splash.addEventListener("click", onSplashInteract, { once: true });
-    splash.addEventListener("touchstart", onSplashInteract, { once: true, passive: true });
-    failsafeTimerId = setTimeout(finishIntro, duration + 320);
+    const onUserInteraction = () => {
+      userInteracted = true;
+      unlockAudioEngine();
+      if (waitingForClickAt100) {
+        finishIntro();
+      }
+    };
+
+    const onSplashClick = () => {
+      userInteracted = true;
+      unlockAudioEngine();
+      if (waitingForClickAt100) {
+        finishIntro();
+      }
+    };
+
+    const onKeyDown = (e) => {
+      userInteracted = true;
+      unlockAudioEngine();
+      if (waitingForClickAt100 || e.key === "Enter" || e.key === " " || e.key === "Escape") {
+        finishIntro();
+      }
+    };
+
+    window.addEventListener("pointerdown", onUserInteraction, { passive: true });
+    window.addEventListener("keydown", onKeyDown, { passive: true });
+    splash.addEventListener("click", onSplashClick);
+
+    const skipBtn = document.getElementById("introSkipBtn");
+    if (skipBtn) {
+      skipBtn.addEventListener("click", onSkipClick);
+    }
+
     rafId = requestAnimationFrame(tick);
 
     activeIntroCleanup = () => {
@@ -3972,8 +4714,13 @@
       if (removeTimerId) clearTimeout(removeTimerId);
       if (failsafeTimerId) clearTimeout(failsafeTimerId);
       document.body.classList.remove("intro-active");
-      splash.removeEventListener("click", onSplashInteract);
-      splash.removeEventListener("touchstart", onSplashInteract);
+      splash.classList.remove("is-ready", "is-unlocked");
+      window.removeEventListener("pointerdown", onUserInteraction);
+      window.removeEventListener("keydown", onKeyDown);
+      splash.removeEventListener("click", onSplashClick);
+      if (skipBtn) {
+        skipBtn.removeEventListener("click", onSkipClick);
+      }
     };
   }
 
@@ -3983,6 +4730,7 @@
   initHomeCarousel();
   // Lazy-render tabs on demand so initial opening animation runs at a locked 60fps without background DOM/image decoding stalls
   ensureTabRendered(state.activeTab);
+  updatePgrSectionHud(state.activeTab);
   initEventListeners();
   initBgmControls();
   runIntroSplash();
