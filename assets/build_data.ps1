@@ -155,7 +155,7 @@ function Get-DocxLines($path) {
 }
 
 # 2. Parse Character Files
-$abilityKeys = @("亡靈病", "加護", "詛咒", "神言", "神器", "神權", "虛能", "古言靈術", "古言靈術式", "世界共鳴", "共鳴", "亞雷利塔光環", "最高等術式", "最高等術士", "異能", "魔法", "幻能", "九紋龍印", "貫星的九紋龍印", "魔眼", "眷屬權能", "改造", "深淵能力", "能力", "獨有術式", "#額外能力")
+$abilityKeys = @("亡靈病", "加護", "詛咒", "神言", "神器", "神權", "神權(偽)", "虛能", "古言靈術", "古言靈術式", "世界共鳴", "共鳴", "亞雷利塔光環", "最高等術式", "最高等術士", "異能", "魔法", "幻能", "九紋龍印", "貫星的九紋龍印", "魔眼", "眷屬權能", "改造", "深淵能力", "深淵賜福", "賢者之賜", "賜福", "繼承能力", "能力", "獨有術式", "#額外能力")
 $profileKeys = @("武器", "群體", "稱號", "性別", "種族", "屬性", "善惡", "生日", "年齡", "身高", "體重", "個性", "外表", "喜歡", "討厭")
 $storyKeys = @("故事背景與相遇過程", "故事背景", "背景故事")
 
@@ -332,7 +332,11 @@ function Parse-CharacterFile($fileItem, $charId) {
 $characters = New-Object System.Collections.Generic.List[object]
 $charIndex = 0
 
-Get-ChildItem -Path "人設資料" -Recurse -File | Where-Object { $_.Name -notmatch "的副本" } | Sort-Object FullName | ForEach-Object {
+Get-ChildItem -Path "人設資料" -Recurse -File | Where-Object {
+    $_.Name -notmatch "的副本" -and
+    $_.FullName -notmatch '人設資料\\其他\\流浪者\\毒牙\.docx$' -and
+    $_.FullName -notmatch '人設資料\\現界\\月星民國\\月影軍\\劉 庭洛\.docx$'
+} | Sort-Object FullName | ForEach-Object {
     $charIndex++
     $cObj = Parse-CharacterFile $_ "char-$charIndex"
     $characters.Add($cObj)

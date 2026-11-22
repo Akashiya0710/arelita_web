@@ -106,9 +106,12 @@
       }
     });
   });
-  // Explicit common aliases (e.g. 黑神之火 -> 黑神之炎)
+  // Explicit common aliases (e.g. 黑神之火 -> 黑神之炎, 海 -> 海洋)
   if (attributeLookupMap.has("黑神之炎") && !attributeLookupMap.has("黑神之火")) {
     attributeLookupMap.set("黑神之火", attributeLookupMap.get("黑神之炎"));
+  }
+  if (attributeLookupMap.has("海洋") && !attributeLookupMap.has("海")) {
+    attributeLookupMap.set("海", attributeLookupMap.get("海洋"));
   }
 
   function findAttributeRecord(attrToken) {
@@ -320,7 +323,9 @@
     "虛空": { style: "background:linear-gradient(135deg,#030108 0%,#1e1b4b 50%,#581c87 100%);border-color:#c084fc;color:#f3e8ff;box-shadow:0 0 9px rgba(192,132,252,0.34);", icon: "🌌", isSupreme: true },
     "無限": { style: "background:linear-gradient(135deg,#1e1b4b 0%,#7e22ce 38%,#0284c7 72%,#ca8a04 100%);border-color:#fef08a;color:#fefce8;box-shadow:0 0 11px rgba(254,240,138,0.45);", icon: "∞", isSupreme: true },
     "萬物": { style: "background:linear-gradient(135deg,#064e3b 0%,#1e3a8a 35%,#581c87 68%,#b45309 100%);border-color:#fef08a;color:#fefce8;box-shadow:0 0 11px rgba(254,240,138,0.45);", icon: "👑", isSupreme: true },
-    "墨": { style: "background:linear-gradient(135deg,#09090b 0%,#18181b 50%,#27272a 100%);border-color:#a1a1aa;color:#f4f4f5;box-shadow:0 0 9px rgba(161,161,170,0.38);", icon: "🖋️", isSupreme: true }
+    "墨": { style: "background:linear-gradient(135deg,#09090b 0%,#18181b 50%,#27272a 100%);border-color:#a1a1aa;color:#f4f4f5;box-shadow:0 0 9px rgba(161,161,170,0.38);", icon: "🖋️", isSupreme: true },
+    "藥": { style: "background:linear-gradient(135deg,#064e3b 0%,#15803d 55%,#0f766e 100%);border-color:#86efac;color:#ecfdf5;box-shadow:0 0 8px rgba(134,239,172,0.32);", icon: "🌿" },
+    "普通": { style: "background:linear-gradient(135deg,#334155,#475569);border-color:#cbd5e1;color:#f8fafc;" }
   };
 
   function getAttributeVisual(attrName) {
@@ -429,8 +434,8 @@
 
   function getAbilityStyleClass(type) {
     if (type === "武器") return "type-weapon";
-    if (["神權", "神言", "神器", "眷屬權能"].includes(type)) return "type-divine";
-    if (["古言靈術", "虛能", "魔眼", "九紋龍印"].includes(type)) return "type-ancient";
+    if (["神權", "神權(偽)", "神言", "神器", "眷屬權能", "賢者之賜"].includes(type)) return "type-divine";
+    if (["古言靈術", "虛能", "魔眼", "九紋龍印", "深淵能力", "深淵賜福", "繼承能力"].includes(type)) return "type-ancient";
     if (["最高等術式", "共鳴", "世界共鳴", "亞雷利塔光環"].includes(type)) return "type-supreme";
     return "";
   }
@@ -2820,325 +2825,131 @@
     updateBodyModalState();
   }
 
-  // ==================== BGM SYNTHESIZER & CUSTOM AUDIO ENGINE ====================
+  // ==================== BGM AUDIO ENGINE (Hikari MP3 & CUSTOM AUDIO) ====================
+  const DEFAULT_BGM_SRC = "Hikari - Clovis Reyes & VDYCD - VDYCD.mp3";
+
+  const savedBgmVolRaw = localStorage.getItem("arelita_bgm_vol");
   const bgmSystem = {
     isPlaying: false,
-    track: localStorage.getItem("arelita_bgm_track") || "harp", // 'harp' | 'astral' | 'custom'
-    volume: Number(localStorage.getItem("arelita_bgm_vol") || 45) / 100,
+    track: "hikari", // 'hikari' | 'custom'
+    volume: (savedBgmVolRaw !== null && savedBgmVolRaw !== "" ? Number(savedBgmVolRaw) : 5) / 100,
     ctx: null,
-    masterGain: null,
-    schedulerTimer: null,
-    stepIdx: 0,
-    customObjectUrl: ""
+    customObjectUrl: "",
+    pendingAutoPlay: false,
+    userManuallyPaused: false,
+    primed: false
   };
 
-  function ensureAudioContext() {
-    if (!bgmSystem.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return null;
-      const ctx = new AudioCtx();
-
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0.001, ctx.currentTime);
-
-      // Stereo Ping-Pong Delay / Warm Hall Echo
-      const delayL = ctx.createDelay(2.0);
-      const delayR = ctx.createDelay(2.0);
-      delayL.delayTime.value = 0.36;
-      delayR.delayTime.value = 0.54;
-
-      const fbL = ctx.createGain();
-      const fbR = ctx.createGain();
-      fbL.gain.value = 0.32;
-      fbR.gain.value = 0.32;
-
-      const wetFilter = ctx.createBiquadFilter();
-      wetFilter.type = "lowpass";
-      wetFilter.frequency.value = 1800;
-
-      const wetGain = ctx.createGain();
-      wetGain.gain.value = 0.38;
-
-      delayL.connect(fbL);
-      fbL.connect(delayR);
-      delayR.connect(fbR);
-      fbR.connect(delayL);
-
-      delayL.connect(wetFilter);
-      delayR.connect(wetFilter);
-      wetFilter.connect(wetGain);
-
-      master.connect(ctx.destination);
-      master.connect(delayL);
-      wetGain.connect(ctx.destination);
-
-      bgmSystem.ctx = ctx;
-      bgmSystem.masterGain = master;
-    }
-    if (bgmSystem.ctx.state === "suspended") {
-      bgmSystem.ctx.resume();
-    }
-    return bgmSystem.ctx;
+  function getBgmAudioElement() {
+    return document.getElementById("bgmCustomAudio");
   }
 
-  function midiToFreq(midi) {
-    return 440 * Math.pow(2, (midi - 69) / 12);
-  }
-
-  function playHarpPluck(ctx, outNode, midi, duration, vel = 0.14) {
-    const now = ctx.currentTime;
-    const freq = midiToFreq(midi);
-
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    osc1.type = "triangle";
-    osc2.type = "sine";
-    osc1.frequency.setValueAtTime(freq, now);
-    osc2.frequency.setValueAtTime(freq * 2, now);
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(freq * 3.5, now);
-    filter.frequency.exponentialRampToValueAtTime(Math.max(280, freq * 0.9), now + duration * 0.85);
-
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0.0001, now);
-    env.gain.linearRampToValueAtTime(vel, now + 0.025);
-    env.gain.exponentialRampToValueAtTime(0.0005, now + duration);
-
-    const harmGain = ctx.createGain();
-    harmGain.gain.value = 0.18;
-
-    osc1.connect(filter);
-    osc2.connect(harmGain);
-    harmGain.connect(filter);
-    filter.connect(env);
-    env.connect(outNode);
-
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + duration + 0.05);
-    osc2.stop(now + duration + 0.05);
-  }
-
-  function playWarmPadChord(ctx, outNode, midiNotes, duration, vel = 0.045) {
-    const now = ctx.currentTime;
-    midiNotes.forEach((midi, i) => {
-      const freq = midiToFreq(midi);
-      const osc = ctx.createOscillator();
-      osc.type = i === 0 ? "sine" : "triangle";
-      osc.frequency.setValueAtTime(freq, now);
-      osc.detune.setValueAtTime((i % 2 === 0 ? 1 : -1) * 4, now);
-
-      const lp = ctx.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(680, now);
-
-      const env = ctx.createGain();
-      env.gain.setValueAtTime(0.0001, now);
-      env.gain.linearRampToValueAtTime(vel, now + duration * 0.3);
-      env.gain.exponentialRampToValueAtTime(0.0004, now + duration);
-
-      osc.connect(lp);
-      lp.connect(env);
-      env.connect(outNode);
-
-      osc.start(now);
-      osc.stop(now + duration + 0.08);
-    });
-  }
-
-  // Track 1: 《世界樹之息》 (A Aeolian Fantasy RPG Harp Progression)
-  const HARP_PROGRESSION = [
-    { pad: [45, 52, 57, 60], arp: [69, 72, 76, 79, 76, 72, 69, 64] }, // Am7
-    { pad: [41, 48, 53, 57], arp: [65, 69, 72, 76, 74, 72, 69, 65] }, // Fmaj7
-    { pad: [48, 55, 60, 64], arp: [67, 72, 76, 79, 81, 79, 76, 72] }, // Cmaj7
-    { pad: [43, 50, 55, 59], arp: [67, 71, 74, 79, 76, 74, 71, 67] }, // G6
-    { pad: [50, 57, 62, 65], arp: [69, 74, 77, 81, 77, 74, 69, 65] }, // Dm7
-    { pad: [40, 47, 52, 55], arp: [64, 67, 71, 76, 74, 71, 67, 64] }  // Em7
-  ];
-
-  // Track 2: 《星界檔案庫》 (D Dorian Ethereal Crystal Ambient)
-  const ASTRAL_PROGRESSION = [
-    { pad: [38, 45, 50, 57, 60], arp: [74, null, 81, 79, null, 76, 72, null] }, // Dm9
-    { pad: [43, 50, 57, 59, 64], arp: [76, null, 79, 83, null, 79, 74, null] }, // G13
-    { pad: [36, 43, 52, 55, 59], arp: [72, null, 76, 79, null, 83, 79, null] }, // Cmaj9
-    { pad: [45, 52, 55, 60, 64], arp: [69, null, 76, 79, null, 76, 72, null] }  // Am7
-  ];
-
-  // Track 3: 《夏日海灘・陽光微風》 (C Major Tropical Bossa Marimba & Gentle Surf)
-  const BEACH_PROGRESSION = [
-    { pad: [36, 48, 55, 59, 62], arp: [72, 76, 79, 83, 79, 76, 83, 79] }, // Cmaj9
-    { pad: [45, 52, 57, 60, 64], arp: [72, 76, 79, 81, 79, 76, 79, 72] }, // Am9
-    { pad: [38, 50, 57, 60, 65], arp: [74, 77, 81, 84, 81, 77, 81, 74] }, // Dm7
-    { pad: [43, 50, 55, 59, 65], arp: [71, 74, 77, 81, 79, 77, 74, 71] }, // G9
-    { pad: [41, 48, 53, 57, 64], arp: [69, 72, 76, 81, 76, 72, 76, 69] }, // Fmaj7
-    { pad: [40, 47, 52, 55, 59], arp: [67, 71, 74, 79, 76, 74, 79, 72] }  // Em7
-  ];
-
-  function playMarimbaNote(ctx, outNode, midi, duration, vel = 0.13) {
-    const now = ctx.currentTime;
-    const freq = midiToFreq(midi);
-
-    // Warm wooden bar fundamental (sine)
-    const osc1 = ctx.createOscillator();
-    osc1.type = "sine";
-    osc1.frequency.setValueAtTime(freq, now);
-
-    // Woody fourth harmonic overtone (characteristic marimba resonance)
-    const osc2 = ctx.createOscillator();
-    osc2.type = "sine";
-    osc2.frequency.setValueAtTime(freq * 3.98, now);
-
-    // Transient attack mallet click
-    const oscClick = ctx.createOscillator();
-    oscClick.type = "triangle";
-    oscClick.frequency.setValueAtTime(freq * 7.5, now);
-    oscClick.frequency.exponentialRampToValueAtTime(Math.max(120, freq * 0.6), now + 0.022);
-
-    const clickEnv = ctx.createGain();
-    clickEnv.gain.setValueAtTime(vel * 0.45, now);
-    clickEnv.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
-    oscClick.connect(clickEnv);
-    clickEnv.connect(outNode);
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(freq * 4.2, now);
-    filter.frequency.exponentialRampToValueAtTime(Math.max(220, freq * 1.1), now + duration * 0.65);
-
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0.0001, now);
-    env.gain.linearRampToValueAtTime(vel, now + 0.008);
-    env.gain.exponentialRampToValueAtTime(0.0005, now + duration);
-
-    const harmEnv = ctx.createGain();
-    harmEnv.gain.setValueAtTime(vel * 0.35, now);
-    harmEnv.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.28);
-
-    osc1.connect(filter);
-    filter.connect(env);
-    env.connect(outNode);
-
-    osc2.connect(harmEnv);
-    harmEnv.connect(outNode);
-
-    osc1.start(now);
-    osc2.start(now);
-    oscClick.start(now);
-    osc1.stop(now + duration + 0.04);
-    osc2.stop(now + duration * 0.3 + 0.02);
-    oscClick.stop(now + 0.03);
-  }
-
-  function playOceanSurfSwell(ctx, outNode, duration, peakVol = 0.024) {
-    const now = ctx.currentTime;
-    const noise = ctx.createBufferSource();
-    noise.buffer = getCachedNoiseBuffer(ctx);
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = "bandpass";
-    filter.frequency.setValueAtTime(220, now);
-    filter.frequency.exponentialRampToValueAtTime(680, now + duration * 0.45);
-    filter.frequency.exponentialRampToValueAtTime(160, now + duration);
-    filter.Q.value = 1.6;
-
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0.0001, now);
-    env.gain.linearRampToValueAtTime(peakVol, now + duration * 0.45);
-    env.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-    noise.connect(filter);
-    filter.connect(env);
-    env.connect(outNode);
-
-    noise.start(now);
-    noise.stop(now + duration + 0.02);
-  }
-
-  function startBgmScheduler() {
-    stopBgmScheduler();
-    const audioEl = document.getElementById("bgmCustomAudio");
-
-    if (bgmSystem.track === "custom" && audioEl && audioEl.src) {
-      audioEl.volume = Math.max(0, Math.min(1, bgmSystem.volume));
-      audioEl.play().catch(() => {});
-      return;
-    }
-
-    const ctx = ensureAudioContext();
-    if (!ctx) return;
-
-    const targetGain = Math.max(0.001, bgmSystem.volume * 0.9);
-    bgmSystem.masterGain.gain.cancelScheduledValues(ctx.currentTime);
-    bgmSystem.masterGain.gain.setValueAtTime(Math.max(0.001, bgmSystem.masterGain.gain.value), ctx.currentTime);
-    bgmSystem.masterGain.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + 0.5);
-
-    const stepMs = bgmSystem.track === "astral" ? 560 : (bgmSystem.track === "beach" ? 380 : 410);
-
-    function step() {
-      if (!bgmSystem.isPlaying) return;
-      let list = HARP_PROGRESSION;
-      if (bgmSystem.track === "astral") {
-        list = ASTRAL_PROGRESSION;
-      } else if (bgmSystem.track === "beach") {
-        list = BEACH_PROGRESSION;
+  function ensureBgmAudioSource() {
+    const audioEl = getBgmAudioElement();
+    if (!audioEl) return null;
+    if (bgmSystem.track === "custom" && bgmSystem.customObjectUrl) {
+      if (audioEl.src !== bgmSystem.customObjectUrl) {
+        audioEl.src = bgmSystem.customObjectUrl;
       }
-      const barIdx = Math.floor(bgmSystem.stepIdx / 8) % list.length;
-      const noteIdx = bgmSystem.stepIdx % 8;
-      const bar = list[barIdx];
-
-      if (noteIdx === 0) {
-        const padVol = bgmSystem.track === "beach" ? 0.038 : (bgmSystem.track === "astral" ? 0.055 : 0.042);
-        playWarmPadChord(ctx, bgmSystem.masterGain, bar.pad, (stepMs * 8) / 1000 + 0.6, padVol);
-        if (bgmSystem.track === "beach" && (barIdx % 2 === 0)) {
-          playOceanSurfSwell(ctx, bgmSystem.masterGain, (stepMs * 16) / 1000, 0.024);
-        }
+    } else {
+      bgmSystem.track = "hikari";
+      const targetSrc = encodeURI(DEFAULT_BGM_SRC);
+      const currentAttr = audioEl.getAttribute("src") || "";
+      if (currentAttr !== DEFAULT_BGM_SRC && !audioEl.src.endsWith(targetSrc)) {
+        audioEl.setAttribute("src", DEFAULT_BGM_SRC);
       }
-
-      const noteMidi = bar.arp[noteIdx];
-      if (noteMidi) {
-        if (bgmSystem.track === "beach") {
-          playMarimbaNote(
-            ctx,
-            bgmSystem.masterGain,
-            noteMidi,
-            (stepMs * 1.6) / 1000,
-            0.125
-          );
-        } else {
-          playHarpPluck(
-            ctx,
-            bgmSystem.masterGain,
-            noteMidi,
-            bgmSystem.track === "astral" ? 2.4 : 1.65,
-            bgmSystem.track === "astral" ? 0.1 : 0.13
-          );
-        }
-      }
-
-      bgmSystem.stepIdx++;
     }
-
-    step();
-    bgmSystem.schedulerTimer = setInterval(step, stepMs);
+    audioEl.loop = true;
+    audioEl.volume = Math.max(0, Math.min(1, bgmSystem.volume));
+    return audioEl;
   }
 
-  function stopBgmScheduler() {
-    if (bgmSystem.schedulerTimer) {
-      clearInterval(bgmSystem.schedulerTimer);
-      bgmSystem.schedulerTimer = null;
+  function primeBgmAudio() {
+    if (bgmSystem.primed || bgmSystem.isPlaying) return;
+    const audioEl = ensureBgmAudioSource();
+    if (!audioEl) return;
+    try {
+      const prevMuted = audioEl.muted;
+      audioEl.muted = true;
+      const p = audioEl.play();
+      if (p && typeof p.then === "function") {
+        p.then(() => {
+          if (!bgmSystem.isPlaying) {
+            audioEl.pause();
+            audioEl.currentTime = 0;
+          }
+          audioEl.muted = prevMuted;
+          bgmSystem.primed = true;
+        }).catch(() => {
+          audioEl.muted = prevMuted;
+        });
+      } else {
+        audioEl.pause();
+        audioEl.currentTime = 0;
+        audioEl.muted = prevMuted;
+        bgmSystem.primed = true;
+      }
+    } catch (e) {}
+  }
+
+  function startBgmPlayback(isAutoStart = false) {
+    const audioEl = ensureBgmAudioSource();
+    if (!audioEl) return;
+    audioEl.muted = false;
+    audioEl.volume = Math.max(0, Math.min(1, bgmSystem.volume));
+    const playPromise = audioEl.play();
+    if (playPromise && typeof playPromise.then === "function") {
+      playPromise
+        .then(() => {
+          bgmSystem.isPlaying = true;
+          bgmSystem.pendingAutoPlay = false;
+          bgmSystem.primed = true;
+          localStorage.setItem("arelita_bgm_on", "1");
+          updateBgmUI();
+        })
+        .catch(() => {
+          bgmSystem.isPlaying = false;
+          if (isAutoStart && !bgmSystem.userManuallyPaused) {
+            bgmSystem.pendingAutoPlay = true;
+            attachPendingAutoPlayFallback();
+          }
+          updateBgmUI();
+        });
+    } else {
+      bgmSystem.isPlaying = true;
+      bgmSystem.pendingAutoPlay = false;
+      localStorage.setItem("arelita_bgm_on", "1");
+      updateBgmUI();
     }
-    const audioEl = document.getElementById("bgmCustomAudio");
+  }
+
+  function stopBgmPlayback() {
+    bgmSystem.pendingAutoPlay = false;
+    const audioEl = getBgmAudioElement();
     if (audioEl) {
       audioEl.pause();
     }
-    if (bgmSystem.ctx && bgmSystem.masterGain) {
-      const now = bgmSystem.ctx.currentTime;
-      bgmSystem.masterGain.gain.cancelScheduledValues(now);
-      bgmSystem.masterGain.gain.setValueAtTime(bgmSystem.masterGain.gain.value, now);
-      bgmSystem.masterGain.gain.linearRampToValueAtTime(0.0001, now + 0.25);
-    }
+  }
+
+  let autoPlayFallbackAttached = false;
+  function attachPendingAutoPlayFallback() {
+    if (autoPlayFallbackAttached) return;
+    autoPlayFallbackAttached = true;
+    const triggerAutoPlay = () => {
+      autoPlayFallbackAttached = false;
+      window.removeEventListener("pointerdown", triggerAutoPlay);
+      window.removeEventListener("keydown", triggerAutoPlay);
+      if (bgmSystem.pendingAutoPlay && !bgmSystem.userManuallyPaused && !bgmSystem.isPlaying) {
+        startBgmPlayback(false);
+      }
+    };
+    window.addEventListener("pointerdown", triggerAutoPlay, { passive: true, once: true });
+    window.addEventListener("keydown", triggerAutoPlay, { passive: true, once: true });
+  }
+
+  function autoStartBgmAfterIntro() {
+    if (bgmSystem.userManuallyPaused || bgmSystem.isPlaying) return;
+    startBgmPlayback(true);
   }
 
   function updateBgmUI() {
@@ -3168,12 +2979,14 @@
   }
 
   function setBgmPlaying(playState) {
-    bgmSystem.isPlaying = Boolean(playState);
-    localStorage.setItem("arelita_bgm_on", bgmSystem.isPlaying ? "1" : "0");
-    if (bgmSystem.isPlaying) {
-      startBgmScheduler();
+    const nextState = Boolean(playState);
+    bgmSystem.isPlaying = nextState;
+    bgmSystem.userManuallyPaused = !nextState;
+    localStorage.setItem("arelita_bgm_on", nextState ? "1" : "0");
+    if (nextState) {
+      startBgmPlayback(false);
     } else {
-      stopBgmScheduler();
+      stopBgmPlayback();
     }
     updateBgmUI();
   }
@@ -3185,11 +2998,11 @@
     const volSlider = document.getElementById("bgmVolumeSlider");
     const fileInput = document.getElementById("bgmFileInput");
     const customTrackBtn = document.getElementById("bgmCustomTrackBtn");
-    const audioEl = document.getElementById("bgmCustomAudio");
+    const audioEl = getBgmAudioElement();
 
-    if (bgmSystem.track === "custom" && (!audioEl || !audioEl.src)) {
-      bgmSystem.track = "harp";
-    }
+    bgmSystem.track = "hikari";
+    localStorage.setItem("arelita_bgm_track", "hikari");
+    ensureBgmAudioSource();
     updateBgmUI();
 
     if (toggleBtn) {
@@ -3221,17 +3034,18 @@
         if (audioEl) {
           audioEl.volume = bgmSystem.volume;
         }
-        if (bgmSystem.ctx && bgmSystem.masterGain && bgmSystem.isPlaying && bgmSystem.track !== "custom") {
-          bgmSystem.masterGain.gain.setTargetAtTime(Math.max(0.001, bgmSystem.volume * 0.9), bgmSystem.ctx.currentTime, 0.08);
-        }
       });
     }
 
     document.querySelectorAll(".bgm-track-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        bgmSystem.track = btn.getAttribute("data-bgm-track");
+        const chosen = btn.getAttribute("data-bgm-track");
+        bgmSystem.track = chosen === "custom" && bgmSystem.customObjectUrl ? "custom" : "hikari";
         localStorage.setItem("arelita_bgm_track", bgmSystem.track);
-        bgmSystem.stepIdx = 0;
+        ensureBgmAudioSource();
+        if (audioEl) {
+          audioEl.currentTime = 0;
+        }
         setBgmPlaying(true);
       });
     });
@@ -4557,6 +4371,7 @@
       if (failsafeTimerId) clearTimeout(failsafeTimerId);
 
       unlockAudioEngine();
+      primeBgmAudio();
 
       if (bar) bar.style.transform = "scaleX(1)";
       if (arcEl) arcEl.style.strokeDashoffset = "0";
@@ -4578,6 +4393,7 @@
       removeTimerId = setTimeout(() => {
         splash.classList.add("is-removed");
         document.body.classList.remove("intro-active");
+        autoStartBgmAfterIntro();
         if (typeof window !== "undefined") {
           const prewarmRoster = () => {
             if (!state.renderedTabs.has("characters")) {
@@ -4670,12 +4486,14 @@
       if (e) e.stopPropagation();
       userInteracted = true;
       unlockAudioEngine();
+      primeBgmAudio();
       finishIntro();
     };
 
     const onUserInteraction = () => {
       userInteracted = true;
       unlockAudioEngine();
+      primeBgmAudio();
       if (waitingForClickAt100) {
         finishIntro();
       }
@@ -4684,6 +4502,7 @@
     const onSplashClick = () => {
       userInteracted = true;
       unlockAudioEngine();
+      primeBgmAudio();
       if (waitingForClickAt100) {
         finishIntro();
       }
@@ -4692,6 +4511,7 @@
     const onKeyDown = (e) => {
       userInteracted = true;
       unlockAudioEngine();
+      primeBgmAudio();
       if (waitingForClickAt100 || e.key === "Enter" || e.key === " " || e.key === "Escape") {
         finishIntro();
       }

@@ -495,8 +495,8 @@
 
   function getAbilityStyleClass(type) {
     if (type === "武器") return "type-weapon";
-    if (["神權", "神言", "神器", "眷屬權能"].includes(type)) return "type-divine";
-    if (["古言靈術", "虛能", "魔眼", "九紋龍印", "深淵能力"].includes(type)) return "type-ancient";
+    if (["神權", "神權(偽)", "神言", "神器", "眷屬權能", "賢者之賜"].includes(type)) return "type-divine";
+    if (["古言靈術", "虛能", "魔眼", "九紋龍印", "深淵能力", "深淵賜福", "繼承能力"].includes(type)) return "type-ancient";
     if (["最高等術式", "共鳴", "世界共鳴", "亞雷利塔光環"].includes(type)) return "type-supreme";
     return "";
   }
@@ -589,13 +589,13 @@
   // ==================== POPULATE FINE-GRAINED FILTER OPTIONS ====================
   const ABILITY_GROUP_FILTERS = [
     { value: "GROUP_WEAPON", label: "⚔️ 武器武裝（持有專屬武器）", match: (c) => c.abilityTypes.includes("武器") },
-    { value: "GROUP_DIVINE", label: "👑 神格權能（神權／神器／神言／眷屬權能）", match: (c) => c.abilityTypes.some((t) => ["神權", "神器", "神言", "眷屬權能"].includes(t)) },
+    { value: "GROUP_DIVINE", label: "👑 神格權能（神權／神器／神言／眷屬權能）", match: (c) => c.abilityTypes.some((t) => ["神權", "神權(偽)", "神器", "神言", "眷屬權能"].includes(t)) },
     { value: "GROUP_ANCIENT", label: "📜 古言靈術（詠唱言靈法則）", match: (c) => c.abilityTypes.includes("古言靈術") },
     { value: "GROUP_RESONANCE", label: "✨ 世界共鳴与極致術式（世界共鳴／共鳴／最高等術式／光環）", match: (c) => c.abilityTypes.some((t) => ["世界共鳴", "共鳴", "最高等術式", "亞雷利塔光環"].includes(t)) },
-    { value: "GROUP_VOID_ABYSS", label: "🌌 虛空與深淵（虛能／深淵能力）", match: (c) => c.abilityTypes.some((t) => ["虛能", "深淵能力"].includes(t)) },
-    { value: "GROUP_OCULAR_DRAGON", label: "🐉 特殊血脈刻印（九紋龍印／魔眼）", match: (c) => c.abilityTypes.some((t) => ["九紋龍印", "魔眼"].includes(t)) },
-    { value: "GROUP_BLESS_CURSE", label: "🛡️ 加護與詛咒（加護／詛咒／亡靈病／改造）", match: (c) => c.abilityTypes.some((t) => ["加護", "詛咒", "亡靈病", "改造"].includes(t)) },
-    { value: "GROUP_MAGIC_SKILL", label: "🔮 常規與獨有體系（魔法／異能／幻能／獨有術式／能力）", match: (c) => c.abilityTypes.some((t) => ["魔法", "異能", "幻能", "獨有術式", "能力", "額外能力"].includes(t)) },
+    { value: "GROUP_VOID_ABYSS", label: "🌌 虛空與深淵（虛能／深淵能力／深淵賜福）", match: (c) => c.abilityTypes.some((t) => ["虛能", "深淵能力", "深淵賜福"].includes(t)) },
+    { value: "GROUP_OCULAR_DRAGON", label: "🐉 特殊血脈刻印（九紋龍印／魔眼／繼承能力）", match: (c) => c.abilityTypes.some((t) => ["九紋龍印", "魔眼", "繼承能力"].includes(t)) },
+    { value: "GROUP_BLESS_CURSE", label: "🛡️ 加護與詛咒（加護／詛咒／賜福／亡靈病／改造）", match: (c) => c.abilityTypes.some((t) => ["加護", "詛咒", "賜福", "賢者之賜", "深淵賜福", "亡靈病", "改造"].includes(t)) },
+    { value: "GROUP_MAGIC_SKILL", label: "🔮 常規與獨有體系（魔法／異能／幻能／獨有術式／能力）", match: (c) => c.abilityTypes.some((t) => ["魔法", "異能", "幻能", "獨有術式", "能力", "額外能力", "繼承能力"].includes(t)) },
     { value: "HAS_PORTRAIT", label: "🖼️ 附帶角色立繪形象圖", match: (c) => Boolean(c.image) }
   ];
 
@@ -702,10 +702,10 @@
       html += `</optgroup>`;
 
       const allTypes = [
-        "武器", "神權", "神器", "神言", "眷屬權能",
+        "武器", "神權", "神權(偽)", "神器", "神言", "眷屬權能",
         "古言靈術", "世界共鳴", "共鳴", "最高等術式", "亞雷利塔光環",
-        "虛能", "深淵能力", "九紋龍印", "魔眼",
-        "加護", "詛咒", "亡靈病", "改造",
+        "虛能", "深淵能力", "深淵賜福", "九紋龍印", "魔眼", "繼承能力",
+        "加護", "詛咒", "賜福", "賢者之賜", "亡靈病", "改造",
         "魔法", "異能", "幻能", "獨有術式", "能力", "額外能力"
       ];
       html += `<optgroup label="── 單一能力／術式欄位 ──">`;
