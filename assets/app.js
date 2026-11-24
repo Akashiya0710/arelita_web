@@ -4063,133 +4063,18 @@
     },
   };
 
-  let sfxAudioCtx = null;
-  let sfxMasterGain = null;
-  let cachedNoiseBuffer = null;
+  const INTRO_SLASH_SFX_SRC = "assets/intro_slash.mp3";
   let slashAudioObj = null;
-
-  function createSlashWavBlobUrl() {
-    try {
-      const sampleRate = 44100;
-      const duration = 0.42;
-      const numSamples = Math.floor(sampleRate * duration);
-      const buffer = new Int16Array(numSamples);
-
-      let pSweep1 = 0;
-      let pSweep2 = 0;
-      let pSheen = 0;
-      let prevNoise = 0;
-
-      for (let i = 0; i < numSamples; i++) {
-        const t = i / sampleRate;
-
-        // 1. Cyber Laser Beam FM Sweep (科技光子光束下行掃頻: 5600Hz -> 520Hz)
-        const sweepFreq = 5600 * Math.pow(520 / 5600, Math.min(1, t / 0.14));
-        const modIndex = 1.6 * Math.exp(-t * 22);
-        const fmMod = Math.sin(2 * Math.PI * sweepFreq * 2.0 * t) * modIndex;
-        pSweep1 += (2 * Math.PI * (sweepFreq + fmMod * 500)) / sampleRate;
-        const laserWave = Math.sin(pSweep1) * 0.32 * Math.exp(-t * 14);
-
-        // 2. Dual-Chamber Plasma Sheen (電漿諧振音 2400Hz + 3600Hz，剔除雜亂噪音)
-        pSweep2 += (2 * Math.PI * 2400 * Math.pow(680 / 2400, Math.min(1, t / 0.12))) / sampleRate;
-        pSheen += (2 * Math.PI * 3600) / sampleRate;
-        const sheenWave = (Math.sin(pSweep2) * 0.16 + Math.sin(pSheen) * 0.08) * Math.exp(-t * 18);
-
-        // 3. Ethereal High-Pass Cyber Dissipation (光羽高通消散微風，無低頻轟鳴)
-        const rawNoise = Math.random() * 2 - 1;
-        const hpNoise = (rawNoise - prevNoise * 0.88);
-        prevNoise = rawNoise;
-        const noiseWave = hpNoise * 0.10 * Math.exp(-t * 9);
-
-        // 4. Subtle Tactile Thump (極短戰術底音，乾淨清脆不震耳)
-        const thump = Math.sin(2 * Math.PI * 130 * Math.pow(55 / 130, Math.min(1, t / 0.06)) * t) * 0.14 * Math.exp(-t * 35);
-
-        let sample = laserWave + sheenWave + noiseWave + thump;
-        // Soft clipping for velvet smooth output
-        sample = Math.tanh(sample * 1.1) * 0.72;
-        buffer[i] = sample < 0 ? sample * 32768 : sample * 32767;
-      }
-
-      const header = new ArrayBuffer(44);
-      const view = new DataView(header);
-      const writeStr = (offset, s) => {
-        for (let j = 0; j < s.length; j++) view.setUint8(offset + j, s.charCodeAt(j));
-      };
-      writeStr(0, "RIFF");
-      view.setUint32(4, 36 + numSamples * 2, true);
-      writeStr(8, "WAVE");
-      writeStr(12, "fmt ");
-      view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true);
-      view.setUint16(22, 1, true);
-      view.setUint32(24, sampleRate, true);
-      view.setUint32(28, sampleRate * 2, true);
-      view.setUint16(32, 2, true);
-      view.setUint16(34, 16, true);
-      writeStr(36, "data");
-      view.setUint32(40, numSamples * 2, true);
-
-      const blob = new Blob([header, buffer], { type: "audio/wav" });
-      return URL.createObjectURL(blob);
-    } catch (e) {
-      return null;
-    }
-  }
+  let slashSfxPlayed = false;
 
   try {
-    const slashUrl = createSlashWavBlobUrl();
-    if (slashUrl) {
-      slashAudioObj = new Audio(slashUrl);
-      slashAudioObj.volume = 0.38;
-      slashAudioObj.preload = "auto";
-    }
+    slashAudioObj = new Audio(INTRO_SLASH_SFX_SRC);
+    slashAudioObj.volume = 0.65;
+    slashAudioObj.preload = "auto";
   } catch (e) {}
-
-  function getSfxContext() {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return null;
-    if (!sfxAudioCtx) {
-      try {
-        sfxAudioCtx = new AudioCtx();
-        sfxMasterGain = sfxAudioCtx.createGain();
-        sfxMasterGain.gain.setValueAtTime(0.95, sfxAudioCtx.currentTime);
-
-        const comp = sfxAudioCtx.createDynamicsCompressor();
-        comp.threshold.setValueAtTime(-12, sfxAudioCtx.currentTime);
-        comp.knee.setValueAtTime(16, sfxAudioCtx.currentTime);
-        comp.ratio.setValueAtTime(6, sfxAudioCtx.currentTime);
-        comp.attack.setValueAtTime(0.003, sfxAudioCtx.currentTime);
-        comp.release.setValueAtTime(0.15, sfxAudioCtx.currentTime);
-
-        sfxMasterGain.connect(comp);
-        comp.connect(sfxAudioCtx.destination);
-      } catch (e) {
-        return null;
-      }
-    }
-    if (sfxAudioCtx && sfxAudioCtx.state === "suspended") {
-      sfxAudioCtx.resume().catch(() => {});
-    }
-    return sfxAudioCtx;
-  }
-
-  // Pre-initialize Web Audio Context eagerly on script load
-  try {
-    getSfxContext();
-  } catch (e) {}
-
-  function getSfxDestination() {
-    const ctx = getSfxContext();
-    if (!ctx) return null;
-    return sfxMasterGain || ctx.destination;
-  }
 
   function unlockAudioEngine() {
     try {
-      const ctx = getSfxContext();
-      if (ctx && ctx.state === "suspended") {
-        ctx.resume().catch(() => {});
-      }
       if (bgmSystem && bgmSystem.ctx && bgmSystem.ctx.state === "suspended") {
         bgmSystem.ctx.resume().catch(() => {});
       }
@@ -4202,99 +4087,9 @@
     window.addEventListener("keydown", unlockAudioEngine, { passive: true });
   }
 
-  function getCachedNoiseBuffer(ctx) {
-    if (cachedNoiseBuffer && cachedNoiseBuffer.sampleRate === ctx.sampleRate) {
-      return cachedNoiseBuffer;
-    }
-    const bufferSize = Math.floor(ctx.sampleRate * 1.4);
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
-    cachedNoiseBuffer = buffer;
-    return cachedNoiseBuffer;
-  }
-
-  function playToneHelper(ctx, dest, freq, startTime, duration, opts = {}) {
-    if (!ctx) return;
-    const out = dest || getSfxDestination();
-    if (!out) return;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const t0 = Math.max(ctx.currentTime + 0.002, (startTime || 0));
-    const attack = Math.max(0.004, opts.attack || 0.02);
-    const dur = Math.max(attack + 0.015, duration || 0.1);
-    const peak = Math.max(0.01, opts.gain || 0.18);
-
-    osc.type = opts.type || "sine";
-    osc.frequency.setValueAtTime(Math.max(20, freq || 440), t0);
-    if (opts.endFreq) {
-      osc.frequency.exponentialRampToValueAtTime(Math.max(20, opts.endFreq), t0 + dur);
-    }
-
-    gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.linearRampToValueAtTime(peak, t0 + attack);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-
-    if (opts.filterFreq) {
-      const filter = ctx.createBiquadFilter();
-      filter.type = opts.filterType || "lowpass";
-      filter.frequency.setValueAtTime(Math.max(40, opts.filterFreq), t0);
-      if (opts.filterEndFreq) {
-        filter.frequency.exponentialRampToValueAtTime(Math.max(40, opts.filterEndFreq), t0 + dur);
-      }
-      osc.connect(filter);
-      filter.connect(gain);
-    } else {
-      osc.connect(gain);
-    }
-
-    gain.connect(out);
-    osc.start(t0);
-    osc.stop(t0 + dur + 0.05);
-  }
-
-  function playNoiseBurstHelper(ctx, dest, startTime, duration, opts = {}) {
-    if (!ctx) return;
-    const out = dest || getSfxDestination();
-    if (!out) return;
-
-    const noise = ctx.createBufferSource();
-    noise.buffer = getCachedNoiseBuffer(ctx);
-    if (!noise.buffer) return;
-
-    const t0 = Math.max(ctx.currentTime + 0.002, (startTime || 0));
-    const dur = Math.max(0.03, duration || 0.1);
-    const peak = Math.max(0.01, opts.gain || 0.16);
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = opts.filterType || "bandpass";
-    filter.frequency.setValueAtTime(Math.max(40, opts.startFreq || 400), t0);
-    if (opts.endFreq) {
-      filter.frequency.exponentialRampToValueAtTime(Math.max(40, opts.endFreq), t0 + dur);
-    }
-    filter.Q.value = opts.Q || 2.5;
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.linearRampToValueAtTime(peak, t0 + dur * 0.2);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-
-    noise.connect(filter);
-    filter.connect(gain);
-    gain.connect(out);
-    noise.start(t0);
-    noise.stop(t0 + dur + 0.03);
-  }
-
-  let slashSfxPlayed = false;
-
   function isAudioUnlocked() {
     try {
-      const ctx = getSfxContext();
-      return Boolean(ctx && ctx.state === "running");
+      return Boolean(bgmSystem && bgmSystem.ctx && bgmSystem.ctx.state === "running");
     } catch (e) {
       return false;
     }
@@ -4304,276 +4099,25 @@
     if (slashSfxPlayed) return;
     slashSfxPlayed = true;
 
-    let playedViaAudio = false;
-    // 1. Play high-precision synthesized Cyber Laser WAV via native Audio element
     try {
-      if (slashAudioObj) {
-        slashAudioObj.currentTime = 0;
-        slashAudioObj.volume = 0.38;
-        const p = slashAudioObj.play();
-        if (p && typeof p.then === "function") {
-          p.then(() => { playedViaAudio = true; }).catch(() => {
-            // If browser autoplay policies reject, fallback to Web Audio API
-            playLaserWebAudioFallback();
-          });
-          return;
-        } else {
-          playedViaAudio = true;
-          return;
-        }
+      if (!slashAudioObj) {
+        slashAudioObj = new Audio(INTRO_SLASH_SFX_SRC);
+      }
+      slashAudioObj.currentTime = 0;
+      slashAudioObj.volume = 0.65;
+      const p = slashAudioObj.play();
+      if (p && typeof p.then === "function") {
+        p.catch(() => {});
       }
     } catch (e) {}
-
-    playLaserWebAudioFallback();
   }
 
-  function playLaserWebAudioFallback() {
-    // 2. High-precision Web Audio API cyber laser slash fallback (Clean Sci-Fi / Gentle Volume)
-    try {
-      const ctx = getSfxContext();
-      if (!ctx || ctx.state !== "running") return;
-      const out = getSfxDestination();
-      const now = ctx.currentTime + 0.002;
-
-      // Part A: Digital laser beam sweep (5600Hz -> 520Hz)
-      playToneHelper(ctx, out, 5600, now, 0.15, {
-        type: "sine",
-        endFreq: 520,
-        gain: 0.16,
-        attack: 0.001,
-        filterFreq: 6800,
-      });
-
-      // Part B: Plasma harmonic sheen (2400Hz -> 900Hz)
-      playToneHelper(ctx, out, 2400, now, 0.12, {
-        type: "triangle",
-        endFreq: 900,
-        gain: 0.12,
-        attack: 0.001,
-        filterFreq: 4500,
-      });
-
-      // Part C: High-pass ethereal dissipation shimmer
-      playNoiseBurstHelper(ctx, out, now, 0.18, {
-        filterType: "highpass",
-        startFreq: 2600,
-        endFreq: 1800,
-        gain: 0.06,
-      });
-    } catch (e) {}
-  }
-
-  function playTacticalSfxInternal(type = "switch") {
-    // Disabled: all UI button sounds removed
+  function playTacticalSfxInternal() {
     return;
   }
 
-  function playThemeIntroSfx(themeName) {
-    try {
-      const ctx = getSfxContext();
-      if (!ctx) return false;
-      const now = ctx.currentTime + 0.01;
-      const master = getSfxDestination();
-      if (!master) return false;
-
-      const theme = themeName || state.theme || "pgr";
-
-      if (theme === "pgr") {
-        // ⚔️ PGR Tactical Terminal: Cyber telemetry lock pulse + sub-bass serum resonance + crystalline metallic arpeggio
-        playToneHelper(ctx, master, 110.0, now, 0.95, {
-          type: "sawtooth",
-          endFreq: 55.0,
-          gain: 0.22,
-          attack: 0.01,
-          filterFreq: 420,
-          filterEndFreq: 140,
-        });
-        playNoiseBurstHelper(ctx, master, now, 0.55, {
-          filterType: "bandpass",
-          startFreq: 1200,
-          endFreq: 3200,
-          Q: 3.2,
-          gain: 0.16,
-        });
-        [440.0, 523.25, 659.25, 880.0, 1046.5, 1318.51, 1760.0].forEach((f, idx) => {
-          const t = now + 0.04 + idx * 0.055;
-          playToneHelper(ctx, master, f, t, 0.38, {
-            type: "triangle",
-            gain: 0.06,
-            attack: 0.005,
-            filterFreq: 3200,
-          });
-          playToneHelper(ctx, master, f * 2, t, 0.18, {
-            type: "sine",
-            gain: 0.025,
-            attack: 0.004,
-          });
-        });
-      } else if (theme === "ocean") {
-        // 🌊 Ocean: Deep submarine sonar ping + ocean wave wash + Lydian aqua-harp & bubble chimes
-        playNoiseBurstHelper(ctx, master, now, 1.15, {
-          filterType: "bandpass",
-          startFreq: 220,
-          endFreq: 950,
-          Q: 1.8,
-          gain: 0.06,
-        });
-        // Sonar ping
-        playToneHelper(ctx, master, 1046.5, now + 0.02, 0.95, { type: "sine", gain: 0.09, attack: 0.008 });
-        playToneHelper(ctx, master, 2093.0, now + 0.02, 0.55, { type: "sine", gain: 0.035, attack: 0.008 });
-        // Rising bubble blips
-        [392.0, 493.88, 587.33, 739.99, 783.99, 987.77, 1174.66, 1567.98].forEach((f, idx) => {
-          const t = now + 0.1 + idx * 0.075;
-          playToneHelper(ctx, master, f, t, 0.55, {
-            type: "triangle",
-            endFreq: f * 1.03,
-            gain: 0.055,
-            attack: 0.01,
-          });
-        });
-      } else if (theme === "beach") {
-        // 🏖️ Beach: Tropical ocean surf wash swell + bright sunny acoustic marimba arpeggio
-        playNoiseBurstHelper(ctx, master, now, 1.25, {
-          filterType: "lowpass",
-          startFreq: 260,
-          endFreq: 720,
-          Q: 1.4,
-          gain: 0.055,
-        });
-        // Warm sunny major chime arpeggio (Cmaj9: C5, E5, G5, B5, D6, E6)
-        [523.25, 659.25, 783.99, 987.77, 1174.66, 1318.51].forEach((f, idx) => {
-          const t = now + 0.08 + idx * 0.08;
-          playToneHelper(ctx, master, f, t, 0.65, {
-            type: "sine",
-            gain: 0.07,
-            attack: 0.008,
-          });
-          playToneHelper(ctx, master, f * 3, t, 0.25, {
-            type: "triangle",
-            gain: 0.02,
-            attack: 0.005,
-          });
-        });
-      } else if (theme === "bubble") {
-        // 🌸 Bubble: Sweet sparkling music box / celeste arpeggio + gentle bubble "bloop" pops
-        playToneHelper(ctx, master, 1200, now, 0.45, {
-          type: "sine",
-          endFreq: 2400,
-          gain: 0.045,
-          attack: 0.01,
-        });
-        // Bubble pop "bloops" (rapid upward pitch glides simulating bubbles forming and popping)
-        [587.33, 783.99, 880.0, 1046.5, 1318.51, 1567.98].forEach((f, idx) => {
-          const t = now + 0.04 + idx * 0.07;
-          playToneHelper(ctx, master, f, t, 0.28, {
-            type: "sine",
-            endFreq: f * 1.25,
-            gain: 0.065,
-            attack: 0.005,
-          });
-          // Sweet music-box harmonic overtone
-          playToneHelper(ctx, master, f * 2, t + 0.01, 0.45, {
-            type: "triangle",
-            gain: 0.035,
-            attack: 0.006,
-          });
-        });
-      } else if (theme === "worldtree") {
-        // 🌳 World Tree: Warm forest fifth drone + wooden wind-chimes + Celtic pentatonic harp cascade
-        playToneHelper(ctx, master, 146.83, now, 1.35, { type: "sine", gain: 0.09, attack: 0.12 }); // D3
-        playToneHelper(ctx, master, 220.0, now, 1.35, { type: "triangle", gain: 0.06, attack: 0.12, filterFreq: 800 }); // A3
-        // Pentatonic harp & wind-chime flourish (D4, F#4, A4, B4, D5, F#5, A5)
-        [293.66, 369.99, 440.0, 493.88, 587.33, 739.99, 880.0, 1174.66].forEach((f, idx) => {
-          const t = now + 0.06 + idx * 0.08;
-          playToneHelper(ctx, master, f, t, 0.85, {
-            type: "triangle",
-            gain: 0.065,
-            attack: 0.012,
-            filterFreq: 2400,
-          });
-          playToneHelper(ctx, master, f * 2, t + 0.015, 0.45, {
-            type: "sine",
-            gain: 0.025,
-            attack: 0.008,
-          });
-        });
-      } else if (theme === "starry") {
-        // 🌌 Starry: Shooting-star high-frequency shimmer sweep + cosmic glass celeste constellation chord
-        playToneHelper(ctx, master, 2400, now, 0.55, {
-          type: "sine",
-          endFreq: 580,
-          gain: 0.05,
-          attack: 0.01,
-        });
-        playNoiseBurstHelper(ctx, master, now, 0.75, {
-          filterType: "highpass",
-          startFreq: 1800,
-          endFreq: 4200,
-          Q: 3.0,
-          gain: 0.035,
-        });
-        // Sparkling astral celeste notes (Eb major 9 / Lydian shimmer)
-        [622.25, 783.99, 932.33, 1174.66, 1396.91, 1567.98, 2093.0].forEach((f, idx) => {
-          const t = now + 0.05 + idx * 0.085;
-          playToneHelper(ctx, master, f, t, 0.9, { type: "sine", gain: 0.06, attack: 0.006 });
-          playToneHelper(ctx, master, f * 1.5, t, 0.5, { type: "sine", gain: 0.022, attack: 0.006 });
-        });
-      } else if (theme === "dark") {
-        // 🌙 Dark: Abyssal sub-bass drop + Phrygian dark rune bell toll + obsidian lock resonance
-        playToneHelper(ctx, master, 130.81, now, 1.15, {
-          type: "sawtooth",
-          endFreq: 55.0,
-          gain: 0.11,
-          attack: 0.015,
-          filterFreq: 380,
-          filterEndFreq: 120,
-        });
-        playNoiseBurstHelper(ctx, master, now, 0.85, {
-          filterType: "lowpass",
-          startFreq: 360,
-          endFreq: 90,
-          Q: 2.0,
-          gain: 0.07,
-        });
-        // Dark metallic rune bells (C# Phrygian / Diminished mystic intervals)
-        [277.18, 293.66, 369.99, 440.0, 554.37, 587.33].forEach((f, idx) => {
-          const t = now + 0.08 + idx * 0.11;
-          playToneHelper(ctx, master, f, t, 0.95, {
-            type: "triangle",
-            gain: 0.065,
-            attack: 0.008,
-            filterFreq: 1600,
-          });
-          playToneHelper(ctx, master, f * 2.41, t, 0.45, {
-            type: "sine",
-            gain: 0.025,
-            attack: 0.005,
-          });
-        });
-      } else {
-        // ☀️ Light: Radiant cathedral organ swell + angelic golden tubular bell & harp glissando
-        [261.63, 329.63, 392.0, 523.25].forEach((f) => {
-          playToneHelper(ctx, master, f, now, 1.35, {
-            type: "triangle",
-            gain: 0.045,
-            attack: 0.14,
-            filterFreq: 1800,
-          });
-        });
-        // Golden glissando
-        [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1318.5, 1567.98, 2093.0].forEach((f, idx) => {
-          const t = now + 0.04 + idx * 0.065;
-          playToneHelper(ctx, master, f, t, 0.75, {
-            type: "sine",
-            gain: 0.055,
-            attack: 0.008,
-          });
-        });
-      }
-      return true;
-    } catch (e) {
-      return false;
-    }
+  function playThemeIntroSfx() {
+    return false;
   }
 
   let activeIntroCleanup = null;
@@ -4632,17 +4176,25 @@
     let userInteracted = false;
     let rafId = null;
     let removeTimerId = null;
+    let stageTimers = [];
     let failsafeTimerId = null;
     let lastPct = -1;
     let lastStage = 1;
     const duration = 1250;
     const startTime = performance.now();
 
+    function clearStageTimers() {
+      while (stageTimers.length) {
+        clearTimeout(stageTimers.pop());
+      }
+    }
+
     function finishIntro() {
       if (finished) return;
       finished = true;
       if (rafId) cancelAnimationFrame(rafId);
       if (failsafeTimerId) clearTimeout(failsafeTimerId);
+      clearStageTimers();
 
       unlockAudioEngine();
       primeBgmAudio();
@@ -4650,9 +4202,9 @@
       if (bar) bar.style.transform = "scaleX(1)";
       if (arcEl) arcEl.style.strokeDashoffset = "0";
       if (pctEl) pctEl.innerHTML = `100<span class="pct-unit">%</span>`;
-      if (statusEl) statusEl.textContent = "ACCESS GRANTED // 終端載入完成";
-      if (badgeEl) badgeEl.textContent = "LINK START";
-      if (hexStreamEl) hexStreamEl.textContent = "MEM.ADDR 0xFFFFFF // VERIFIED";
+      if (statusEl) statusEl.textContent = "DIMENSION CLEAVE // 空間裝甲斬裂中";
+      if (badgeEl) badgeEl.textContent = "BLADE LOCK";
+      if (hexStreamEl) hexStreamEl.textContent = "MEM.ADDR 0xFFFFFF // OVERDRIVE";
       nodeChips.forEach((chip) => chip.classList.add("is-locked"));
 
       splash.classList.remove("is-ready");
@@ -4660,12 +4212,34 @@
       document.body.classList.remove("is-loading");
       document.body.classList.add("is-loaded");
 
-      // EXACT MOMENT: When the red laser cross slash bursts across the screen (.is-exiting)
-      splash.classList.add("is-exiting");
+      // Beat 0 (0ms): Audio starts immediately ("Whoosh / Blade Charge-Up" 0.00s -> 0.44s)
+      // Visor core coils inward, calipers clamp & spin rapidly, glowing charge lines appear
+      splash.classList.add("is-charging", "is-exiting");
       playLaserCrossSlashSfx();
 
+      // Beat 1 (430ms): First Heavy Blade Slash Peak in intro_slash.mp3!
+      // Primary horizontal/diagonal blade cuts across screen, screen shakes, seam cracks glowing red/cyan
+      stageTimers.push(
+        setTimeout(() => {
+          splash.classList.add("is-slash-1");
+          if (badgeEl) badgeEl.textContent = "CLEAVE // 01";
+        }, 430)
+      );
+
+      // Beat 2 (660ms): Second Cross-Cleave & Armor Shattering Peak in intro_slash.mp3!
+      // Cross blade slices through, shockwave rings + 12 sparks burst, 4 armor gates violently slip & rocket apart!
+      stageTimers.push(
+        setTimeout(() => {
+          splash.classList.add("is-slash-2");
+          if (badgeEl) badgeEl.textContent = "ACCESS GRANTED";
+          if (statusEl) statusEl.textContent = "ACCESS GRANTED // 終端載入完成";
+        }, 660)
+      );
+
+      // Beat 3 (1580ms): Tail metallic resonance finishes, remove splash & auto-start BGM
       removeTimerId = setTimeout(() => {
         splash.classList.add("is-removed");
+        splash.classList.remove("is-charging", "is-slash-1", "is-slash-2");
         document.body.classList.remove("intro-active");
         autoStartBgmAfterIntro();
         if (typeof window !== "undefined") {
@@ -4680,7 +4254,7 @@
             setTimeout(prewarmRoster, 200);
           }
         }
-      }, 650);
+      }, 1580);
     }
 
     function tick(nowTs) {
@@ -4807,8 +4381,9 @@
       if (rafId) cancelAnimationFrame(rafId);
       if (removeTimerId) clearTimeout(removeTimerId);
       if (failsafeTimerId) clearTimeout(failsafeTimerId);
+      clearStageTimers();
       document.body.classList.remove("intro-active");
-      splash.classList.remove("is-ready", "is-unlocked");
+      splash.classList.remove("is-ready", "is-unlocked", "is-charging", "is-slash-1", "is-slash-2");
       window.removeEventListener("pointerdown", onUserInteraction);
       window.removeEventListener("keydown", onKeyDown);
       splash.removeEventListener("click", onSplashClick);

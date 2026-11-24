@@ -3081,127 +3081,346 @@ body.is-loaded .pgr-bottom-hud {
   to { transform: rotate(360deg); }
 }
 
-/* ==================== GATE UNLOCK & DIAGONAL BLAST-DOOR EXIT ANIMATION ==================== */
-.intro-splash.is-unlocked .cyber-caliper.cal-tl { transform: translate(12px, 12px); }
-.intro-splash.is-unlocked .cyber-caliper.cal-tr { transform: translate(-12px, 12px); }
-.intro-splash.is-unlocked .cyber-caliper.cal-bl { transform: translate(12px, -12px); }
-.intro-splash.is-unlocked .cyber-caliper.cal-br { transform: translate(-12px, -12px); }
+/* ==================== GATE UNLOCK & 3-BEAT SYNCHRONIZED DIMENSIONAL CLEAVE ANIMATION ==================== */
+/* Beat 0 (0ms -> 430ms): .is-charging — Audio windup whoosh; calipers lock & spin, visor coils inward */
+.intro-splash.is-unlocked .cyber-caliper.cal-tl { transform: translate(16px, 16px) scale(0.9); box-shadow: 0 0 18px #ff2a32; }
+.intro-splash.is-unlocked .cyber-caliper.cal-tr { transform: translate(-16px, 16px) scale(0.9); box-shadow: 0 0 18px #ff2a32; }
+.intro-splash.is-unlocked .cyber-caliper.cal-bl { transform: translate(16px, -16px) scale(0.9); box-shadow: 0 0 18px #ff2a32; }
+.intro-splash.is-unlocked .cyber-caliper.cal-br { transform: translate(-16px, -16px) scale(0.9); box-shadow: 0 0 18px #ff2a32; }
 
-.intro-splash.is-exiting .cyber-laser-slash.slash-main {
-  animation: pgrLaserSlashMain 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+.intro-splash.is-charging .cyber-visor-core {
+  transform: scale(0.92);
+  filter: brightness(1.35) drop-shadow(0 0 28px rgba(224, 26, 34, 0.75));
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1), filter 0.42s ease;
 }
 
-.intro-splash.is-exiting .cyber-laser-slash.slash-cross {
-  animation: pgrLaserSlashCross 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+.intro-splash.is-charging .cyber-radar-svg.radar-outer {
+  animation: cyberSpinCw 1.1s linear infinite !important;
+}
+
+.intro-splash.is-charging .cyber-radar-svg.radar-inner {
+  animation: cyberSpinCcw 0.75s linear infinite !important;
+}
+
+.intro-splash.is-charging .cyber-horizon-beam {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #ff2a32 25%, #ffffff 50%, #ff2a32 75%, transparent 100%);
+  box-shadow: 0 0 32px #ff2a32;
+  transition: all 0.38s ease;
+}
+
+/* Afterglow Trails, Shockwave Rings & Sparks Base Styles */
+.cyber-slash-afterglow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 14;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.cyber-slash-afterglow.glow-main {
+  left: -10%;
+  right: -10%;
+  top: 50%;
+  height: 36px;
+  transform: translate3d(0, -50%, 0) scaleX(0) scaleY(0.2);
+  background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 30, 39, 0.75) 35%, rgba(224, 26, 34, 0) 75%);
+  filter: blur(2px);
+}
+
+.cyber-slash-afterglow.glow-cross {
+  left: 50%;
+  top: -20%;
+  width: 38px;
+  height: 140%;
+  transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(0) scaleX(0.2);
+  background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 30, 39, 0.78) 35%, rgba(224, 26, 34, 0) 75%);
+  filter: blur(2px);
+}
+
+.cyber-impact-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 240px;
+  height: 240px;
+  margin-left: -120px;
+  margin-top: -120px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 28px #ff1e27, inset 0 0 24px #ff1e27;
+  pointer-events: none;
+  z-index: 16;
+  opacity: 0;
+  transform: scale(0.2);
+  will-change: transform, opacity;
+}
+
+.cyber-slash-sparks {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 17;
+}
+
+.cyber-slash-sparks i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 2.5px;
+  background: linear-gradient(90deg, #ffffff 0%, #ff2a32 65%, transparent 100%);
+  box-shadow: 0 0 12px #ff1e27;
+  transform-origin: left center;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.cyber-slash-sparks i:nth-child(1)  { --spk-deg: 12deg;  --spk-dist: 420px; }
+.cyber-slash-sparks i:nth-child(2)  { --spk-deg: 38deg;  --spk-dist: 340px; }
+.cyber-slash-sparks i:nth-child(3)  { --spk-deg: 74deg;  --spk-dist: 460px; }
+.cyber-slash-sparks i:nth-child(4)  { --spk-deg: 105deg; --spk-dist: 380px; }
+.cyber-slash-sparks i:nth-child(5)  { --spk-deg: 142deg; --spk-dist: 440px; }
+.cyber-slash-sparks i:nth-child(6)  { --spk-deg: 176deg; --spk-dist: 510px; }
+.cyber-slash-sparks i:nth-child(7)  { --spk-deg: 198deg; --spk-dist: 430px; }
+.cyber-slash-sparks i:nth-child(8)  { --spk-deg: 224deg; --spk-dist: 350px; }
+.cyber-slash-sparks i:nth-child(9)  { --spk-deg: 256deg; --spk-dist: 470px; }
+.cyber-slash-sparks i:nth-child(10) { --spk-deg: 288deg; --spk-dist: 390px; }
+.cyber-slash-sparks i:nth-child(11) { --spk-deg: 322deg; --spk-dist: 450px; }
+.cyber-slash-sparks i:nth-child(12) { --spk-deg: 352deg; --spk-dist: 520px; }
+
+/* Beat 1 (430ms): .is-slash-1 — First Heavy Blade Slash Peak! */
+.intro-splash.is-slash-1 .cyber-laser-slash.slash-main {
+  animation: pgrLaserSlashMain 0.52s cubic-bezier(0.12, 1, 0.25, 1) forwards !important;
+}
+
+.intro-splash.is-slash-1 .cyber-slash-afterglow.glow-main {
+  animation: pgrAfterglowMain 0.56s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.intro-splash.is-slash-1 .cyber-impact-ring.ring-primary {
+  animation: pgrImpactRingExpand 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* First cut causes the 4 armor gates to shudder & slip slightly along the cut seam (Staggered Hit-Stop) */
+.intro-splash.is-slash-1 .cyber-gate-tl {
+  transform: translate3d(-14px, -9px, 0);
+  filter: brightness(1.45);
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), filter 0.16s ease;
+}
+.intro-splash.is-slash-1 .cyber-gate-tr {
+  transform: translate3d(14px, -9px, 0);
+  filter: brightness(1.45);
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), filter 0.16s ease;
+}
+.intro-splash.is-slash-1 .cyber-gate-bl {
+  transform: translate3d(-14px, 9px, 0);
+  filter: brightness(1.45);
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), filter 0.16s ease;
+}
+.intro-splash.is-slash-1 .cyber-gate-br {
+  transform: translate3d(14px, 9px, 0);
+  filter: brightness(1.45);
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), filter 0.16s ease;
+}
+
+.intro-splash.is-slash-1 .cyber-visor-core {
+  transform: scale(1.04) skewX(-3deg);
+  filter: brightness(1.85) contrast(1.25) drop-shadow(-8px 0 0 rgba(255, 30, 39, 0.85)) drop-shadow(8px 0 0 rgba(0, 240, 255, 0.75));
+  transition: transform 0.14s ease, filter 0.14s ease;
+}
+
+/* Beat 2 (660ms): .is-slash-2 — Second Cross-Cleave Peak & 4 Armor Blast-Gates Shatter Apart! */
+.intro-splash.is-slash-2 .cyber-laser-slash.slash-cross {
+  animation: pgrLaserSlashCross 0.58s cubic-bezier(0.12, 1, 0.25, 1) forwards !important;
+}
+
+.intro-splash.is-slash-2 .cyber-slash-afterglow.glow-cross {
+  animation: pgrAfterglowCross 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.intro-splash.is-slash-2 .cyber-impact-ring.ring-secondary {
+  animation: pgrImpactRingExpand 0.64s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.intro-splash.is-slash-2 .cyber-slash-sparks i {
+  animation: pgrSlashSparkBurst 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.intro-splash.is-slash-2 .cyber-unlock-flash {
+  transform: scale(1.65);
+  opacity: 1;
+  animation: cyberFlashFade 0.64s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 @keyframes pgrLaserSlashMain {
   0% {
-    transform: translate3d(0, -50%, 0) scaleX(0) scaleY(0.7);
+    transform: translate3d(-15%, -50%, 0) scaleX(0) scaleY(1.2);
     opacity: 0;
   }
-  14% {
-    transform: translate3d(0, -50%, 0) scaleX(1) scaleY(1.3);
+  12% {
+    transform: translate3d(0, -50%, 0) scaleX(1.05) scaleY(2.6);
     opacity: 1;
   }
-  40% {
-    transform: translate3d(0, -50%, 0) scaleX(1.02) scaleY(2.2);
-    opacity: 0.85;
+  42% {
+    transform: translate3d(0, -50%, 0) scaleX(1.08) scaleY(4.2);
+    opacity: 0.92;
   }
-  70% {
-    transform: translate3d(0, -50%, 0) scaleX(1.04) scaleY(3.5);
-    opacity: 0.35;
+  75% {
+    transform: translate3d(0, -50%, 0) scaleX(1.1) scaleY(1.2);
+    opacity: 0.45;
   }
   100% {
-    transform: translate3d(0, -50%, 0) scaleX(1.06) scaleY(4.6);
+    transform: translate3d(0, -50%, 0) scaleX(1.12) scaleY(0.2);
     opacity: 0;
   }
 }
 
 @keyframes pgrLaserSlashCross {
   0% {
-    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(0) scaleX(0.7);
+    transform: translate3d(-50%, -15%, 0) rotate(13.5deg) scaleY(0) scaleX(1.2);
     opacity: 0;
   }
-  14% {
-    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1) scaleX(1.3);
+  12% {
+    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.05) scaleX(2.8);
     opacity: 1;
   }
-  40% {
-    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.02) scaleX(2.2);
-    opacity: 0.85;
+  42% {
+    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.08) scaleX(4.8);
+    opacity: 0.95;
   }
-  70% {
-    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.04) scaleX(3.5);
-    opacity: 0.35;
+  75% {
+    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.1) scaleX(1.5);
+    opacity: 0.45;
   }
   100% {
-    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.06) scaleX(4.6);
+    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.12) scaleX(0.2);
     opacity: 0;
   }
 }
 
-.intro-splash.is-exiting .cyber-unlock-flash {
-  transform: scale(1.65);
-  opacity: 1;
-  animation: cyberFlashFade 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+@keyframes pgrAfterglowMain {
+  0% {
+    transform: translate3d(0, -50%, 0) scaleX(0.1) scaleY(0.3);
+    opacity: 0;
+  }
+  18% {
+    transform: translate3d(0, -50%, 0) scaleX(1.05) scaleY(1.8);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(0, -50%, 0) scaleX(1.15) scaleY(3.6);
+    opacity: 0;
+  }
+}
+
+@keyframes pgrAfterglowCross {
+  0% {
+    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(0.1) scaleX(0.3);
+    opacity: 0;
+  }
+  18% {
+    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.05) scaleX(1.9);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0) rotate(13.5deg) scaleY(1.15) scaleX(3.8);
+    opacity: 0;
+  }
+}
+
+@keyframes pgrImpactRingExpand {
+  0% {
+    transform: scale(0.15);
+    opacity: 1;
+    border-width: 6px;
+  }
+  65% {
+    opacity: 0.7;
+    border-width: 2px;
+  }
+  100% {
+    transform: scale(4.2);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+@keyframes pgrSlashSparkBurst {
+  0% {
+    transform: rotate(var(--spk-deg, 0deg)) translate3d(10px, 0, 0) scaleX(0.3);
+    opacity: 1;
+  }
+  45% {
+    transform: rotate(var(--spk-deg, 0deg)) translate3d(calc(var(--spk-dist, 360px) * 0.65), 0, 0) scaleX(1.5);
+    opacity: 0.95;
+  }
+  100% {
+    transform: rotate(var(--spk-deg, 0deg)) translate3d(var(--spk-dist, 360px), 0, 0) scaleX(0.1);
+    opacity: 0;
+  }
 }
 
 @keyframes cyberFlashFade {
   0% {
-    transform: scale(0.6);
-    opacity: 0.95;
+    transform: scale(0.45);
+    opacity: 1;
   }
-  24% {
-    transform: scale(1.4);
-    opacity: 0.8;
+  22% {
+    transform: scale(1.45);
+    opacity: 0.88;
   }
   60% {
-    transform: scale(2.0);
-    opacity: 0.3;
+    transform: scale(2.1);
+    opacity: 0.32;
   }
   100% {
-    transform: scale(2.6);
+    transform: scale(2.8);
     opacity: 0;
   }
 }
 
-/* 4 Angled Blast Blades Rocket Apart Diagonally to Reveal Website */
-.intro-splash.is-exiting .cyber-gate-panel {
+/* 4 Angled Blast Blades Rocket Apart Diagonally ONLY on Beat 2 (.is-slash-2) when the second cross-cut shatters the lock */
+.intro-splash.is-slash-2 .cyber-gate-panel {
   opacity: 0;
+  filter: brightness(1.8);
+  transition:
+    transform 0.72s cubic-bezier(0.14, 1, 0.24, 1),
+    opacity 0.62s cubic-bezier(0.33, 1, 0.68, 1),
+    filter 0.3s ease !important;
 }
 
-.intro-splash.is-exiting .cyber-gate-tl {
-  transform: translate3d(-105%, -65%, 0);
-  transition-delay: 0.03s;
+.intro-splash.is-slash-2 .cyber-gate-tl {
+  transform: translate3d(-108%, -72%, 0) rotate(-3.5deg) !important;
 }
 
-.intro-splash.is-exiting .cyber-gate-tr {
-  transform: translate3d(105%, -65%, 0);
-  transition-delay: 0.03s;
+.intro-splash.is-slash-2 .cyber-gate-tr {
+  transform: translate3d(108%, -72%, 0) rotate(3.5deg) !important;
 }
 
-.intro-splash.is-exiting .cyber-gate-bl {
-  transform: translate3d(-105%, 65%, 0);
-  transition-delay: 0.03s;
+.intro-splash.is-slash-2 .cyber-gate-bl {
+  transform: translate3d(-108%, 72%, 0) rotate(3.5deg) !important;
 }
 
-.intro-splash.is-exiting .cyber-gate-br {
-  transform: translate3d(105%, 65%, 0);
-  transition-delay: 0.03s;
+.intro-splash.is-slash-2 .cyber-gate-br {
+  transform: translate3d(108%, 72%, 0) rotate(-3.5deg) !important;
 }
 
-/* Visor HUD Zooms Forward Smoothly Through the Camera */
-.intro-splash.is-exiting .cyber-visor-core {
-  transform: scale(1.18);
+/* Visor HUD & Backdrop Shatter Forward on Beat 2 (.is-slash-2) */
+.intro-splash.is-slash-2 .cyber-visor-core {
+  transform: scale(1.32);
   opacity: 0;
-  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease;
+  filter: brightness(2.4);
+  transition: transform 0.46s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.34s ease, filter 0.34s ease !important;
 }
 
-.intro-splash.is-exiting .cyber-hud-backdrop {
+.intro-splash.is-slash-2 .cyber-hud-backdrop {
   opacity: 0;
-  transform: scale(1.05);
-  transition: opacity 0.32s ease, transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(1.1);
+  transition: opacity 0.38s ease, transform 0.46s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 /* ==================== 11.4 PGR INTRO SPLASH & VISOR HUD RESPONSIVE OVERHAUL ==================== */
@@ -3341,49 +3560,50 @@ body.is-loaded .pgr-bottom-hud {
   }
 
   /* Diagonal Laser Slash & Gate Seam Alignment for Portrait Mobile */
-  .cyber-laser-slash.slash-cross {
+  .cyber-laser-slash.slash-cross,
+  .cyber-slash-afterglow.glow-cross {
     transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(0);
   }
 
-  .intro-splash.is-exiting .cyber-laser-slash.slash-cross {
-    animation: pgrLaserSlashCrossMobile 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  .intro-splash.is-slash-2 .cyber-laser-slash.slash-cross {
+    animation: pgrLaserSlashCrossMobile 0.58s cubic-bezier(0.12, 1, 0.25, 1) forwards !important;
   }
 
   @keyframes pgrLaserSlashCrossMobile {
     0% {
-      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(0) scaleX(0.7);
+      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(0) scaleX(1.2);
       opacity: 0;
     }
-    14% {
-      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(1) scaleX(1.3);
+    12% {
+      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(1.05) scaleX(2.6);
       opacity: 1;
     }
-    40% {
-      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(1.02) scaleX(2.2);
-      opacity: 0.85;
+    42% {
+      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(1.08) scaleX(4.2);
+      opacity: 0.92;
     }
-    70% {
-      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(1.04) scaleX(3.5);
-      opacity: 0.35;
+    75% {
+      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(1.1) scaleX(1.4);
+      opacity: 0.4;
     }
     100% {
-      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(1.06) scaleX(4.6);
+      transform: translate3d(-50%, 0, 0) rotate(7.5deg) scaleY(1.12) scaleX(0.2);
       opacity: 0;
     }
   }
 
-  /* 4 Blast Doors Outward Acceleration on Mobile */
-  .intro-splash.is-exiting .cyber-gate-tl {
-    transform: translate3d(-110%, -75%, 0) !important;
+  /* 4 Blast Doors Outward Acceleration on Mobile (Only on Beat 2 .is-slash-2) */
+  .intro-splash.is-slash-2 .cyber-gate-tl {
+    transform: translate3d(-112%, -76%, 0) rotate(-3deg) !important;
   }
-  .intro-splash.is-exiting .cyber-gate-tr {
-    transform: translate3d(110%, -75%, 0) !important;
+  .intro-splash.is-slash-2 .cyber-gate-tr {
+    transform: translate3d(112%, -76%, 0) rotate(3deg) !important;
   }
-  .intro-splash.is-exiting .cyber-gate-bl {
-    transform: translate3d(-110%, 75%, 0) !important;
+  .intro-splash.is-slash-2 .cyber-gate-bl {
+    transform: translate3d(-112%, 76%, 0) rotate(3deg) !important;
   }
-  .intro-splash.is-exiting .cyber-gate-br {
-    transform: translate3d(110%, 75%, 0) !important;
+  .intro-splash.is-slash-2 .cyber-gate-br {
+    transform: translate3d(112%, 76%, 0) rotate(-3deg) !important;
   }
 
   /* Top Navigation Controls on Mobile */
@@ -4330,6 +4550,29 @@ html[data-pgr-palette="blue"] .cyber-laser-slash.slash-main {
 html[data-pgr-palette="blue"] .cyber-laser-slash.slash-cross {
   background: linear-gradient(180deg, transparent 0%, #00f0ff 15%, #ffffff 50%, #00f0ff 85%, transparent 100%) !important;
   box-shadow: 0 0 16px rgba(255, 255, 255, 0.95), 0 0 28px rgba(0, 210, 255, 0.9) !important;
+}
+
+html[data-pgr-palette="blue"] .cyber-slash-afterglow.glow-main,
+html[data-pgr-palette="blue"] .cyber-slash-afterglow.glow-cross {
+  background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.96) 0%, rgba(0, 240, 255, 0.78) 35%, rgba(0, 180, 216, 0) 75%) !important;
+}
+
+html[data-pgr-palette="blue"] .cyber-impact-ring {
+  box-shadow: 0 0 28px #00f0ff, inset 0 0 24px #00f0ff !important;
+}
+
+html[data-pgr-palette="blue"] .cyber-slash-sparks i {
+  background: linear-gradient(90deg, #ffffff 0%, #00f0ff 65%, transparent 100%) !important;
+  box-shadow: 0 0 12px #00f0ff !important;
+}
+
+html[data-pgr-palette="blue"] .intro-splash.is-charging .cyber-visor-core {
+  filter: brightness(1.35) drop-shadow(0 0 28px rgba(0, 210, 255, 0.8)) !important;
+}
+
+html[data-pgr-palette="blue"] .intro-splash.is-charging .cyber-horizon-beam {
+  background: linear-gradient(90deg, transparent 0%, #00f0ff 25%, #ffffff 50%, #00f0ff 75%, transparent 100%) !important;
+  box-shadow: 0 0 32px #00f0ff !important;
 }
 
 html[data-pgr-palette="blue"] .intro-splash #introArcProgress {
