@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>亞雷利塔 ARELITA｜官方世界觀與角色檔案庫</title>
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-  <link rel="shortcut icon" href="assets/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=20261124_pgr" />
+  <link rel="shortcut icon" href="assets/favicon.svg?v=20261124_pgr" />
   <script>
     (function () {
       try {
@@ -17,7 +17,7 @@
     })();
   </script>
   <link rel="stylesheet" href="assets/styles.css?v=20261115_pgr3" />
-  <link rel="stylesheet" href="assets/pgr-theme.css?v=20261116_pgr25" />
+  <link rel="stylesheet" href="assets/pgr-theme.css?v=20261124_home4" />
 </head>
 <body class="is-loading">
   <!-- Next-Gen Cyber-Tactical Holographic Visor & Diagonal Blast-Gate Opening Sequence -->
@@ -432,17 +432,56 @@
 
     <!-- ==================== TAB 0: HOME PORTAL (CAROUSEL & ARCHIVE GUIDE) ==================== -->
     <section id="tab-home" class="tab-panel active">
-      <div class="pgr-home-stage-outer">
+      <!-- PGR Worldview Live Telemetry Bar: Five Realms Resonance & World Reset Chronicle Ticker -->
+      <div class="pgr-worldview-telemetry pgr-hud-only" aria-label="亞雷利塔五界共鳴與世界觀動態儀表">
+        <div class="pgr-wt-realms">
+          <div class="pgr-wt-label">
+            <span class="wt-pulse-dot"></span>
+            <span>REALM GATES // 五界門扉共鳴</span>
+          </div>
+          <div class="pgr-wt-realm-pills">
+            <button type="button" class="pgr-realm-chip" data-home-realm="現界" title="點擊檢索【現界】陣營角色（魔風聯邦・月星・日天・龍族帝國・極真圃等 25 國）">
+              <span class="rc-dot rc-mortal"></span>
+              <span class="rc-name">現界</span>
+              <span class="rc-sub">MORTAL // 25國</span>
+            </button>
+            <button type="button" class="pgr-realm-chip" data-home-realm="魔界" title="點擊檢索【魔界】陣營角色（垂直九層・凱撒家族・原初三魔神）">
+              <span class="rc-dot rc-demon"></span>
+              <span class="rc-name">魔界</span>
+              <span class="rc-sub">DEMON // 九層</span>
+            </button>
+            <button type="button" class="pgr-realm-chip" data-home-realm="天界" title="點擊檢索【天界】陣營角色（米加百列天國・浮空聖域）">
+              <span class="rc-dot rc-celestial"></span>
+              <span class="rc-name">天界</span>
+              <span class="rc-sub">CELESTIAL // 聖域</span>
+            </button>
+            <button type="button" class="pgr-realm-chip" data-home-realm="其他" title="點擊檢索【冥界／諸神／傳奇】角色（24H層級顛倒・亡靈神域與原初神明）">
+              <span class="rc-dot rc-underworld"></span>
+              <span class="rc-name">冥界・諸神</span>
+              <span class="rc-sub">HADES // 24H顛倒</span>
+            </button>
+            <button type="button" class="pgr-realm-chip" data-goto-tab="world" title="點擊閱覽【幻想界・萬寂虛域】與世界樹完整設定">
+              <span class="rc-dot rc-void"></span>
+              <span class="rc-name">幻想界・萬寂虛域</span>
+              <span class="rc-sub">VOID // 免於重置</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pgr-home-stage-outer" id="pgrHomeStageOuter">
         <!-- Left Flanking Ghost Preview Card (PGR #Features 01) -->
         <div class="pgr-side-preview prev pgr-hud-only" id="pgrSidePreviewLeft" title="上一張世界觀展示">
           <div class="pgr-sp-arrow"><span class="pgr-sp-chev">◀◀</span><span>PREV // ARCHIVE</span></div>
           <div class="pgr-sp-card">
-            <img id="pgrSidePrevImg" src="assets/banners/watercolor-5-celestial-truth.jpg" alt="Previous Slide" />
+            <img id="pgrSidePrevImg" src="assets/banners/watercolor-5-celestial-truth.jpg?v=20261124_art3" alt="Previous Slide" />
+            <div class="pgr-sp-scanline" aria-hidden="true"></div>
             <div class="pgr-sp-overlay">
               <span class="pgr-sp-num" id="pgrSidePrevNum">05</span>
               <span class="pgr-sp-sub" id="pgrSidePrevTitle">CELESTIAL SANCTUM</span>
             </div>
           </div>
+          <div class="pgr-sp-telemetry" id="pgrSidePrevMeta">SECTOR // 05-CELESTIA</div>
         </div>
 
         <!-- 5-Slide Interactive Worldview Carousel -->
@@ -451,17 +490,29 @@
           <div class="pgr-frame-corner tr pgr-hud-only"></div>
           <div class="pgr-frame-corner bl pgr-hud-only"></div>
           <div class="pgr-frame-corner br pgr-hud-only"></div>
-          <div class="pgr-frame-brand-tag pgr-hud-only">TACTICAL ARCHIVE // ARELITA</div>
-          <div class="pgr-frame-ver-tag pgr-hud-only">VER 3.0 // ARCHIVE</div>
-          <div class="carousel-viewport">
+          <div class="pgr-frame-brand-tag pgr-hud-only">
+            <span class="brand-pulse-dot"></span>
+            <span>TACTICAL ARCHIVE // ARELITA</span>
+          </div>
+          <div class="pgr-frame-ver-tag pgr-hud-only" id="pgrCarouselCoordTag">EPOCH #12026 // REALM SYNC 99.8%</div>
+
+          <div class="carousel-viewport" id="carouselViewport">
+            <!-- Live 60FPS Particle & Rune Energy Canvas Overlay -->
+            <canvas id="homeHeroFxCanvas" class="home-hero-fx-canvas" aria-hidden="true"></canvas>
+
           <!-- Slide 1: World Tree & Five Realms -->
-          <div class="carousel-slide active" data-slide-index="0">
-            <img src="assets/banners/watercolor-1-worldtree.jpg" alt="世界樹與五界門扉・水彩奇幻藝術" class="carousel-bg-img" />
+          <div class="carousel-slide active" data-slide-index="0" data-fx-theme="worldtree" data-coord="YGGDRASIL // 05 REALM GATES ONLINE">
+            <img src="assets/banners/watercolor-1-worldtree.jpg?v=20261124_art3" alt="世界樹與五界門扉・暗黑奇幻戰術視覺" class="carousel-bg-img" />
             <div class="carousel-overlay">
               <div class="carousel-content">
                 <div class="carousel-badge">WORLD TREE &amp; FIVE REALMS // 世界命根・五界門扉</div>
-                <h2 class="carousel-title">世界樹與五界門扉的記憶織網</h2>
+                <h2 class="carousel-title" data-text="世界樹與五界門扉的記憶織網">世界樹與五界門扉的記憶織網</h2>
                 <p class="carousel-desc">世界樹為亞雷利塔的命根子，枝葉銘刻萬物資訊、排出蘊含強大力量的琥珀樹脂，根部則封存歷經古神紀至救贖紀五次「世界重置」的舊日記憶；無高低之分的現界、天界、魔界、冥界與幻想界，唯有透過各界之門方能彼此連通。</p>
+                <div class="carousel-lore-chips">
+                  <span class="lore-chip">❖ 琥珀樹脂・萬物資訊銘刻</span>
+                  <span class="lore-chip">⏳ 五次世界重置・舊日記憶根脈</span>
+                  <span class="lore-chip">🚪 現界／魔界／天界／冥界／幻想界</span>
+                </div>
                 <div class="carousel-actions">
                   <button class="carousel-cta-btn" data-goto-tab="world">🌳 閱覽世界樹與五界設定</button>
                   <button class="carousel-cta-btn secondary" data-goto-tab="attributes">✨ 探索 17 大類全屬性手冊</button>
@@ -471,13 +522,18 @@
           </div>
 
           <!-- Slide 2: Mofeng Federation Metropolis -->
-          <div class="carousel-slide" data-slide-index="1">
-            <img src="assets/banners/watercolor-2-mofeng.jpg" alt="魔風聯邦・八大直轄市霓虹與燈火" class="carousel-bg-img" />
+          <div class="carousel-slide" data-slide-index="1" data-fx-theme="mofeng" data-coord="MOFENG ISLAND // 08 METROPOLIS &amp; 09 HADES">
+            <img src="assets/banners/watercolor-2-mofeng.jpg?v=20261124_art3" alt="魔風聯邦・八大直轄市與冥府神傑" class="carousel-bg-img" />
             <div class="carousel-overlay">
               <div class="carousel-content">
                 <div class="carousel-badge">MOFENG FEDERATION // 魔風聯邦・八大直轄市</div>
-                <h2 class="carousel-title">魔風島的霓虹夜色與市井煙火</h2>
-                <p class="carousel-desc">由「極惡之師」赤夜風竹統領的新興強國，短短十年間於魔風島崛起。從摩天霓虹交錯的首都霍普、紅燈籠綿延的商都天御、海風音樂廳迴盪的瑪捷塔，至山頂歌德競技場阿瑞納，由軍團八部隊與九人私兵「冥府神傑」共同守護。</p>
+                <h2 class="carousel-title" data-text="魔風島的霓虹夜色與冥府神威">魔風島的霓虹夜色與冥府神威</h2>
+                <p class="carousel-desc">由「極惡之師」亡靈神赤夜風竹統領的新興強國，短短十年間於魔風島崛起。從摩天霓虹交錯的首都霍普、紅燈籠綿延的商都天御、海風音樂廳迴盪的瑪捷塔，至山頂歌德競技場阿瑞納，由軍團八部隊與九人私兵「冥府神傑」共同守護。</p>
+                <div class="carousel-lore-chips">
+                  <span class="lore-chip">🦅 最高總司令：赤夜風竹・副司令：阿撒托斯</span>
+                  <span class="lore-chip">⚔️ 冥府九神傑・正規八大軍團</span>
+                  <span class="lore-chip">🏙️ 霍普／赤羽／亞美特／天御／丹格八市</span>
+                </div>
                 <div class="carousel-actions">
                   <button class="carousel-cta-btn" data-goto-tab="characters">⚔️ 檢索魔風聯邦角色檔案</button>
                   <button class="carousel-cta-btn secondary" data-goto-tab="stories">📖 閱讀《魔風傳記》與外傳</button>
@@ -487,13 +543,18 @@
           </div>
 
           <!-- Slide 3: Havidorn Dragon Empire -->
-          <div class="carousel-slide" data-slide-index="2">
-            <img src="assets/banners/watercolor-3-dragon-island.jpg" alt="哈維德恩龍族帝國・龍皇島與九紋龍印" class="carousel-bg-img" />
+          <div class="carousel-slide" data-slide-index="2" data-fx-theme="dragon" data-coord="HAVIDORN EMPIRE // 09 DRAGON SEALS AWAKENED">
+            <img src="assets/banners/watercolor-3-dragon-island.jpg?v=20261124_art3" alt="哈維德恩龍族帝國・龍皇島與九紋龍印" class="carousel-bg-img" />
             <div class="carousel-overlay">
               <div class="carousel-content">
                 <div class="carousel-badge">HAVIDORN DRAGON EMPIRE // 龍皇島・九紋龍印</div>
-                <h2 class="carousel-title">哈維德恩龍族帝國與蒼穹浮島</h2>
-                <p class="carousel-desc">「寂滅龍皇」德貢・阿茲拉格統御的龍皇島，國土橫跨本島、浮空島與深海，東西方龍族在此共存。身為現界肉體最強種族，龍族每開啟一階「九紋龍印」皆能突破肉身極限，至第九印更將覺醒專屬龍種稱號與神威。</p>
+                <h2 class="carousel-title" data-text="哈維德恩龍族帝國與九紋龍印">哈維德恩龍族帝國與九紋龍印</h2>
+                <p class="carousel-desc">「寂滅龍皇」德貢・阿茲拉格統御的龍皇島，國土橫跨本島、浮空島與深海，東西方龍族在此共存。身為現界肉體最強種族，龍族每開啟一階「九紋龍印」皆能突破肉身極限，至第九印更將覺醒專屬龍種稱號與毀天滅地之神威。</p>
+                <div class="carousel-lore-chips">
+                  <span class="lore-chip">🐉 寂滅龍皇：德貢・阿茲拉格</span>
+                  <span class="lore-chip">🔥 九紋龍印・第九印真名神威覺醒</span>
+                  <span class="lore-chip">⚡ 初代五龍神・龍皇四柱・四大軍團</span>
+                </div>
                 <div class="carousel-actions">
                   <button class="carousel-cta-btn" data-goto-tab="world">🐉 查看龍族帝國與四柱編制</button>
                   <button class="carousel-cta-btn secondary" data-goto-tab="characters">👑 依種族與強度階級檢索</button>
@@ -503,13 +564,18 @@
           </div>
 
           <!-- Slide 4: Abyssal Maw & Monochrome Void -->
-          <div class="carousel-slide" data-slide-index="3">
-            <img src="assets/banners/watercolor-4-abyss-void.jpg" alt="丹格深淵之口與無色萬寂虛域" class="carousel-bg-img" />
+          <div class="carousel-slide" data-slide-index="3" data-fx-theme="abyss" data-coord="ABYSSAL MAW &amp; MONOCHROME VOID // HAZARD OMEGA">
+            <img src="assets/banners/watercolor-4-abyss-void.jpg?v=20261124_art3" alt="亞雷利塔深淵之口與無色萬寂虛域" class="carousel-bg-img" />
             <div class="carousel-overlay">
               <div class="carousel-content">
                 <div class="carousel-badge">ABYSSAL MAW &amp; MONOCHROME VOID // 深淵之口・萬寂虛域</div>
-                <h2 class="carousel-title">丹格深淵浪潮與無色萬寂虛域</h2>
-                <p class="carousel-desc">丹格市邊緣的黑紫色「深淵之口」潛伏著吞噬魔力的深淵魔獸與淵蝕五系；而表面包裹著外界虛空力的「萬寂虛域（無色境域）」與每 24 小時隨機顛倒層級的「冥界」，則是連世界樹與世界重置也無法干涉的禁忌領域。</p>
+                <h2 class="carousel-title" data-text="深淵之口浪潮與無色萬寂虛域">深淵之口浪潮與無色萬寂虛域</h2>
+                <p class="carousel-desc">遍布亞雷利塔各處的黑紫色「深淵之口」潛伏著吞噬魔力的深淵魔獸與淵蝕五系；而表面包裹著外界虛空力的「萬寂虛域（無色境域）」與每 24 小時隨機顛倒層級的「冥界」，則是連世界樹與世界重置也無法干涉的禁忌領域。</p>
+                <div class="carousel-lore-chips">
+                  <span class="lore-chip">🕳️ 始源深淵 The Abyss・淵蝕五系</span>
+                  <span class="lore-chip">🩸 血魔之影守淵將軍・死守丹格要塞</span>
+                  <span class="lore-chip">🌌 萬寂虛域・隔絕世界重置之無色境域</span>
+                </div>
                 <div class="carousel-actions">
                   <button class="carousel-cta-btn" data-goto-tab="attributes">🌑 查閱深淵與特殊始源屬性</button>
                   <button class="carousel-cta-btn secondary" data-goto-tab="world">🏛️ 探索九大力與禁術規則</button>
@@ -519,13 +585,18 @@
           </div>
 
           <!-- Slide 5: Celestial Sanctum & Flowers of Truth -->
-          <div class="carousel-slide" data-slide-index="4">
-            <img src="assets/banners/watercolor-5-celestial-truth.jpg" alt="米加百列天界浮島與極真圃識真之花" class="carousel-bg-img" />
+          <div class="carousel-slide" data-slide-index="4" data-fx-theme="celestial" data-coord="MIGABRIEL &amp; FLOWERS OF TRUTH // EPOCH SEEKERS">
+            <img src="assets/banners/watercolor-5-celestial-truth.jpg?v=20261124_art3" alt="米加百列天界浮島與極真圃識真之花" class="carousel-bg-img" />
             <div class="carousel-overlay">
               <div class="carousel-content">
                 <div class="carousel-badge">CELESTIAL SANCTUM &amp; FLOWERS OF TRUTH // 天界浮島・極真圃</div>
-                <h2 class="carousel-title">米加百列浮空聖域與識真之花</h2>
+                <h2 class="carousel-title" data-text="米加百列浮空聖域與識真六花">米加百列浮空聖域與識真六花</h2>
                 <p class="carousel-desc">天界「米加百列天國」的古老浮島受初代天神庇護，歷經數千萬年重置仍留存古神紀遺蹟；而在星光與金木樨花香之間，隱秘組織「極真圃」正以六朵「識真之花」為核心遊走四界，追尋世界重置前的終極真相。</p>
+                <div class="carousel-lore-chips">
+                  <span class="lore-chip">☀️ 初代天神米迦勒・天神王潘朵拉</span>
+                  <span class="lore-chip">🏵️ 極真圃：金木樨伊森塔爾與識真六花</span>
+                  <span class="lore-chip">🔍 勘破五次世界重置與「救世」真相</span>
+                </div>
                 <div class="carousel-actions">
                   <button class="carousel-cta-btn" data-goto-tab="world">🌸 查閱 11 大世界級組織設定</button>
                   <button class="carousel-cta-btn secondary" data-goto-tab="gallery">🖼️ 鑑賞高解析角色立繪畫廊</button>
@@ -553,12 +624,14 @@
         <div class="pgr-side-preview next pgr-hud-only" id="pgrSidePreviewRight" title="下一張世界觀展示">
           <div class="pgr-sp-arrow"><span>NEXT // ARCHIVE</span><span class="pgr-sp-chev">▶▶</span></div>
           <div class="pgr-sp-card">
-            <img id="pgrSideNextImg" src="assets/banners/watercolor-2-mofeng.jpg" alt="Next Slide" />
+            <img id="pgrSideNextImg" src="assets/banners/watercolor-2-mofeng.jpg?v=20261124_art3" alt="Next Slide" />
+            <div class="pgr-sp-scanline" aria-hidden="true"></div>
             <div class="pgr-sp-overlay">
               <span class="pgr-sp-num" id="pgrSideNextNum">02</span>
               <span class="pgr-sp-sub" id="pgrSideNextTitle">MOFENG FEDERATION</span>
             </div>
           </div>
+          <div class="pgr-sp-telemetry" id="pgrSideNextMeta">SECTOR // 02-MOFENG</div>
         </div>
       </div>
 
@@ -566,34 +639,66 @@
       <div class="pgr-home-caption pgr-hud-only">
         <div class="pgr-hc-line-row">
           <span class="pgr-hc-long-line"></span>
+          <span class="pgr-hc-diamond">❖</span>
+          <span class="pgr-hc-short-line"></span>
         </div>
-        <div class="pgr-hc-spaced-text">T H E &nbsp;&nbsp; A R E L I T A &nbsp;&nbsp; W O R L D &nbsp;&nbsp; A R C H I V E</div>
+        <div class="pgr-hc-spaced-text">T H E &nbsp;&nbsp; A R E L I T A &nbsp;&nbsp; W O R L D &nbsp;&nbsp; A R C H I V E &nbsp;&nbsp; // &nbsp;&nbsp; 五 界 戰 術 終 端</div>
       </div>
 
       <div class="pgr-home-dock pgr-hud-only">
         <button type="button" class="pgr-dock-btn" data-goto-tab="characters">
-          <span class="pgr-db-code">01 // DATA</span>
+          <span class="pgr-db-watermark">01</span>
+          <div class="pgr-db-top">
+            <span class="pgr-db-code">01 // DATA</span>
+            <span class="pgr-db-dot"></span>
+          </div>
           <span class="pgr-db-title">CONSTRUCTS 角色檔案 (177)</span>
+          <span class="pgr-db-sub">五界陣營・21族・現象級～凡人</span>
         </button>
         <button type="button" class="pgr-dock-btn" data-goto-tab="gallery">
-          <span class="pgr-db-code">02 // ILLUSTRATION</span>
-          <span class="pgr-db-title">CHARACTER ILLUSTRATION 角色立繪 (36)</span>
+          <span class="pgr-db-watermark">02</span>
+          <div class="pgr-db-top">
+            <span class="pgr-db-code">02 // ILLUSTRATION</span>
+            <span class="pgr-db-dot"></span>
+          </div>
+          <span class="pgr-db-title">ILLUSTRATION 角色立繪 (36)</span>
+          <span class="pgr-db-sub">4K無段縮放・全身立繪細節檢視</span>
         </button>
         <a href="relations.html" class="pgr-dock-btn">
-          <span class="pgr-db-code">03 // NETWORK</span>
+          <span class="pgr-db-watermark">03</span>
+          <div class="pgr-db-top">
+            <span class="pgr-db-code">03 // NETWORK</span>
+            <span class="pgr-db-dot"></span>
+          </div>
           <span class="pgr-db-title">RELATIONS 角色關係圖譜 ↗</span>
+          <span class="pgr-db-sub">998條羈絆星網・魔國軍政階層</span>
         </a>
         <a href="compare.html" class="pgr-dock-btn">
-          <span class="pgr-db-code">04 // COMBAT</span>
+          <span class="pgr-db-watermark">04</span>
+          <div class="pgr-db-top">
+            <span class="pgr-db-code">04 // COMBAT</span>
+            <span class="pgr-db-dot"></span>
+          </div>
           <span class="pgr-db-title">COMPARE 戰力能力對比 ↗</span>
+          <span class="pgr-db-sub">雙視窗神權剖析・五連勝擂台賽</span>
         </a>
         <a href="tierlist.html" class="pgr-dock-btn">
-          <span class="pgr-db-code">05 // RANKING</span>
+          <span class="pgr-db-watermark">05</span>
+          <div class="pgr-db-top">
+            <span class="pgr-db-code">05 // RANKING</span>
+            <span class="pgr-db-dot"></span>
+          </div>
           <span class="pgr-db-title">TIER LIST 全角色排行 ↗</span>
+          <span class="pgr-db-sub">官方戰力一鍵套用・雙稱號匯出</span>
         </a>
         <a href="summon.html" class="pgr-dock-btn">
-          <span class="pgr-db-code">06 // TERMINAL</span>
+          <span class="pgr-db-watermark">06</span>
+          <div class="pgr-db-top">
+            <span class="pgr-db-code">06 // TERMINAL</span>
+            <span class="pgr-db-dot"></span>
+          </div>
           <span class="pgr-db-title">SUMMON 角色召喚模擬 ↗</span>
+          <span class="pgr-db-sub">種族善惡定向・8階專屬召喚演出</span>
         </a>
       </div>
 
@@ -822,13 +927,31 @@
 
         <!-- Right Content: Character Catalog & Split Detail View -->
         <div class="content-area">
-          <div class="content-toolbar">
+          <div class="content-toolbar pgr-data-toolbar">
+            <div class="pgr-dt-corner tl pgr-hud-only"></div>
+            <div class="pgr-dt-corner tr pgr-hud-only"></div>
+            <div class="pgr-dt-corner bl pgr-hud-only"></div>
+            <div class="pgr-dt-corner br pgr-hud-only"></div>
             <div class="toolbar-left">
-              <div class="toolbar-kicker">CHARACTER ARCHIVE // 角色檔案檢索</div>
+              <div class="toolbar-kicker">
+                <span class="pgr-dt-pulse"></span>
+                <span>CHARACTER ARCHIVE // 角色檔案檢索終端</span>
+                <span class="pgr-dt-code">DB.VER // 177-SYNC</span>
+              </div>
               <div class="breadcrumb" id="factionBreadcrumb">全部陣營角色</div>
               <div class="toolbar-subtitle" id="factionDescription">收錄現界、魔界、天界與諸神傳奇共 177 名角色設定檔案</div>
             </div>
             <div class="toolbar-right">
+              <div class="pgr-dt-stat-group pgr-hud-only">
+                <div class="pgr-dt-stat">
+                  <span class="stat-k">MATCHED</span>
+                  <strong class="stat-v" id="pgrToolbarMatchedCount">177</strong>
+                </div>
+                <div class="pgr-dt-stat">
+                  <span class="stat-k">ILLUSTRATED</span>
+                  <strong class="stat-v" id="pgrToolbarImgCount">36</strong>
+                </div>
+              </div>
               <div class="view-mode-group" role="group" aria-label="排版檢視模式">
                 <button class="view-mode-btn active" data-view="showcase" title="圖文並列檔案模式（立繪形象圖在旁，完整排版）">
                   <span>📑 圖文並列</span>
@@ -1093,6 +1216,6 @@
   </div>
 
   <script src="assets/data.js?v=20261123"></script>
-  <script src="assets/app.js?v=20261123_bgm3"></script>
+  <script src="assets/app.js?v=20261124_home4"></script>
 </body>
 </html>

@@ -578,6 +578,16 @@
   }
 
   // ==================== BUILD COLLAPSIBLE FACTION SIDEBAR TREE ====================
+  const TACTICAL_ICON_SVGS = {
+    all: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="8,1.5 14.5,8 8,14.5 1.5,8"/><circle cx="8" cy="8" r="2.2" fill="currentColor" stroke="none"/></svg>`,
+    realmAll: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>`,
+    faction: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1.5 13.8,4.8 13.8,11.2 8,14.5 2.2,11.2 2.2,4.8"/><polygon points="8,5 10.6,6.5 10.6,9.5 8,11 5.4,9.5 5.4,6.5" fill="currentColor" stroke="none"/></svg>`,
+    subGroup: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l5 5-5 5M9 3l5 5-5 5"/></svg>`,
+    subLeaf: `<svg class="tactical-tree-svg is-leaf" viewBox="0 0 16 16" fill="none"><polygon points="8,4.2 11.8,8 8,11.8 4.2,8" fill="currentColor"/></svg>`,
+    imgBadge: `<svg class="tactical-img-svg" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="2.5" width="11" height="9"/><circle cx="5" cy="5.8" r="1.1" fill="currentColor" stroke="none"/><path d="M2.5 10l3.2-3 2.4 2.2 1.8-1.6 2.1 2.4"/></svg>`,
+    sectorBanner: `<svg class="tactical-sector-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="8,1.5 14.5,8 8,14.5 1.5,8"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/></svg>`
+  };
+
   function renderFactionTree() {
     const container = document.getElementById("factionTreeContainer");
     const isAllActive = !state.selectedRealm && !state.selectedFaction && !state.selectedSubFaction;
@@ -585,15 +595,15 @@
 
     let html = `
       <div class="tree-quick-actions">
-        <button class="tree-action-btn" id="btnExpandAllTree" title="展開所有目錄層級">➕ 全部展開</button>
-        <button class="tree-action-btn" id="btnCollapseAllTree" title="收合所有目錄層級">➖ 全部折疊</button>
+        <button class="tree-action-btn" id="btnExpandAllTree" title="展開所有目錄層級"><span class="tact-act-sym">＋</span> 全部展開</button>
+        <button class="tree-action-btn" id="btnCollapseAllTree" title="收合所有目錄層級"><span class="tact-act-sym">－</span> 全部折疊</button>
       </div>
 
       <div style="margin-bottom:0.5rem;">
         <button class="tree-item ${isAllActive ? "active" : ""}" data-select-realm="" data-select-faction="" data-select-sub="">
-          <span class="tree-item-label">🌟 全部陣營角色</span>
+          <span class="tree-item-label">${TACTICAL_ICON_SVGS.all}<span>全部陣營角色</span></span>
           <span class="tree-item-badges">
-            <span class="tree-img-dot" title="含 ${totalWithImg} 張形象圖">🖼️${totalWithImg}</span>
+            <span class="tree-img-dot" title="含 ${totalWithImg} 張形象圖">${TACTICAL_ICON_SVGS.imgBadge}${totalWithImg}</span>
             <span class="tree-count">${characters.length}</span>
           </span>
         </button>
@@ -622,7 +632,7 @@
             <div class="tree-row">
               <span class="tree-expand-spacer"></span>
               <button class="tree-item ${isRealmActive ? "active" : ""}" data-select-realm="${esc(realm)}" data-select-faction="" data-select-sub="">
-                <span class="tree-item-label">📂 ${esc(realm)}全部 (${realmChars.length})</span>
+                <span class="tree-item-label">${TACTICAL_ICON_SVGS.realmAll}<span>${esc(realm)}全部 (${realmChars.length})</span></span>
               </button>
             </div>
       `;
@@ -653,9 +663,9 @@
                 : `<span class="tree-expand-spacer"></span>`
             }
             <button class="tree-item ${isFacActive ? "active" : ""}" data-select-realm="${esc(realm)}" data-select-faction="${esc(faction)}" data-select-sub="" data-auto-toggle-faction="${hasSubs ? esc(facKey) : ""}">
-              <span class="tree-item-label">🛡️ ${esc(faction)}</span>
+              <span class="tree-item-label">${TACTICAL_ICON_SVGS.faction}<span>${esc(faction)}</span></span>
               <span class="tree-item-badges">
-                ${facImgs > 0 ? `<span class="tree-img-dot" title="含 ${facImgs} 張形象圖">🖼️${facImgs}</span>` : ""}
+                ${facImgs > 0 ? `<span class="tree-img-dot" title="含 ${facImgs} 張形象圖">${TACTICAL_ICON_SVGS.imgBadge}${facImgs}</span>` : ""}
                 <span class="tree-count">${facChars.length}</span>
               </span>
             </button>
@@ -710,9 +720,9 @@
                     <span class="tree-chevron ${isSubGroupOpen ? "open" : ""}">▶</span>
                   </button>
                   <button class="tree-item tree-item-sub ${isGroupActive ? "active" : ""}" data-select-realm="${esc(realm)}" data-select-faction="${esc(faction)}" data-select-sub="${esc(topSub)}" data-auto-toggle-subgroup="${esc(subGroupKey)}">
-                    <span class="tree-item-label">⚔️ ${esc(topSub)}</span>
+                    <span class="tree-item-label">${TACTICAL_ICON_SVGS.subGroup}<span>${esc(topSub)}</span></span>
                     <span class="tree-item-badges">
-                      ${groupImgs > 0 ? `<span class="tree-img-dot">🖼️${groupImgs}</span>` : ""}
+                      ${groupImgs > 0 ? `<span class="tree-img-dot">${TACTICAL_ICON_SVGS.imgBadge}${groupImgs}</span>` : ""}
                       <span class="tree-count">${groupChars.length}</span>
                     </span>
                   </button>
@@ -732,9 +742,9 @@
                   <div class="tree-row">
                     <span class="tree-expand-spacer"></span>
                     <button class="tree-item tree-item-sub ${isChActive ? "active" : ""}" data-select-realm="${esc(realm)}" data-select-faction="${esc(faction)}" data-select-sub="${esc(ch.full)}">
-                      <span class="tree-item-label">• ${esc(ch.label)}</span>
+                      <span class="tree-item-label">${TACTICAL_ICON_SVGS.subLeaf}<span>${esc(ch.label)}</span></span>
                       <span class="tree-item-badges">
-                        ${chImgs > 0 ? `<span class="tree-img-dot">🖼️${chImgs}</span>` : ""}
+                        ${chImgs > 0 ? `<span class="tree-img-dot">${TACTICAL_ICON_SVGS.imgBadge}${chImgs}</span>` : ""}
                         <span class="tree-count">${chChars.length}</span>
                       </span>
                     </button>
@@ -756,9 +766,9 @@
                 <div class="tree-row">
                   <span class="tree-expand-spacer"></span>
                   <button class="tree-item tree-item-sub ${isSubActive ? "active" : ""}" data-select-realm="${esc(realm)}" data-select-faction="${esc(faction)}" data-select-sub="${esc(topSub)}">
-                    <span class="tree-item-label">• ${esc(topSub)}</span>
+                    <span class="tree-item-label">${TACTICAL_ICON_SVGS.subLeaf}<span>${esc(topSub)}</span></span>
                     <span class="tree-item-badges">
-                      ${subImgs > 0 ? `<span class="tree-img-dot">🖼️${subImgs}</span>` : ""}
+                      ${subImgs > 0 ? `<span class="tree-img-dot">${TACTICAL_ICON_SVGS.imgBadge}${subImgs}</span>` : ""}
                       <span class="tree-count">${subChars.length}</span>
                     </span>
                   </button>
@@ -962,70 +972,138 @@
     const serialIdx = characters.indexOf(c) + 1;
     const serialCode = `ARL-${String(serialIdx > 0 ? serialIdx : 1).padStart(3, "0")}`;
 
+    const META_EN_MAP = {
+      "種族": "RACE // 種族",
+      "性別": "GENDER // 性別",
+      "屬性": "ELEMENT // 屬性",
+      "善惡": "ALIGNMENT // 善惡",
+      "年齡": "AGE // 年齡",
+      "生日": "BIRTH // 生日",
+      "身高": "HEIGHT // 身高",
+      "體重": "WEIGHT // 體重",
+      "所屬群體": "AFFILIATION // 所屬群體"
+    };
+
+    const TRAIT_EN_MAP = {
+      "外表": ["APPEARANCE", "◈"],
+      "個性": ["PERSONALITY", "❖"],
+      "喜歡": ["PREFERENCE +", "▲"],
+      "討厭": ["AVERSION -", "▼"]
+    };
+
+    const ABILITY_EN_MAP = {
+      "武器": "TACTICAL ARMAMENT // 專屬武裝",
+      "神權": "DIVINE AUTHORITY // 神權法則",
+      "神權(偽)": "PSEUDO-DIVINITY // 偽神權法則",
+      "古言靈術": "ANCIENT KOTODAMA // 古言靈術",
+      "言靈": "KOTODAMA // 言靈術式",
+      "神器": "SACRED RELIC // 神器武裝",
+      "魔器": "DEMONIC RELIC // 魔器武裝",
+      "加護": "DIVINE BLESSING // 神明加護",
+      "賜福": "CELESTIAL GRACE // 賜福",
+      "深淵賜福": "ABYSSAL GRACE // 深淵賜福",
+      "賢者之賜": "SAGE BESTOWAL // 賢者之賜",
+      "繼承能力": "INHERITED ART // 繼承能力",
+      "極惡秘術": "SUPREME MALEFIC // 極惡秘術",
+      "原初魔法": "PRIMORDIAL MAGIC // 原初魔法",
+      "固有能力": "INNATE ABILITY // 固有能力",
+      "特殊體質": "SPECIAL PHYSIQUE // 特殊體質"
+    };
+
     return `
       <article class="char-showcase-card ${hasImg ? "has-portrait" : ""}" id="card-${esc(c.id)}">
+        <div class="pgr-card-bracket tl" aria-hidden="true"></div>
+        <div class="pgr-card-bracket tr" aria-hidden="true"></div>
+        <div class="pgr-card-bracket bl" aria-hidden="true"></div>
+        <div class="pgr-card-bracket br" aria-hidden="true"></div>
         <div class="card-graphic-watermark" aria-hidden="true">${esc(serialCode)}</div>
         <div class="char-main-body">
           <div class="char-header-row">
             <div class="char-title-block">
-              <div class="char-dossier-kicker">DOSSIER // ${esc(serialCode)} ・ ${esc(c.realm)} ARCHIVE</div>
+              <div class="char-dossier-kicker">
+                <span class="dossier-live-dot"></span>
+                <span class="dossier-serial-chip">${esc(serialCode)}</span>
+                <span class="dossier-kicker-text">CONSTRUCT DOSSIER // ${esc(c.realm)} ARCHIVE</span>
+              </div>
               <div class="char-name-line">
                 <h4 class="char-name">${formatCharacterDisplayName(c.name)}</h4>
-                ${epithet ? `<span class="char-epithet">${formatCharacterDisplayName(epithet)}</span>` : ""}
+                ${epithet ? `<span class="char-epithet"><span class="ep-prefix">TITLE //</span> ${formatCharacterDisplayName(epithet)}</span>` : ""}
               </div>
               <div class="char-faction-path">
                 <span class="badge-realm">${esc(c.realm)}</span>
-                <span>${esc(c.faction)}</span>
-                ${c.subFaction ? `<span>› ${esc(c.subFaction)}</span>` : ""}
+                <span class="fac-path-node">${esc(c.faction)}</span>
+                ${c.subFaction ? `<span class="fac-path-sep">///</span><span class="fac-path-sub">${esc(c.subFaction)}</span>` : ""}
               </div>
             </div>
             <div class="char-header-right-badges">
-              ${c.power ? `<div class="badge-power" title="世界樹強度分級">⚡ 強度：${esc(c.power)}</div>` : ""}
+              ${c.power ? `<div class="badge-power" title="世界樹強度分級"><span class="bp-kicker">CLASS //</span> ⚡ 強度：${esc(c.power)}</div>` : ""}
               <a href="compare.html?left=${encodeURIComponent(c.id)}" target="_blank" rel="noopener" class="btn-compare-char" title="於新分頁將此角色加入能力對比">⚖️ 能力對比 ↗</a>
+              <a href="relations.html?char=${encodeURIComponent(c.name)}" target="_blank" rel="noopener" class="btn-compare-char btn-rel-char" title="於新分頁檢視此角色的人際關係星圖">🧬 關係圖譜 ↗</a>
             </div>
           </div>
 
           ${
             c.identities.length > 0
               ? `<div class="char-identities">
-                  ${c.identities.map((id) => `<span class="identity-pill">${esc(id)}</span>`).join("")}
+                  <span class="identities-kicker">IDENTITIES //</span>
+                  ${c.identities.map((id) => `<span class="identity-pill"><span class="id-dot">◆</span>${esc(id)}</span>`).join("")}
                 </div>`
               : ""
           }
 
           ${
             metaFields.length > 0
-              ? `<div class="char-meta-grid">
-                  ${metaFields
-                    .map(
-                      ([label, val, wide]) => `
-                    <div class="meta-cell ${wide ? "wide" : ""}">
-                      <span class="meta-label">${esc(label)}</span>
-                      ${
-                        label === "屬性"
-                          ? renderAttributeBadgesHtml(val, false)
-                          : `<span class="meta-val">${esc(val)}</span>`
-                      }
-                    </div>
-                  `
-                    )
-                    .join("")}
+              ? `<div class="char-meta-panel">
+                  <div class="pgr-subpanel-header">
+                    <span class="subpanel-bar"></span>
+                    <span class="subpanel-title">BIOMETRIC &amp; ELEMENTAL TELEMETRY // 基礎檔案與屬性矩陣</span>
+                    <span class="subpanel-line"></span>
+                  </div>
+                  <div class="char-meta-grid">
+                    ${metaFields
+                      .map(
+                        ([label, val, wide]) => `
+                      <div class="meta-cell ${wide ? "wide" : ""} ${label === "屬性" ? "meta-cell-attr" : ""}">
+                        <span class="meta-label">${esc(META_EN_MAP[label] || label)}</span>
+                        ${
+                          label === "屬性"
+                            ? renderAttributeBadgesHtml(val, false)
+                            : `<span class="meta-val">${esc(val)}</span>`
+                        }
+                      </div>
+                    `
+                      )
+                      .join("")}
+                  </div>
                 </div>`
               : ""
           }
 
           ${
             traitFields.length > 0
-              ? `<div class="char-traits-box">
-                  ${traitFields
-                    .map(
-                      ([label, val]) => `
-                    <div class="trait-item">
-                      <strong>${esc(label)}：</strong><span>${esc(val)}</span>
-                    </div>
-                  `
-                    )
-                    .join("")}
+              ? `<div class="char-traits-panel">
+                  <div class="pgr-subpanel-header">
+                    <span class="subpanel-bar"></span>
+                    <span class="subpanel-title">PSYCHOLOGICAL &amp; VISUAL PROFILE // 外表特徵與性格傾向</span>
+                    <span class="subpanel-line"></span>
+                  </div>
+                  <div class="char-traits-box">
+                    ${traitFields
+                      .map(([label, val]) => {
+                        const [enTag, icon] = TRAIT_EN_MAP[label] || ["PROFILE", "◈"];
+                        return `
+                      <div class="trait-item" data-trait-type="${esc(label)}">
+                        <div class="trait-item-head">
+                          <span class="trait-icon">${icon}</span>
+                          <strong>${esc(label)}</strong>
+                          <span class="trait-en-code">${enTag}</span>
+                        </div>
+                        <div class="trait-item-body">${esc(val)}</div>
+                      </div>
+                    `;
+                      })
+                      .join("")}
+                  </div>
                 </div>`
               : ""
           }
@@ -1033,6 +1111,11 @@
           ${
             displayAbilities.length > 0
               ? `<div class="char-abilities-section">
+                  <div class="pgr-subpanel-header">
+                    <span class="subpanel-bar"></span>
+                    <span class="subpanel-title">COMBAT ARSENAL &amp; AUTHORITIES // 武裝・權能・術式模組 (${displayAbilities.length})</span>
+                    <span class="subpanel-line"></span>
+                  </div>
                   ${displayAbilities
                     .map(
                       (ab) => `
@@ -1056,7 +1139,7 @@
                     </button>
                     ${
                       !isModal
-                        ? `<button class="btn-open-modal" data-modal-char="${esc(c.id)}">🗖 獨立視窗閱覽</button>`
+                        ? `<button class="btn-open-modal" data-modal-char="${esc(c.id)}">🗖 獨立戰術視窗閱覽</button>`
                         : ""
                     }
                   </div>
@@ -1072,9 +1155,18 @@
           hasImg
             ? `<aside class="char-portrait-aside">
                 <div class="portrait-sticky-box">
+                  <div class="portrait-hud-top">
+                    <span class="ph-dot"></span>
+                    <span>VISUAL RECORD // ${esc(serialCode)}</span>
+                  </div>
                   <div class="portrait-img-frame" data-lightbox-src="${esc(c.image)}" data-lightbox-caption="${esc(c.name)}${epithet ? " — " + esc(epithet) : ""}" title="點擊於新分頁開啟立繪細節檢視器">
+                    <div class="portrait-corner tl"></div>
+                    <div class="portrait-corner tr"></div>
+                    <div class="portrait-corner bl"></div>
+                    <div class="portrait-corner br"></div>
+                    <div class="portrait-scanline" aria-hidden="true"></div>
                     <img src="${esc(portraitSrc)}" alt="${esc(c.name)} 角色形象圖" loading="lazy" decoding="async" />
-                    <span class="portrait-zoom-hint">🔍 新分頁放大檢視細節 ↗</span>
+                    <span class="portrait-zoom-hint">🔍 高解析立繪檢視 ↗</span>
                   </div>
                   <div class="portrait-caption-bar">
                     <strong>${formatCharacterDisplayName(c.name)}</strong>
@@ -1095,34 +1187,42 @@
     const race = c.profile["種族"] || "未知";
     const attr = c.profile["屬性"] || "無";
     const align = c.profile["善惡"] || "未知";
+    const serialIdx = characters.indexOf(c) + 1;
+    const serialCode = `ARL-${String(serialIdx > 0 ? serialIdx : 1).padStart(3, "0")}`;
 
     return `
       <div class="char-grid-card ${hasImg ? "has-portrait" : ""}" data-modal-char="${esc(c.id)}">
+        <div class="pgr-card-bracket tl" aria-hidden="true"></div>
+        <div class="pgr-card-bracket br" aria-hidden="true"></div>
         ${
           hasImg
             ? `<div class="grid-card-thumb">
                 <img src="${esc(portraitSrc)}" alt="${esc(c.name)}" loading="lazy" decoding="async" />
+                <span class="grid-thumb-tag">ART</span>
               </div>`
             : ""
         }
         <div class="grid-card-info">
+          <div class="grid-card-serial-row">
+            <span class="grid-serial-code">${esc(serialCode)} // ${esc(c.realm)}</span>
+            ${c.power ? `<span class="badge-power grid-power-badge">⚡ ${esc(c.power)}</span>` : ""}
+          </div>
           <div class="grid-card-title">
             <span>${formatCharacterDisplayName(c.name)}</span>
-            ${c.power ? `<span class="badge-power" style="font-size:0.72rem;padding:0.12rem 0.45rem;">${esc(c.power)}</span>` : ""}
           </div>
           ${epithet ? `<div class="grid-card-sub">${formatCharacterDisplayName(epithet)}</div>` : ""}
           <div class="grid-card-meta">
-            <span>種族：${esc(race)}</span>
-            <span>善惡：${esc(align)}</span>
+            <span><strong>RACE:</strong> ${esc(race)}</span>
+            <span><strong>ALIGN:</strong> ${esc(align)}</span>
           </div>
           <div class="grid-card-attrs" style="margin-top:0.25rem;">
             ${renderAttributeBadgesHtml(attr, true)}
           </div>
-          <div style="margin-top:auto;padding-top:0.4rem;display:flex;flex-wrap:wrap;gap:0.25rem;">
-            ${c.profile["武器"] ? `<span class="identity-pill" style="font-size:0.7rem;padding:0.05rem 0.4rem;">⚔️ 武器</span>` : ""}
+          <div style="margin-top:auto;padding-top:0.45rem;display:flex;flex-wrap:wrap;gap:0.25rem;">
+            ${c.profile["武器"] ? `<span class="identity-pill" style="font-size:0.7rem;padding:0.06rem 0.44rem;">⚔️ 武器</span>` : ""}
             ${c.abilities
               .slice(0, 4)
-              .map((a) => `<span class="identity-pill" style="font-size:0.7rem;padding:0.05rem 0.4rem;">${esc(a.type)}</span>`)
+              .map((a) => `<span class="identity-pill" style="font-size:0.7rem;padding:0.06rem 0.44rem;">✦ ${esc(a.type)}</span>`)
               .join("")}
             ${hasImg ? `<span class="identity-pill" style="color:var(--accent-gold);border-color:var(--border-gold);font-size:0.7rem;">🖼️ 立繪</span>` : ""}
           </div>
@@ -1153,6 +1253,10 @@
 
     const withImgCount = filtered.filter((c) => c.image).length;
     descEl.textContent = `符合條件共 ${filtered.length} 名角色（其中 ${withImgCount} 名附帶角色立繪形象圖・點擊各陣營橫幅亦可折疊區塊）`;
+    const matchedCountEl = document.getElementById("pgrToolbarMatchedCount");
+    const imgCountEl = document.getElementById("pgrToolbarImgCount");
+    if (matchedCountEl) matchedCountEl.textContent = String(filtered.length);
+    if (imgCountEl) imgCountEl.textContent = String(withImgCount);
 
     if (filtered.length === 0) {
       container.innerHTML = `
@@ -1208,8 +1312,10 @@
     }
 
     let html = "";
-    sortedGroups.forEach((grp) => {
+    sortedGroups.forEach((grp, grpIdx) => {
       const isCollapsed = !isFilteredView && state.collapsedMainGroups.has(grp.label);
+      const grpImgCount = grp.items.filter((c) => c.image).length;
+      const sectorCode = `SEC-${String(grpIdx + 1).padStart(2, "0")}`;
       const itemsHtml = isCollapsed
         ? ""
         : grp.items
@@ -1221,14 +1327,16 @@
       html += `
         <section class="faction-section-group">
           <div class="faction-group-banner" data-toggle-main-group="${esc(grp.label)}" title="點擊收合／展開此陣營區塊">
-            <h3>
+            <div class="fgb-left">
               <span class="tree-chevron ${isCollapsed ? "" : "open"}">▶</span>
-              <span>⚜️ ${esc(grp.label)}</span>
-            </h3>
-            <span class="group-count-tag">
-              <span>${grp.items.length} 名成員</span>
-              <span style="font-size:0.72rem;color:var(--text-muted)">(${isCollapsed ? "已折疊" : "點擊可折疊"})</span>
-            </span>
+              <span class="fgb-sector-chip">${esc(sectorCode)}</span>
+              <h3>${TACTICAL_ICON_SVGS.sectorBanner}<span>${esc(grp.label)}</span></h3>
+            </div>
+            <div class="group-count-tag">
+              ${grpImgCount > 0 ? `<span class="fgb-img-pill">${TACTICAL_ICON_SVGS.imgBadge} 立繪 ${grpImgCount}</span>` : ""}
+              <span class="fgb-member-pill">UNITS // ${grp.items.length} 名成員</span>
+              <span class="fgb-state-pill">${isCollapsed ? "[ 展開 + ]" : "[ 收合 - ]"}</span>
+            </div>
           </div>
           <div class="faction-cards-wrap ${isCollapsed ? "collapsed" : ""}">
             ${itemsHtml}
@@ -1318,26 +1426,51 @@
     const sideNextNum = document.getElementById("pgrSideNextNum");
     const sidePrevTitle = document.getElementById("pgrSidePrevTitle");
     const sideNextTitle = document.getElementById("pgrSideNextTitle");
+    const sidePrevMeta = document.getElementById("pgrSidePrevMeta");
+    const sideNextMeta = document.getElementById("pgrSideNextMeta");
+    const coordTag = document.getElementById("pgrCarouselCoordTag");
+    const laserBar = document.getElementById("carouselLaserBar");
+    const fxCanvas = document.getElementById("homeHeroFxCanvas");
     if (slides.length === 0) return;
 
     let currentIdx = 0;
-    let autoTimer = null;
+    let isHovered = false;
+    const SLIDE_DURATION_MS = 6200;
+    let slideElapsedMs = 0;
+    let lastTickTs = performance.now();
+
+    // Theme palettes for the 5 worldview slides
+    const SLIDE_FX_PALETTES = {
+      worldtree: { primary: "#facc15", secondary: "#00f0ff", glow: "rgba(250, 204, 21, 0.55)", mode: "amber" },
+      mofeng:    { primary: "#ff2a32", secondary: "#00f0ff", glow: "rgba(255, 42, 50, 0.55)",  mode: "cyber" },
+      dragon:    { primary: "#fbbf24", secondary: "#ef4444", glow: "rgba(245, 158, 11, 0.6)", mode: "dragon" },
+      abyss:     { primary: "#f43f5e", secondary: "#c084fc", glow: "rgba(192, 132, 252, 0.55)", mode: "abyss" },
+      celestial: { primary: "#38bdf8", secondary: "#fde047", glow: "rgba(56, 189, 248, 0.55)", mode: "star" }
+    };
+
+    let activeFxTheme = "worldtree";
+    let burstEnergy = 0;
+    let pointerNormX = 0;
+    let pointerNormY = 0;
 
     function getSlideMeta(idx) {
       const sl = slides[(idx + slides.length) % slides.length];
-      if (!sl) return { src: "", label: "ARCHIVE" };
+      if (!sl) return { src: "", label: "ARCHIVE", coord: "EPOCH #12026", fx: "worldtree" };
       const img = sl.querySelector(".carousel-bg-img, img");
       const badge = sl.querySelector(".carousel-badge");
       const rawBadge = badge ? badge.textContent.split("//")[0].trim() : "ARCHIVE";
       return {
         src: img ? img.getAttribute("src") || "" : "",
-        label: rawBadge
+        label: rawBadge,
+        coord: sl.getAttribute("data-coord") || "EPOCH #12026 // REALM SYNC 99.8%",
+        fx: sl.getAttribute("data-fx-theme") || "worldtree"
       };
     }
 
     function updateSidePreviews() {
       const prevIdx = (currentIdx - 1 + slides.length) % slides.length;
       const nextIdx = (currentIdx + 1) % slides.length;
+      const curMeta = getSlideMeta(currentIdx);
       const prevMeta = getSlideMeta(prevIdx);
       const nextMeta = getSlideMeta(nextIdx);
       if (sidePrevImg && prevMeta.src) sidePrevImg.src = prevMeta.src;
@@ -1346,65 +1479,88 @@
       if (sideNextNum) sideNextNum.textContent = String(nextIdx + 1).padStart(2, "0");
       if (sidePrevTitle) sidePrevTitle.textContent = prevMeta.label;
       if (sideNextTitle) sideNextTitle.textContent = nextMeta.label;
+      if (sidePrevMeta) sidePrevMeta.textContent = `SECTOR // 0${prevIdx + 1} · ${prevMeta.label.slice(0, 14)}`;
+      if (sideNextMeta) sideNextMeta.textContent = `SECTOR // 0${nextIdx + 1} · ${nextMeta.label.slice(0, 14)}`;
+      if (coordTag) coordTag.textContent = curMeta.coord;
+      activeFxTheme = curMeta.fx;
+      burstEnergy = 1.0;
     }
 
     function goToSlide(idx) {
       currentIdx = (idx + slides.length) % slides.length;
       slides.forEach((sl, i) => sl.classList.toggle("active", i === currentIdx));
       dots.forEach((dt, i) => dt.classList.toggle("active", i === currentIdx));
+      slideElapsedMs = 0;
+      if (laserBar) laserBar.style.transform = "scaleX(0)";
       updateSidePreviews();
-    }
-
-    function startAutoPlay() {
-      stopAutoPlay();
-      autoTimer = setInterval(() => {
-        if (state.activeTab === "home") {
-          goToSlide(currentIdx + 1);
-        }
-      }, 5200);
-    }
-
-    function stopAutoPlay() {
-      if (autoTimer) {
-        clearInterval(autoTimer);
-        autoTimer = null;
-      }
     }
 
     if (prevBtn) {
       prevBtn.addEventListener("click", () => {
         goToSlide(currentIdx - 1);
-        startAutoPlay();
       });
     }
     if (nextBtn) {
       nextBtn.addEventListener("click", () => {
         goToSlide(currentIdx + 1);
-        startAutoPlay();
       });
     }
     if (sidePrevCard) {
       sidePrevCard.addEventListener("click", () => {
         goToSlide(currentIdx - 1);
-        startAutoPlay();
       });
     }
     if (sideNextCard) {
       sideNextCard.addEventListener("click", () => {
         goToSlide(currentIdx + 1);
-        startAutoPlay();
       });
     }
     dots.forEach((dot) => {
       dot.addEventListener("click", () => {
         const idx = Number(dot.getAttribute("data-slide-to") || 0);
         goToSlide(idx);
-        startAutoPlay();
       });
     });
 
-    carouselEl.addEventListener("mouseenter", stopAutoPlay);
-    carouselEl.addEventListener("mouseleave", startAutoPlay);
+    carouselEl.addEventListener("mouseenter", () => {
+      isHovered = true;
+    });
+    carouselEl.addEventListener("mouseleave", () => {
+      isHovered = false;
+      pointerNormX = 0;
+      pointerNormY = 0;
+      carouselEl.style.setProperty("--parallax-x", "0px");
+      carouselEl.style.setProperty("--parallax-y", "0px");
+    });
+
+    carouselEl.addEventListener("mousemove", (e) => {
+      const rect = carouselEl.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      pointerNormX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+      pointerNormY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      const px = (-pointerNormX * 12).toFixed(1);
+      const py = (-pointerNormY * 8).toFixed(1);
+      carouselEl.style.setProperty("--parallax-x", `${px}px`);
+      carouselEl.style.setProperty("--parallax-y", `${py}px`);
+    });
+
+    // Bind Realm Gate Resonance Quick-Filter Chips on Home Page
+    document.querySelectorAll("[data-home-realm]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const targetRealm = btn.getAttribute("data-home-realm") || "";
+        state.selectedRealm = targetRealm;
+        state.selectedFaction = "";
+        state.selectedSubFaction = "";
+        state.expandedRealms.add(targetRealm);
+        switchTab("characters");
+        renderFactionTree();
+        renderCharacters();
+        const rosterSec = document.getElementById("pgrFullRosterSection");
+        if (rosterSec) {
+          setTimeout(() => rosterSec.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+        }
+      });
+    });
 
     // Bind all [data-goto-tab] buttons/cards on Home Page
     document.querySelectorAll("[data-goto-tab]").forEach((el) => {
@@ -1417,8 +1573,126 @@
       });
     });
 
+    // Live 60FPS Particle & Rune Energy Canvas Engine + Laser Auto-Progress Timer
+    const ctx = fxCanvas ? fxCanvas.getContext("2d") : null;
+    const particles = [];
+    const PARTICLE_COUNT = 44;
+
+    function createParticle(w, h, randomY = true) {
+      return {
+        x: Math.random() * w,
+        y: randomY ? Math.random() * h : h + 12,
+        vx: (Math.random() - 0.5) * 0.55,
+        vy: -(0.35 + Math.random() * 1.15),
+        size: 1.4 + Math.random() * 3.2,
+        alpha: 0.25 + Math.random() * 0.65,
+        phase: Math.random() * Math.PI * 2,
+        isSecondary: Math.random() > 0.5,
+        isDiamond: Math.random() > 0.45
+      };
+    }
+
+    function resizeFxCanvas() {
+      if (!fxCanvas) return;
+      const rect = fxCanvas.parentElement ? fxCanvas.parentElement.getBoundingClientRect() : { width: 960, height: 495 };
+      const w = Math.max(320, Math.round(rect.width || 960));
+      const h = Math.max(240, Math.round(rect.height || 495));
+      if (fxCanvas.width !== w || fxCanvas.height !== h) {
+        fxCanvas.width = w;
+        fxCanvas.height = h;
+      }
+      if (particles.length === 0) {
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push(createParticle(w, h, true));
+        }
+      }
+    }
+
+    resizeFxCanvas();
+    window.addEventListener("resize", resizeFxCanvas);
+
+    function animateHomeStage(nowTs) {
+      const dt = Math.min(80, Math.max(0, nowTs - lastTickTs));
+      lastTickTs = nowTs;
+
+      if (state.activeTab === "home") {
+        if (!isHovered) {
+          slideElapsedMs += dt;
+          if (laserBar) {
+            const ratio = Math.min(1, slideElapsedMs / SLIDE_DURATION_MS);
+            laserBar.style.transform = `scaleX(${ratio.toFixed(4)})`;
+          }
+          if (slideElapsedMs >= SLIDE_DURATION_MS) {
+            goToSlide(currentIdx + 1);
+          }
+        }
+
+        if (ctx && fxCanvas) {
+          const w = fxCanvas.width;
+          const h = fxCanvas.height;
+          ctx.clearRect(0, 0, w, h);
+
+          const pal = SLIDE_FX_PALETTES[activeFxTheme] || SLIDE_FX_PALETTES.worldtree;
+          if (burstEnergy > 0.01) {
+            burstEnergy *= 0.92;
+            const grad = ctx.createRadialGradient(w * 0.5, h * 0.42, 10, w * 0.5, h * 0.42, w * 0.55);
+            grad.addColorStop(0, pal.glow);
+            grad.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.save();
+            ctx.globalAlpha = burstEnergy * 0.52;
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+            ctx.restore();
+          }
+
+          for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            p.phase += 0.035;
+            const speedMul = 1 + burstEnergy * 2.4;
+            p.x += (p.vx + Math.sin(p.phase) * 0.25 + pointerNormX * 0.35) * speedMul;
+            p.y += p.vy * speedMul;
+
+            if (p.y < -15) {
+              p.y = h + 10;
+              p.x = Math.random() * w;
+            }
+            if (p.x < -15) p.x = w + 10;
+            if (p.x > w + 15) p.x = -10;
+
+            const pulseAlpha = Math.max(0.08, Math.min(0.95, p.alpha * (0.7 + 0.3 * Math.sin(p.phase))));
+            const col = p.isSecondary ? pal.secondary : pal.primary;
+
+            ctx.save();
+            ctx.globalAlpha = pulseAlpha;
+            ctx.fillStyle = col;
+            ctx.shadowColor = col;
+            ctx.shadowBlur = 10;
+
+            if (p.isDiamond) {
+              ctx.translate(p.x, p.y);
+              ctx.rotate(p.phase * 0.5);
+              ctx.beginPath();
+              ctx.moveTo(0, -p.size * 1.3);
+              ctx.lineTo(p.size * 1.3, 0);
+              ctx.lineTo(0, p.size * 1.3);
+              ctx.lineTo(-p.size * 1.3, 0);
+              ctx.closePath();
+              ctx.fill();
+            } else {
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+          }
+        }
+      }
+
+      requestAnimationFrame(animateHomeStage);
+    }
+
     updateSidePreviews();
-    startAutoPlay();
+    requestAnimationFrame(animateHomeStage);
   }
 
   // ==================== ATTRIBUTE HANDBOOK & ELEMENTAL ENCYCLOPEDIA ====================
@@ -2400,13 +2674,13 @@
 
     let html = `
       <div class="tree-quick-actions">
-        <button class="tree-action-btn" id="btnExpandAllGalleryTree" title="展開所有立繪分類">➕ 全部展開</button>
-        <button class="tree-action-btn" id="btnCollapseAllGalleryTree" title="收合所有立繪分類">➖ 全部折疊</button>
+        <button class="tree-action-btn" id="btnExpandAllGalleryTree" title="展開所有立繪分類"><span class="tact-act-sym">＋</span> 全部展開</button>
+        <button class="tree-action-btn" id="btnCollapseAllGalleryTree" title="收合所有立繪分類"><span class="tact-act-sym">－</span> 全部折疊</button>
       </div>
 
       <div style="margin-bottom:0.5rem;">
         <button class="tree-item ${isAllActive ? "active" : ""}" data-g-realm="" data-g-faction="" data-g-sub="">
-          <span class="tree-item-label">🖼️ 全部角色立繪</span>
+          <span class="tree-item-label">${TACTICAL_ICON_SVGS.all}<span>全部角色立繪</span></span>
           <span class="tree-count">${charsWithImg.length}</span>
         </button>
       </div>
@@ -2434,7 +2708,7 @@
             <div class="tree-row">
               <span class="tree-expand-spacer"></span>
               <button class="tree-item ${isRealmActive ? "active" : ""}" data-g-realm="${esc(realm)}" data-g-faction="" data-g-sub="">
-                <span class="tree-item-label">📂 ${esc(realm)}全部 (${realmChars.length})</span>
+                <span class="tree-item-label">${TACTICAL_ICON_SVGS.realmAll}<span>${esc(realm)}全部 (${realmChars.length})</span></span>
               </button>
             </div>
       `;
@@ -2464,7 +2738,7 @@
                 : `<span class="tree-expand-spacer"></span>`
             }
             <button class="tree-item ${isFacActive ? "active" : ""}" data-g-realm="${esc(realm)}" data-g-faction="${esc(faction)}" data-g-sub="" data-g-auto-fac="${hasSubs ? esc(facKey) : ""}">
-              <span class="tree-item-label">🛡️ ${esc(faction)}</span>
+              <span class="tree-item-label">${TACTICAL_ICON_SVGS.faction}<span>${esc(faction)}</span></span>
               <span class="tree-count">${facChars.length}</span>
             </button>
           </div>
@@ -2513,7 +2787,7 @@
                     <span class="tree-chevron ${isSubGroupOpen ? "open" : ""}">▶</span>
                   </button>
                   <button class="tree-item tree-item-sub ${isGroupActive ? "active" : ""}" data-g-realm="${esc(realm)}" data-g-faction="${esc(faction)}" data-g-sub="${esc(topSub)}" data-g-auto-sub="${esc(subGroupKey)}">
-                    <span class="tree-item-label">⚔️ ${esc(topSub)}</span>
+                    <span class="tree-item-label">${TACTICAL_ICON_SVGS.subGroup}<span>${esc(topSub)}</span></span>
                     <span class="tree-count">${groupChars.length}</span>
                   </button>
                 </div>
@@ -2531,7 +2805,7 @@
                   <div class="tree-row">
                     <span class="tree-expand-spacer"></span>
                     <button class="tree-item tree-item-sub ${isChActive ? "active" : ""}" data-g-realm="${esc(realm)}" data-g-faction="${esc(faction)}" data-g-sub="${esc(ch.full)}">
-                      <span class="tree-item-label">• ${esc(ch.label)}</span>
+                      <span class="tree-item-label">${TACTICAL_ICON_SVGS.subLeaf}<span>${esc(ch.label)}</span></span>
                       <span class="tree-count">${chChars.length}</span>
                     </button>
                   </div>
@@ -2550,7 +2824,7 @@
                 <div class="tree-row">
                   <span class="tree-expand-spacer"></span>
                   <button class="tree-item tree-item-sub ${isSubActive ? "active" : ""}" data-g-realm="${esc(realm)}" data-g-faction="${esc(faction)}" data-g-sub="${esc(topSub)}">
-                    <span class="tree-item-label">• ${esc(topSub)}</span>
+                    <span class="tree-item-label">${TACTICAL_ICON_SVGS.subLeaf}<span>${esc(topSub)}</span></span>
                     <span class="tree-count">${subChars.length}</span>
                   </button>
                 </div>

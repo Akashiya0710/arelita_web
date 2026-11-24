@@ -1,30 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="35%" r="70%">
-      <stop offset="0%" stop-color="#2a145c"/>
-      <stop offset="60%" stop-color="#120829"/>
-      <stop offset="100%" stop-color="#070312"/>
-    </radialGradient>
-    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fde68a"/>
-      <stop offset="50%" stop-color="#e5b8ff"/>
-      <stop offset="100%" stop-color="#c084fc"/>
+    <!-- Obsidian Tactical Armor Background -->
+    <linearGradient id="armorBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141822"/>
+      <stop offset="55%" stop-color="#0b0d13"/>
+      <stop offset="100%" stop-color="#050609"/>
     </linearGradient>
-    <linearGradient id="star" x1="0%" y1="0%" x2="100%" y2="100%">
+
+    <!-- Crimson Red Tactical Glow -->
+    <linearGradient id="crimsonEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff2a32"/>
+      <stop offset="50%" stop-color="#e01a22"/>
+      <stop offset="100%" stop-color="#990d13"/>
+    </linearGradient>
+
+    <!-- Cyan Telemetry Accent -->
+    <linearGradient id="cyanBeam" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00b4d8"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+
+    <!-- Metallic Titanium A-Monogram -->
+    <linearGradient id="titanium" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="45%" stop-color="#f5d0fe"/>
-      <stop offset="100%" stop-color="#e4b858"/>
+      <stop offset="60%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
     </linearGradient>
   </defs>
-  <!-- Outer Shield / Rounded Badge -->
-  <rect x="3" y="3" width="58" height="58" rx="14" fill="url(#bg)" stroke="url(#gold)" stroke-width="2.5"/>
-  <!-- Subtle Astrolabe Orbit Ring -->
-  <circle cx="32" cy="32" r="21" fill="none" stroke="url(#gold)" stroke-width="1.4" stroke-dasharray="4 3" opacity="0.7"/>
-  <!-- Rotated Diamond Frame -->
-  <polygon points="32,9 55,32 32,55 9,32" fill="rgba(192,132,252,0.12)" stroke="url(#gold)" stroke-width="1.8"/>
-  <!-- Four-Pointed Radiant Star -->
-  <path d="M32 6 L37.5 26.5 L58 32 L37.5 37.5 L32 58 L26.5 37.5 L6 32 L26.5 26.5 Z" fill="url(#star)"/>
-  <!-- Inner Core Gem -->
-  <polygon points="32,23 41,32 32,41 23,32" fill="#14092e" stroke="#fde68a" stroke-width="1.6"/>
-  <circle cx="32" cy="32" r="3.6" fill="#fef08a"/>
+
+  <!-- Outer Chamfered Mecha Octagon Plate -->
+  <polygon points="14,3 50,3 61,14 61,50 50,61 14,61 3,50 3,14" fill="url(#armorBg)" stroke="url(#crimsonEdge)" stroke-width="2.5"/>
+
+  <!-- Inner Tactical Reticle Frame -->
+  <polygon points="17,8 47,8 56,17 56,47 47,56 17,56 8,47 8,17" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+
+  <!-- Corner Target Lock Brackets -->
+  <path d="M8 20 L8 15 L15 8 L20 8" fill="none" stroke="#ff2a32" stroke-width="2" stroke-linecap="square"/>
+  <path d="M44 8 L49 8 L56 15 L56 20" fill="none" stroke="#00f0ff" stroke-width="2" stroke-linecap="square"/>
+  <path d="M8 44 L8 49 L15 56 L20 56" fill="none" stroke="#00f0ff" stroke-width="2" stroke-linecap="square"/>
+  <path d="M44 56 L49 56 L56 49 L56 44" fill="none" stroke="#ff2a32" stroke-width="2" stroke-linecap="square"/>
+
+  <!-- Diagonal Crimson Laser Slash Behind Emblem -->
+  <polygon points="10,48 52,14 54,17 12,51" fill="url(#crimsonEdge)" opacity="0.88"/>
+
+  <!-- Sharp Cyber-Tactical "A" Construct Monogram -->
+  <path d="M32 11 L50 51 L41 51 L32 28 L23 51 L14 51 Z" fill="url(#titanium)"/>
+
+  <!-- Center Crimson Singularity Core Diamond (Crossbar of A) -->
+  <polygon points="32,33 41,40 32,47 23,40" fill="url(#crimsonEdge)" stroke="#ffffff" stroke-width="1.2"/>
+  <polygon points="32,37 35,40 32,43 29,40" fill="#00f0ff"/>
 </svg>
