@@ -1,5 +1,5 @@
-window.ARELITA_RELATIONS = window.ARELITA_RELATIONS_DATA = {
-    "generatedAt":  "2026-11-23 03:01:20",
+﻿window.ARELITA_RELATIONS = window.ARELITA_RELATIONS_DATA = {
+    "generatedAt":  "2026-11-28 04:55:05",
     "totalCharacters":  177,
     "totalRelationships":  998,
     "nodes":  [
@@ -142,11 +142,11 @@ window.ARELITA_RELATIONS = window.ARELITA_RELATIONS_DATA = {
                       "race":  "影魔族",
                       "gender":  "女",
                       "age":  "1300萬歲",
-                      "alignment":  "中立",
+                      "alignment":  "中立-善",
                       "image":  null,
                       "story":  "",
-                      "likes":  "",
-                      "dislikes":  "",
+                      "likes":  "無",
+                      "dislikes":  "無",
                       "relations":  [
                                         {
                                             "targetId":  "char-4",

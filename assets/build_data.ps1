@@ -342,6 +342,33 @@ Get-ChildItem -Path "人設資料" -Recurse -File | Where-Object {
     $characters.Add($cObj)
 }
 
+# Preserve canonical IDs from assets/relations_data.js if present
+$relDataPath = Join-Path $rootPath "assets\relations_data.js"
+if (Test-Path $relDataPath) {
+    $relRaw = Get-Content -Path $relDataPath -Raw -Encoding UTF8
+    $relJsonStr = $relRaw -replace '^window\.ARELITA_RELATIONS\s*=\s*window\.ARELITA_RELATIONS_DATA\s*=\s*', '' -replace ';\s*$', ''
+    try {
+        $relData = $relJsonStr | ConvertFrom-Json
+        $relByNorm = @{}
+        foreach ($n in $relData.nodes) {
+            $norm = ($n.name -replace '[\s~~\?\？・•]', '').Trim()
+            $relByNorm[$norm] = $n.id
+        }
+        foreach ($c in $characters) {
+            $norm1 = ($c.name -replace '[\s~~\?\？・•]', '').Trim()
+            $norm2 = ($c.fileName -replace '[\s~~\?\？・•]', '').Trim()
+            if ($relByNorm.ContainsKey($norm1)) {
+                $c.id = $relByNorm[$norm1]
+            } elseif ($relByNorm.ContainsKey($norm2)) {
+                $c.id = $relByNorm[$norm2]
+            }
+        }
+        $sortedChars = $characters | Sort-Object { [int]($_.id -replace '^char-', '') }
+        $characters = New-Object System.Collections.Generic.List[object]
+        foreach ($sc in $sortedChars) { $characters.Add($sc) }
+    } catch {}
+}
+
 # 3. Parse World Lore & Settings Files (Grouped with orgName for 組織 國家設定)
 $loreDocs = New-Object System.Collections.Generic.List[object]
 $loreOrder = @(
