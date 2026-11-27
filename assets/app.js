@@ -1696,10 +1696,68 @@
   }
 
   // ==================== ATTRIBUTE HANDBOOK & ELEMENTAL ENCYCLOPEDIA ====================
-  const ATTR_CAT_ICONS = [
-    "🔥", "❄️", "🌪️", "⚡", "⛰️", "🌿", "✨", "🪐",
-    "🌑", "🕳️", "🩸", "⚔️", "⏳", "🔮", "💥", "☠️", "👑"
+  const ATTR_CAT_SVGS = [
+    // 01. 火屬性 (Flame Core)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5L13 8.5C13 11.8 10.8 14.2 8 14.2C5.2 14.2 3 11.8 3 8.5L8 1.5Z"/><polygon points="8,6.2 10.3,9.6 8,12 5.7,9.6" fill="currentColor" stroke="none"/></svg>`,
+    // 02. 水與冰雪 (Cryo Hex Crystal)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="1.5" x2="8" y2="14.5"/><line x1="2.4" y1="4.8" x2="13.6" y2="11.2"/><line x1="13.6" y1="4.8" x2="2.4" y2="11.2"/><polygon points="8,5.2 10.5,6.6 10.5,9.4 8,10.8 5.5,9.4 5.5,6.6"/></svg>`,
+    // 03. 風與空氣 (Aero Vortex Wing)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5.5H11.5C12.9 5.5 14 4.4 14 3"/><path d="M1.5 8.5H13.5"/><path d="M3 11.5H10.5C11.9 11.5 13 12.6 13 14"/></svg>`,
+    // 04. 雷電 (Volt Fulmination)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="9.2,1.5 3.5,8.8 7.8,8.8 6.8,14.5 12.5,7.2 8.2,7.2" fill="currentColor" fill-opacity="0.22"/></svg>`,
+    // 05. 土石金屬與礦物 (Geo Monolith)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1.5 14,5 14,11 8,14.5 2,11 2,5"/><line x1="8" y1="1.5" x2="8" y2="14.5"/><line x1="2" y1="5" x2="14" y2="11"/></svg>`,
+    // 06. 草木植物與自然花卉 (Bio Flora Leaf)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 2.5C7.5 2.5 3 6.5 3 12.5C9 12.5 13.5 8.5 13.5 2.5Z"/><path d="M2.5 13.5L9.5 6.5"/></svg>`,
+    // 07. 光芒與神聖 (Luminary Radiance)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1L9.8 6.2L15 8L9.8 9.8L8 15L6.2 9.8L1 8L6.2 6.2L8 1Z"/><circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none"/></svg>`,
+    // 08. 天體星空與日月 (Astral Orbit)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3.2"/><ellipse cx="8" cy="8" rx="6.8" ry="2.6" transform="rotate(-28 8 8)"/></svg>`,
+    // 09. 暗影與幽冥 (Umbra Eclipse)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.5 2.2C6.8 2.8 4 5.9 4 9.6C4 11.2 4.5 12.6 5.4 13.8C2.9 12.8 1.2 10.4 1.2 7.5C1.2 3.8 4.2 0.8 7.9 0.8C8.9 0.8 9.8 1.3 10.5 2.2Z"/><polygon points="11.5,5 13.5,8 11.5,11 9.5,8" fill="currentColor" stroke="none"/></svg>`,
+    // 10. 深淵與淵蝕 (Abyssal Rift)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1 12.5,5.5 14.5,8 12.5,10.5 8,15 3.5,10.5 1.5,8 3.5,5.5"/><polygon points="8,4.2 10.5,8 8,11.8 5.5,8" fill="currentColor" stroke="none"/></svg>`,
+    // 11. 血腥與肉體 (Crimson Ichor)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.8L12.5 8.5C12.5 11.2 10.5 13.8 8 13.8C5.5 13.8 3.5 11.2 3.5 8.5L8 1.8Z"/><line x1="8" y1="5.5" x2="8" y2="10.5"/><line x1="5.8" y1="8" x2="10.2" y2="8"/></svg>`,
+    // 12. 戰鬥相關 (Tactical Crossed Blades)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2.2" y1="13.8" x2="13.2" y2="2.8"/><polyline points="9.5,2.5 13.5,2.5 13.5,6.5"/><line x1="13.8" y1="13.8" x2="2.8" y2="2.8"/><polyline points="6.5,2.5 2.5,2.5 2.5,6.5"/></svg>`,
+    // 13. 時空法則 (Chrono Hourglass)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="3.5,2 12.5,2 8,8 12.5,14 3.5,14 8,8"/><line x1="2.2" y1="2" x2="13.8" y2="2"/><line x1="2.2" y1="14" x2="13.8" y2="14"/></svg>`,
+    // 14. 精神靈魂感知幻象 (Psyche Mind Eye)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.2 8C3.2 4.4 5.6 2.8 8 2.8C10.4 2.8 12.8 4.4 14.8 8C12.8 11.6 10.4 13.2 8 13.2C5.6 13.2 3.2 11.6 1.2 8Z"/><circle cx="8" cy="8" r="2.2" fill="currentColor" stroke="none"/></svg>`,
+    // 15. 粉碎破壞毀滅與戰爭 (Destruction Shatter)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1 10.2,5.4 15,4.5 11.8,8.5 14.2,13 9.5,11.2 7,15 6.2,10.5 1.5,11.5 4.6,7.8 2,3.5 6.6,5.2"/></svg>`,
+    // 16. 毒素腐蝕瘟疫與死毒 (Bio-Hazard)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,2 13.5,5.2 13.5,10.8 8,14 2.5,10.8 2.5,5.2"/><circle cx="8" cy="8" r="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="13.5" y1="10.8" x2="9.7" y2="9"/><line x1="2.5" y1="10.8" x2="6.3" y2="9"/></svg>`,
+    // 17. 特殊屬性法則概念與始源 (Primordial Crown / Apex)
+    `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="2,12.5 3.5,4.5 6.5,8.2 8,2.5 9.5,8.2 12.5,4.5 14,12.5"/><line x1="2" y1="14.2" x2="14" y2="14.2"/></svg>`
   ];
+
+  const LORE_TACTICAL_SVGS = {
+    categoryOrg: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1.5 14.2,5 14.2,11 8,14.5 1.8,11 1.8,5"/><circle cx="8" cy="8" r="2.2"/></svg>`,
+    globeOverview: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.2"/><ellipse cx="8" cy="8" rx="3" ry="6.2"/><line x1="1.8" y1="8" x2="14.2" y2="8"/></svg>`,
+    docBase: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1.5 14,4.8 14,11.2 8,14.5 2,11.2 2,4.8"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="8" y1="5" x2="8" y2="11"/></svg>`,
+    docWorldOrg: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><polygon points="11.5,9 14,11.5 11.5,14 9,11.5" fill="currentColor" stroke="none"/></svg>`,
+    docElements: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.2L9.8 6.2L14.8 8L9.8 9.8L8 14.8L6.2 9.8L1.2 8L6.2 6.2L8 1.2Z"/></svg>`,
+    docCombat: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="2.2" y1="13.8" x2="13.2" y2="2.8"/><polyline points="9.5,2.5 13.5,2.5 13.5,6.5"/><line x1="13.8" y1="13.8" x2="2.8" y2="2.8"/></svg>`,
+    orgMofeng: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1.5 14.5,5.5 12,13.8 8,11.2 4,13.8 1.5,5.5"/><polygon points="8,4.8 10.5,8 8,10.2 5.5,8" fill="currentColor" stroke="none"/></svg>`,
+    orgDragon: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1 14,4.5 11.5,8 14.5,11.5 8,15 1.5,11.5 4.5,8 2,4.5"/><circle cx="8" cy="8" r="1.8" fill="currentColor" stroke="none"/></svg>`,
+    orgTruth: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,1.2 10.2,5.8 14.8,8 10.2,10.2 8,14.8 5.8,10.2 1.2,8 5.8,5.8"/><circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none"/></svg>`,
+    storySeries: `<svg class="tactical-tree-svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 3H11.5L13.5 5V13.5H2.5V3Z"/><line x1="5" y1="6.5" x2="11" y2="6.5"/><line x1="5" y1="9.5" x2="9.5" y2="9.5"/></svg>`,
+    storyChapter: `<svg class="tactical-tree-svg is-leaf" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="8,3 13,8 8,13 3,8"/><circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none"/></svg>`
+  };
+
+  function getLoreDocTacticalIcon(doc) {
+    if (!doc) return LORE_TACTICAL_SVGS.docBase;
+    const t = String(doc.title || "");
+    if (t.includes("組織")) return LORE_TACTICAL_SVGS.docWorldOrg;
+    if (t.includes("屬性")) return LORE_TACTICAL_SVGS.docElements;
+    if (t.includes("虛斬") || t.includes("戰") || t.includes("強")) return LORE_TACTICAL_SVGS.docCombat;
+    if (doc.orgName === "魔風聯邦") return LORE_TACTICAL_SVGS.orgMofeng;
+    if (doc.orgName === "哈維德恩龍族帝國") return LORE_TACTICAL_SVGS.orgDragon;
+    if (doc.orgName === "極真圃") return LORE_TACTICAL_SVGS.orgTruth;
+    return LORE_TACTICAL_SVGS.docBase;
+  }
 
   function getCharactersWithAttribute(attrName) {
     const clean = String(attrName || "").trim();
@@ -1732,20 +1790,20 @@
     let html = `
       <div style="margin-bottom:0.55rem;">
         <button class="tree-item ${isAllActive ? "active" : ""}" data-select-attr-cat="">
-          <span class="tree-item-label">🌟 全部 ${attributeCategories.length} 大屬性分類</span>
+          <span class="tree-item-label">${TACTICAL_ICON_SVGS.all}<span>全部 ${attributeCategories.length} 大屬性分類</span></span>
           <span class="tree-count">${totalAttributeItemsCount}</span>
         </button>
       </div>
     `;
 
     attributeCategories.forEach((cat, idx) => {
-      const icon = ATTR_CAT_ICONS[idx] || "✦";
+      const iconSvg = ATTR_CAT_SVGS[idx] || TACTICAL_ICON_SVGS.subLeaf;
       const isActive = state.selectedAttrCatId === cat.id;
       const shortTitle = cat.title.replace(/（共\s*\d+\s*種）.*$/, "").trim();
       html += `
         <div class="tree-row" style="margin-bottom:0.2rem;">
           <button class="tree-item ${isActive ? "active" : ""}" data-select-attr-cat="${esc(cat.id)}" title="${esc(cat.title)}">
-            <span class="tree-item-label">${icon} ${esc(shortTitle)}</span>
+            <span class="tree-item-label">${iconSvg}<span>${esc(shortTitle)}</span></span>
             <span class="tree-count">${cat.items.length}</span>
           </button>
         </div>
@@ -1893,7 +1951,7 @@
 
     let html = "";
     filteredCats.forEach((cat) => {
-      const icon = ATTR_CAT_ICONS[(cat.index || 1) - 1] || "✦";
+      const iconSvg = ATTR_CAT_SVGS[(cat.index || 1) - 1] || TACTICAL_ICON_SVGS.subLeaf;
       const cardsHtml = cat.filteredItems
         .map((item) => {
           const vCard = getAttributeVisual(item.name);
@@ -1920,7 +1978,7 @@
         <section class="faction-section-group attr-category-section">
           <div class="faction-group-banner" style="cursor:default;">
             <div>
-              <h3><span>${icon} ${esc(cat.title)}</span></h3>
+              <h3 style="display:flex;align-items:center;gap:0.5rem;">${iconSvg}<span>${esc(cat.title)}</span></h3>
               ${cat.description ? `<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.2rem;">${esc(cat.description)}</div>` : ""}
             </div>
             <span class="group-count-tag">${cat.filteredItems.length} 種屬性</span>
@@ -1968,19 +2026,19 @@
   // ==================== WORLD LORE & SETTINGS RENDERER ====================
   const ORG_META = {
     "魔風聯邦": {
-      icon: "🦅",
+      iconSvg: LORE_TACTICAL_SVGS.orgMofeng,
       en: "MAFENG FEDERATION",
       desc: "亞雷利塔現界強權之一，涵蓋魔風聯邦核心制度、魔風軍團編制與建國歷史脈絡。",
       factionLink: { realm: "現界", faction: "魔風聯邦" }
     },
     "哈維德恩龍族帝國": {
-      icon: "🐉",
+      iconSvg: LORE_TACTICAL_SVGS.orgDragon,
       en: "HAVIDN DRAGON EMPIRE",
       desc: "由龍族統御的古老強盛帝國，記載帝國歷史演進、龍皇傳承與完整軍隊編制體系。",
       factionLink: null
     },
     "極真圃": {
-      icon: "🏵️",
+      iconSvg: LORE_TACTICAL_SVGS.orgTruth,
       en: "JIZHEN GARDEN",
       desc: "歷史悠久的神秘組織，收錄自遠古紀元以來的重大事件與時間線紀錄。",
       factionLink: { realm: "現界", faction: "極真圃" }
@@ -1993,14 +2051,14 @@
     return orgNames.map((name) => {
       const docs = orgDocs.filter((d) => d.orgName === name);
       const meta = ORG_META[name] || {
-        icon: docs[0]?.icon || "🏛️",
+        iconSvg: LORE_TACTICAL_SVGS.categoryOrg,
         en: "ORGANIZATION ARCHIVE",
         desc: `收錄「${name}」相關之國家與組織設定文獻。`,
         factionLink: null
       };
       return {
         name,
-        icon: meta.icon,
+        iconSvg: meta.iconSvg,
         en: meta.en,
         desc: meta.desc,
         factionLink: meta.factionLink,
@@ -2026,13 +2084,13 @@
             <button class="tree-realm-header-btn ${isCatOpen ? "expanded" : ""}" data-toggle-lore-cat="${esc(cat)}">
               <span class="tree-realm-left">
                 <span class="tree-chevron ${isCatOpen ? "open" : ""}">▶</span>
-                <span>🏛️ ${esc(cat)}（依組織分類）</span>
+                <span>${esc(cat)}（依組織分類）</span>
               </span>
               <span class="tree-count">${orgList.length} 組織</span>
             </button>
             <div class="tree-children-box ${isCatOpen ? "" : "collapsed"}">
               <button class="tree-item ${isOverviewActive ? "active" : ""}" data-lore-org-overview="true">
-                <span class="tree-item-label">🌐 全部國家與組織總覽</span>
+                <span class="tree-item-label">${LORE_TACTICAL_SVGS.globeOverview}<span>全部國家與組織總覽</span></span>
                 <span class="tree-count">${orgList.length}</span>
               </button>
               ${orgList
@@ -2043,7 +2101,7 @@
                     (state.selectedLoreMode === "doc" && activeDoc && activeDoc.orgName === org.name);
                   return `
                     <button class="tree-item ${isOrgSelected ? "active" : ""}" data-lore-org="${esc(org.name)}">
-                      <span class="tree-item-label">${esc(org.icon)} ${esc(org.name)}</span>
+                      <span class="tree-item-label">${org.iconSvg}<span>${esc(org.name)}</span></span>
                       <span class="tree-count">${org.docs.length} 篇</span>
                     </button>
                   `;
@@ -2067,7 +2125,7 @@
                 .map(
                   (doc) => `
                 <button class="tree-item ${state.selectedLoreMode === "doc" && state.selectedLoreId === doc.id ? "active" : ""}" data-lore-id="${esc(doc.id)}">
-                  <span class="tree-item-label">${esc(doc.icon)} ${esc(doc.title)}</span>
+                  <span class="tree-item-label">${getLoreDocTacticalIcon(doc)}<span>${esc(doc.title)}</span></span>
                 </button>
               `
                 )
@@ -2266,7 +2324,7 @@
       container.innerHTML = `
         <div class="lore-doc-header">
           <div class="lore-doc-cat">ORGANIZATIONS &amp; NATIONS ARCHIVE</div>
-          <h2 class="lore-doc-title">🏛️ 組織與國家設定總覽</h2>
+          <h2 class="lore-doc-title" style="display:flex;align-items:center;gap:0.55rem;">${LORE_TACTICAL_SVGS.categoryOrg}<span>組織與國家設定總覽</span></h2>
           <div class="lore-doc-subtitle">每個國家與組織皆獨立分類，請點擊下方組織卡片進入該組織專區，再選擇欲閱讀的文獻檔案。</div>
         </div>
         <div class="org-hub-grid">
@@ -2275,7 +2333,7 @@
               (org) => `
             <div class="org-hub-card" data-open-org="${esc(org.name)}">
               <div class="org-hub-card-top">
-                <span class="org-hub-icon">${esc(org.icon)}</span>
+                <span class="org-hub-icon">${org.iconSvg}</span>
                 <span class="org-hub-badge">共 ${org.docs.length} 篇設定文獻</span>
               </div>
               <div style="font-family:var(--font-tech);font-size:0.7rem;letter-spacing:0.14em;color:var(--text-muted);">${esc(org.en)}</div>
@@ -2285,7 +2343,7 @@
                 ${org.docs
                   .map(
                     (d) =>
-                      `<span class="identity-pill" style="font-size:0.75rem;">${esc(d.icon)} ${esc(d.title)}</span>`
+                      `<span class="identity-pill" style="font-size:0.75rem;display:inline-flex;align-items:center;gap:0.3rem;">${getLoreDocTacticalIcon(d)}<span>${esc(d.title)}</span></span>`
                   )
                   .join("")}
               </div>
@@ -2312,8 +2370,8 @@
             ${orgList
               .map(
                 (o) => `
-              <button class="org-doc-pill-btn ${o.name === org.name ? "active" : ""}" data-open-org="${esc(o.name)}">
-                ${esc(o.icon)} ${esc(o.name)} (${o.docs.length})
+              <button class="org-doc-pill-btn ${o.name === org.name ? "active" : ""}" data-open-org="${esc(o.name)}" style="display:inline-flex;align-items:center;gap:0.38rem;">
+                ${o.iconSvg}<span>${esc(o.name)} (${o.docs.length})</span>
               </button>
             `
               )
@@ -2324,11 +2382,11 @@
         <div class="lore-doc-header">
           <div class="lore-doc-cat">${esc(org.en)} ・ 組織與國家設定專區</div>
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
-            <h2 class="lore-doc-title">${esc(org.icon)} ${esc(org.name)}</h2>
+            <h2 class="lore-doc-title" style="display:flex;align-items:center;gap:0.55rem;">${org.iconSvg}<span>${esc(org.name)}</span></h2>
             ${
               org.factionLink
                 ? `<button class="btn-story-toggle" data-jump-realm="${esc(org.factionLink.realm)}" data-jump-faction="${esc(org.factionLink.faction)}">
-                    ⚔️ 前往查看「${esc(org.name)}」陣營角色圖鑑 ↗
+                    前往查看「${esc(org.name)}」陣營角色圖鑑 ↗
                   </button>`
                 : ""
             }
@@ -2337,7 +2395,7 @@
         </div>
 
         <div style="margin-bottom:0.9rem;font-weight:700;color:var(--accent-gold);font-size:0.95rem;display:flex;align-items:center;gap:0.5rem;">
-          <span>📂 請選擇要閱讀的「${esc(org.name)}」文獻（共 ${org.docs.length} 篇）：</span>
+          ${TACTICAL_ICON_SVGS.realmAll}<span>請選擇要閱讀的「${esc(org.name)}」文獻（共 ${org.docs.length} 篇）：</span>
         </div>
 
         <div class="org-hub-grid">
@@ -2348,7 +2406,7 @@
               return `
                 <div class="org-doc-selector-card" data-open-lore-doc="${esc(d.id)}">
                   <div class="org-hub-card-top">
-                    <span class="org-hub-icon">${esc(d.icon)}</span>
+                    <span class="org-hub-icon">${getLoreDocTacticalIcon(d)}</span>
                     <span class="org-hub-badge">ARCHIVE #0${idx + 1}</span>
                   </div>
                   <div class="org-doc-selector-title">${esc(d.title)}</div>
@@ -2357,7 +2415,7 @@
                     ${esc(getDocPreviewSummary(d))}
                   </p>
                   <div style="margin-top:auto;padding-top:0.65rem;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;font-size:0.78rem;color:var(--text-muted);">
-                    <span>📄 ${paraCount} 段落${tableCount > 0 ? ` ・ 📊 ${tableCount} 表格` : ""}</span>
+                    <span>${paraCount} 段落${tableCount > 0 ? ` ・ ${tableCount} 表格` : ""}</span>
                     <span style="color:var(--accent-gold);font-weight:700;">開始閱讀 ➔</span>
                   </div>
                 </div>
@@ -2453,8 +2511,8 @@
             ${siblingDocs
               .map(
                 (sd) => `
-              <button class="org-doc-pill-btn ${sd.id === doc.id ? "active" : ""}" data-open-lore-doc="${esc(sd.id)}">
-                ${esc(sd.icon)} ${esc(sd.title)}
+              <button class="org-doc-pill-btn ${sd.id === doc.id ? "active" : ""}" data-open-lore-doc="${esc(sd.id)}" style="display:inline-flex;align-items:center;gap:0.38rem;">
+                ${getLoreDocTacticalIcon(sd)}<span>${esc(sd.title)}</span>
               </button>
             `
               )
@@ -2468,7 +2526,7 @@
       ${orgSwitcherHtml}
       <div class="lore-doc-header">
         <div class="lore-doc-cat">${esc(doc.category)}${doc.orgName ? ` ／ ${esc(doc.orgName)}` : ""}</div>
-        <h2 class="lore-doc-title">${esc(doc.icon)} ${esc(doc.title)}</h2>
+        <h2 class="lore-doc-title" style="display:flex;align-items:center;gap:0.55rem;">${getLoreDocTacticalIcon(doc)}<span>${esc(doc.title)}</span></h2>
         <div class="lore-doc-subtitle">${esc(doc.subtitle)}</div>
       </div>
       ${tocHtml}
@@ -2488,8 +2546,8 @@
 
     let html = `
       <div class="tree-quick-actions">
-        <button class="tree-action-btn" id="btnExpandAllStoryTree" title="展開所有劇情系列">➕ 全部展開</button>
-        <button class="tree-action-btn" id="btnCollapseAllStoryTree" title="收合所有劇情系列">➖ 全部折疊</button>
+        <button class="tree-action-btn" id="btnExpandAllStoryTree" title="展開所有劇情系列"><span class="tact-act-sym">＋</span> 全部展開</button>
+        <button class="tree-action-btn" id="btnCollapseAllStoryTree" title="收合所有劇情系列"><span class="tact-act-sym">－</span> 全部折疊</button>
       </div>
     `;
 
@@ -2502,7 +2560,7 @@
           <button class="tree-realm-header-btn ${isOpen ? "expanded" : ""}" data-toggle-story-series="${esc(seriesName)}">
             <span class="tree-realm-left">
               <span class="tree-chevron ${isOpen ? "open" : ""}">▶</span>
-              <span>📚 ${esc(seriesName)}</span>
+              <span>${esc(seriesName)}</span>
             </span>
             <span class="tree-count">${seriesStories.length}</span>
           </button>
@@ -2511,7 +2569,7 @@
               .map(
                 (st, idx) => `
               <button class="tree-item ${state.selectedStoryId === st.id ? "active" : ""}" data-story-id="${esc(st.id)}">
-                <span class="tree-item-label">📖 ${esc(st.title)}</span>
+                <span class="tree-item-label">${LORE_TACTICAL_SVGS.storyChapter}<span>${esc(st.title)}</span></span>
                 <span class="tree-count">${seriesStories.length > 1 ? `#${idx}` : "單篇"}</span>
               </button>
             `
@@ -3023,7 +3081,7 @@
           <div class="faction-group-banner" data-toggle-gallery-group="${esc(grp.label)}" title="點擊收合／展開此立繪分類">
             <h3>
               <span class="tree-chevron ${isCollapsed ? "" : "open"}">▶</span>
-              <span>🖼️ ${esc(grp.label)}</span>
+              ${TACTICAL_ICON_SVGS.sectorBanner}<span>${esc(grp.label)}</span>
             </h3>
             <span class="group-count-tag">
               <span>${grp.items.length} 幅立繪</span>

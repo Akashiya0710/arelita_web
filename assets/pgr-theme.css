@@ -5687,6 +5687,28 @@ html[data-pgr-palette="blue"] .tactical-sector-svg {
   filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.65)) !important;
 }
 
+.org-hub-icon .tactical-tree-svg {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 8px rgba(224, 26, 34, 0.55));
+}
+
+.lore-doc-title .tactical-tree-svg {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 8px rgba(224, 26, 34, 0.55));
+}
+
+.faction-group-banner h3 .tactical-tree-svg {
+  width: 17px;
+  height: 17px;
+}
+
+html[data-pgr-palette="blue"] .org-hub-icon .tactical-tree-svg,
+html[data-pgr-palette="blue"] .lore-doc-title .tactical-tree-svg {
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.55)) !important;
+}
+
 /* 18.9 Combat Arsenal & Authorities Modules (Original Rounded Pill & Card Border Style) */
 html[data-theme="pgr"] .ability-card {
   background: var(--bg-subtle) !important;
