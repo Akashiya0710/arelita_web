@@ -294,6 +294,51 @@
     .pgr-viewer-bottom-hud .caution {
       color: #e01a22;
     }
+
+    @media (max-width: 768px) {
+      .viewer-header {
+        height: auto;
+        min-height: 56px;
+        flex-wrap: wrap;
+        padding: 0.45rem 0.7rem;
+        gap: 0.4rem;
+      }
+      .viewer-badge {
+        display: none;
+      }
+      .viewer-title {
+        font-size: 0.92rem;
+      }
+      .viewer-controls {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .viewer-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .ctrl-btn {
+        padding: 0.3rem 0.55rem;
+        font-size: 0.72rem;
+      }
+      .viewport {
+        top: 86px;
+      }
+      .viewer-footer-hint {
+        width: 94vw;
+        max-width: 94vw;
+        white-space: normal;
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+        gap: 0.35rem 0.75rem;
+        padding: 0.35rem 0.65rem;
+        font-size: 0.68rem;
+        bottom: 2rem;
+      }
+    }
   </style>
 </head>
 <body class="bg-dark">

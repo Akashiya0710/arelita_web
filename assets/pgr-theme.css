@@ -6129,3 +6129,929 @@ html[data-pgr-palette="blue"] .portrait-zoom-hint {
   border-color: #00f0ff !important;
 }
 
+/* ============================================================================
+   19. COMPREHENSIVE MOBILE & TABLET RESPONSIVE OVERHAUL (PGR TACTICAL UI)
+   Eliminates cramped elements, overlapping HUD headers, sticky sidebar traps,
+   and 3-column mobile squeezes across index.html and all subpages.
+   ============================================================================ */
+
+/* --- 19.1 Tablet & Mobile Top 2-Tier Tactical Header & Horizontal Navigation Rail (<= 1180px) --- */
+@media (max-width: 1180px) {
+  /* Solid Glass Backdrop behind Fixed Top Brand + Controls so scrolling content never collides */
+  html[data-theme="pgr"] body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: rgba(9, 10, 14, 0.96);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 9780;
+    pointer-events: none;
+  }
+
+  html[data-theme="pgr"] body.compare-page-body::before {
+    display: none !important;
+  }
+
+  .pgr-top-brand {
+    top: 10px !important;
+    left: 16px !important;
+    z-index: 9810 !important;
+  }
+
+  .pgr-tb-main {
+    font-size: 1.28rem !important;
+  }
+
+  .pgr-tb-sub {
+    font-size: 0.5rem !important;
+    padding-left: 24px !important;
+    letter-spacing: 0.2em !important;
+  }
+
+  .pgr-top-controls {
+    top: 9px !important;
+    right: 14px !important;
+    gap: 6px !important;
+    z-index: 9810 !important;
+  }
+
+  /* Transform Left Vertical Rail into a Swipeable Horizontal Tactical Nav Bar at Top Tier 2 */
+  .pgr-left-rail {
+    display: flex !important;
+    position: fixed !important;
+    top: 50px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: 42px !important;
+    background: rgba(11, 13, 19, 0.96) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.72) !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 0 10px !important;
+    z-index: 9790 !important;
+    box-sizing: border-box !important;
+  }
+
+  .pgr-rail-toggle {
+    display: none !important;
+  }
+
+  .pgr-left-rail .pgr-rail-list,
+  .pgr-left-rail.is-collapsed .pgr-rail-list {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    border-left: none !important;
+    padding: 0 4px !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .pgr-left-rail .pgr-rail-list::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .pgr-rail-item {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 5px 11px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(16, 19, 27, 0.75) !important;
+    transform: none !important;
+  }
+
+  .pgr-rail-item .pgr-rail-en {
+    font-size: 0.66rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  .pgr-rail-item .pgr-rail-zh {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    color: rgba(255, 255, 255, 0.82) !important;
+  }
+
+  .pgr-rail-item.active {
+    background: linear-gradient(90deg, rgba(224, 26, 34, 0.28) 0%, rgba(16, 19, 27, 0.95) 100%) !important;
+    border-color: #ff2a32 !important;
+  }
+
+  html[data-pgr-palette="blue"] .pgr-rail-item.active {
+    background: linear-gradient(90deg, rgba(0, 180, 216, 0.28) 0%, rgba(13, 17, 26, 0.95) 100%) !important;
+    border-color: #00f0ff !important;
+  }
+
+  .pgr-rail-item.active .pgr-rail-en {
+    font-size: 0.7rem !important;
+  }
+
+  .pgr-rail-item.active .pgr-rail-zh {
+    color: #ffffff !important;
+  }
+
+  .pgr-rail-item.active::before {
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 2.5px !important;
+  }
+
+  .pgr-rail-item.active::after {
+    display: none !important;
+  }
+
+  html[data-theme="pgr"] .main-container {
+    padding: 104px 20px 58px 20px !important;
+  }
+
+  html[data-theme="pgr"] #bgmPopover:not(.hidden) {
+    top: 52px !important;
+    right: 12px !important;
+  }
+}
+
+/* --- 19.2 Collapsible Sidebar & Portrait Stacking Fix on Tablet/Mobile (<= 1024px) --- */
+@media (max-width: 1024px) {
+  /* Release sticky sidebar trap on mobile/tablet so it never blocks vertical scrolling */
+  html[data-theme="pgr"] .sidebar,
+  html[data-theme="pgr"] #factionSidebar,
+  html[data-theme="pgr"] #worldSidebar,
+  html[data-theme="pgr"] #attributeSidebar,
+  html[data-theme="pgr"] #storySidebar,
+  html[data-theme="pgr"] #gallerySidebar {
+    position: relative !important;
+    top: auto !important;
+    max-height: none !important;
+    margin-bottom: 12px !important;
+    z-index: 15 !important;
+  }
+
+  /* Restore mobile collapse indicator on #factionSidebar and all PGR sidebars */
+  html[data-theme="pgr"] .sidebar .sidebar-header,
+  html[data-theme="pgr"] #factionSidebar .sidebar-header {
+    position: relative !important;
+    padding: 0.75rem 0.95rem !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  html[data-theme="pgr"] .sidebar .sidebar-header::after,
+  html[data-theme="pgr"] #factionSidebar .sidebar-header::after {
+    position: static !important;
+    content: "▲ 收合篩選目錄" !important;
+    font-family: "Consolas", "Noto Sans TC", monospace !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em !important;
+    color: #ffffff !important;
+    background: rgba(224, 26, 34, 0.25) !important;
+    border: 1px solid #ff2a32 !important;
+    border-radius: 0 !important;
+    padding: 0.24rem 0.62rem !important;
+    flex-shrink: 0 !important;
+    clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+  }
+
+  html[data-theme="pgr"] .sidebar.is-mobile-collapsed .sidebar-header::after,
+  html[data-theme="pgr"] #factionSidebar.is-mobile-collapsed .sidebar-header::after {
+    content: "▼ 展開篩選目錄" !important;
+  }
+
+  html[data-pgr-palette="blue"] .sidebar .sidebar-header::after,
+  html[data-pgr-palette="blue"] #factionSidebar .sidebar-header::after {
+    background: rgba(0, 180, 216, 0.24) !important;
+    border-color: #00f0ff !important;
+    color: #00f0ff !important;
+  }
+
+  html[data-theme="pgr"] .sidebar .faction-tree,
+  html[data-theme="pgr"] .sidebar .lore-nav-tree,
+  html[data-theme="pgr"] .sidebar .story-nav-tree,
+  html[data-theme="pgr"] .sidebar .attribute-nav-tree,
+  html[data-theme="pgr"] .sidebar #galleryNavContainer {
+    max-height: 320px !important;
+    padding: 0.6rem 0.65rem 1rem !important;
+  }
+
+  /* Stack Character Portrait Above Dossier Body Cleanly */
+  html[data-theme="pgr"] .char-showcase-card.has-portrait .card-graphic-watermark {
+    right: 1rem !important;
+    font-size: 2.8rem !important;
+  }
+
+  html[data-theme="pgr"] .char-portrait-aside {
+    border-left: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+    padding: 0.85rem !important;
+  }
+}
+
+/* --- 19.3 Mobile & Large Phone Layout Overhaul (<= 768px) --- */
+@media (max-width: 768px) {
+  html[data-theme="pgr"] .main-container {
+    padding: 98px 12px 46px 12px !important;
+  }
+
+  .pgr-bg-watermark {
+    font-size: 3.6rem !important;
+    top: 94px !important;
+    left: 10px !important;
+    opacity: 0.5 !important;
+  }
+
+  .pgr-tb-sub {
+    display: none !important;
+  }
+
+  .pgr-top-brand {
+    top: 14px !important;
+    left: 12px !important;
+  }
+
+  .pgr-tb-main {
+    font-size: 1.18rem !important;
+  }
+
+  /* Compact Top-Right Controls on Mobile so Brand and Controls never collide */
+  .pgr-top-controls {
+    top: 9px !important;
+    right: 10px !important;
+    gap: 5px !important;
+  }
+
+  .pgr-palette-btn {
+    padding: 0 9px !important;
+    height: 30px !important;
+  }
+
+  .pgr-palette-text {
+    display: none !important;
+  }
+
+  .pgr-quick-search {
+    height: 30px !important;
+    padding: 2px 8px !important;
+  }
+
+  .pgr-quick-search input {
+    width: clamp(95px, 28vw, 145px) !important;
+    font-size: 0.72rem !important;
+  }
+
+  .pgr-hud-btn {
+    height: 30px !important;
+    padding: 0 9px !important;
+    font-size: 0.66rem !important;
+  }
+
+  #pgrAudioMirrorText {
+    display: none !important;
+  }
+
+  /* Compact Section Telemetry Header */
+  .pgr-section-header {
+    margin: 0 0 12px 0 !important;
+  }
+
+  .pgr-sh-event-code,
+  .pgr-sh-page-counter,
+  .pgr-sh-dots {
+    display: none !important;
+  }
+
+  .pgr-sh-center {
+    padding: 0 10px !important;
+    gap: 10px !important;
+  }
+
+  .pgr-sh-main-title {
+    font-size: clamp(1.22rem, 5.2vw, 1.65rem) !important;
+  }
+
+  .pgr-sh-sub-bar::before,
+  .pgr-sh-sub-bar::after {
+    width: 22px !important;
+  }
+
+  .pgr-sh-sub-text {
+    font-size: 0.54rem !important;
+    letter-spacing: 0.14em !important;
+    padding: 1px 6px !important;
+  }
+
+  /* Home Tab: Five Realms Resonance Bar */
+  .pgr-worldview-telemetry {
+    margin: -2px auto 8px !important;
+  }
+
+  .pgr-wt-realms {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+    padding: 7px 10px !important;
+  }
+
+  .pgr-wt-label {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    padding-right: 0 !important;
+    padding-bottom: 4px !important;
+    font-size: 0.6rem !important;
+  }
+
+  .pgr-wt-realm-pills {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 6px !important;
+    padding-bottom: 2px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .pgr-wt-realm-pills::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .pgr-realm-chip {
+    flex-shrink: 0 !important;
+    padding: 4px 9px !important;
+  }
+
+  /* Home Tab: Hero Carousel Stage */
+  html[data-theme="pgr"] .home-carousel-wrap {
+    height: clamp(330px, 74vw, 395px) !important;
+  }
+
+  .pgr-frame-brand-tag {
+    top: 10px !important;
+    left: 12px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .pgr-frame-ver-tag {
+    display: none !important;
+  }
+
+  .carousel-astrolabe-hud {
+    width: 240px !important;
+    height: 240px !important;
+    top: 34% !important;
+  }
+
+  html[data-theme="pgr"] .carousel-nav-btn {
+    width: 32px !important;
+    height: 32px !important;
+    top: 30% !important;
+    font-size: 0.78rem !important;
+  }
+
+  html[data-theme="pgr"] .carousel-nav-btn.prev {
+    left: 8px !important;
+  }
+
+  html[data-theme="pgr"] .carousel-nav-btn.next {
+    right: 8px !important;
+  }
+
+  html[data-theme="pgr"] .carousel-overlay {
+    padding: 14px 12px 18px !important;
+    background: linear-gradient(180deg, rgba(8, 10, 14, 0.08) 0%, rgba(8, 10, 14, 0.58) 36%, rgba(8, 10, 14, 0.96) 100%) !important;
+  }
+
+  html[data-theme="pgr"] .carousel-badge {
+    font-size: 0.56rem !important;
+    letter-spacing: 0.08em !important;
+    padding: 2px 8px !important;
+    margin-bottom: 6px !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    line-height: 1.35 !important;
+  }
+
+  html[data-theme="pgr"] .carousel-title {
+    font-size: clamp(1.16rem, 4.8vw, 1.48rem) !important;
+    margin: 0 0 6px 0 !important;
+    line-height: 1.25 !important;
+  }
+
+  html[data-theme="pgr"] .carousel-desc {
+    font-size: 0.76rem !important;
+    line-height: 1.48 !important;
+    margin: 0 auto 8px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  .carousel-lore-chips {
+    gap: 4px !important;
+    margin: 0 auto 10px !important;
+  }
+
+  .lore-chip {
+    font-size: 0.6rem !important;
+    padding: 2px 6px !important;
+  }
+
+  html[data-theme="pgr"] .carousel-actions {
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  html[data-theme="pgr"] .carousel-cta-btn {
+    padding: 6px 12px !important;
+    font-size: 0.72rem !important;
+  }
+
+  html[data-theme="pgr"] .carousel-indicators {
+    bottom: -18px !important;
+    gap: 10px !important;
+  }
+
+  .pgr-home-caption {
+    margin: 18px auto 8px !important;
+  }
+
+  .pgr-hc-spaced-text {
+    font-size: 0.62rem !important;
+    letter-spacing: 0.18em !important;
+  }
+
+  /* Home Tactical Dock: 2 Columns on Phones instead of cramped 3 columns */
+  .pgr-home-dock {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .pgr-dock-btn,
+  .pgr-dock-btn:link,
+  .pgr-dock-btn:visited {
+    padding: 9px 10px 10px !important;
+  }
+
+  .pgr-db-code {
+    font-size: 0.54rem !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .pgr-db-title {
+    font-size: 0.76rem !important;
+  }
+
+  .pgr-db-sub {
+    font-size: 0.6rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .pgr-db-watermark {
+    font-size: 1.8rem !important;
+  }
+
+  /* DATA Tab: Construct Spotlight Stage */
+  .pgr-construct-stage {
+    padding: 14px 12px !important;
+    margin-bottom: 14px !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .pgr-char-select-slash {
+    position: static !important;
+    align-self: stretch !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 10px !important;
+    padding: 5px 10px !important;
+  }
+
+  .pgr-cs-inner {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+    min-height: 0 !important;
+  }
+
+  .pgr-cs-left {
+    min-width: 0 !important;
+  }
+
+  .pgr-cs-name {
+    font-size: 1.35rem !important;
+  }
+
+  .pgr-cs-specs {
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .pgr-cs-spec-item {
+    font-size: 0.7rem !important;
+    padding: 2px 7px !important;
+  }
+
+  .pgr-cs-actions {
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .pgr-cs-btn {
+    padding: 6px 11px !important;
+    font-size: 0.7rem !important;
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+  }
+
+  .pgr-cs-avatar-strip {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .pgr-cs-right {
+    height: 205px !important;
+    order: -1 !important;
+  }
+
+  .pgr-cs-art-wrap {
+    height: 205px !important;
+    max-width: 260px !important;
+  }
+
+  .pgr-cs-art-wrap img {
+    max-height: 200px !important;
+  }
+
+  /* DATA Tab: Toolbar & Faction Banner */
+  html[data-theme="pgr"] .pgr-data-toolbar {
+    padding: 0.75rem 0.85rem !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+
+  html[data-theme="pgr"] .pgr-data-toolbar .toolbar-right {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  .pgr-dt-stat {
+    min-width: 60px !important;
+    padding: 3px 8px !important;
+  }
+
+  .pgr-dt-stat .stat-v {
+    font-size: 0.88rem !important;
+  }
+
+  html[data-theme="pgr"] .view-mode-btn {
+    padding: 0.34rem 0.62rem !important;
+    font-size: 0.74rem !important;
+  }
+
+  html[data-theme="pgr"] .faction-group-banner {
+    padding: 0.62rem 0.85rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.45rem !important;
+  }
+
+  .fgb-right {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  .fgb-img-pill,
+  .fgb-member-pill,
+  .fgb-state-pill {
+    font-size: 0.66rem !important;
+    padding: 2px 7px !important;
+  }
+
+  /* DATA Tab: Character Dossier Showcase Card */
+  html[data-theme="pgr"] .char-main-body {
+    padding: 0.8rem !important;
+    gap: 0.68rem !important;
+  }
+
+  html[data-theme="pgr"] .char-header-row {
+    padding: 0.7rem 0.8rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.55rem !important;
+  }
+
+  .char-dossier-kicker {
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+  }
+
+  .dossier-kicker-text {
+    font-size: 0.58rem !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  html[data-theme="pgr"] .char-name {
+    font-size: 1.28rem !important;
+  }
+
+  html[data-theme="pgr"] .char-epithet {
+    font-size: 0.74rem !important;
+    padding: 0.14rem 0.55rem !important;
+  }
+
+  html[data-theme="pgr"] .char-header-right-badges {
+    width: 100% !important;
+    gap: 6px !important;
+  }
+
+  html[data-theme="pgr"] .badge-power,
+  html[data-theme="pgr"] .btn-compare-char {
+    padding: 0.28rem 0.6rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .pgr-subpanel-header .subpanel-title {
+    white-space: normal !important;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.08em !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Biometric Grid: Crisp 2-Column Layout on Phones */
+  html[data-theme="pgr"] .char-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.38rem !important;
+    padding: 0.5rem !important;
+  }
+
+  html[data-theme="pgr"] .meta-cell {
+    padding: 0.38rem 0.52rem !important;
+    min-width: 0 !important;
+  }
+
+  html[data-theme="pgr"] .meta-cell.meta-cell-attr,
+  html[data-theme="pgr"] .meta-cell.wide {
+    grid-column: span 2 !important;
+  }
+
+  html[data-theme="pgr"] .meta-label {
+    font-size: 0.56rem !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  html[data-theme="pgr"] .meta-val {
+    font-size: 0.84rem !important;
+    word-break: break-word !important;
+  }
+
+  /* Psychological & Visual Profile: 1-Column Stack on Phones */
+  html[data-theme="pgr"] .char-traits-box {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0.45rem !important;
+  }
+
+  html[data-theme="pgr"] .trait-item {
+    padding: 0.55rem 0.72rem !important;
+  }
+
+  .trait-item-body {
+    font-size: 0.8rem !important;
+  }
+
+  html[data-theme="pgr"] .ability-card {
+    padding: 0.55rem 0.75rem !important;
+  }
+
+  html[data-theme="pgr"] .ability-content {
+    font-size: 0.8rem !important;
+    line-height: 1.58 !important;
+  }
+
+  html[data-theme="pgr"] .portrait-img-frame {
+    max-width: 240px !important;
+    height: clamp(210px, 60vw, 280px) !important;
+    margin: 0 auto !important;
+  }
+
+  /* WORLD & CHRONICLES Tabs: Responsive Tables & Cards */
+  html[data-theme="pgr"] .lore-document-card,
+  html[data-theme="pgr"] .story-reader-card {
+    padding: 0.85rem 0.85rem !important;
+  }
+
+  .lore-doc-content table,
+  .lore-document-card table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* ILLUSTRATION Tab: Bento Grid on Mobile (2 Roomy Cards per Row) */
+  .pgr-wp-bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: auto !important;
+    gap: 8px !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .pgr-wp-col-stack {
+    grid-column: span 2 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: 195px !important;
+    gap: 8px !important;
+    height: 195px !important;
+  }
+
+  .pgr-wp-col-tall {
+    height: 220px !important;
+  }
+
+  .pgr-wp-controls-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+
+  .pgr-wp-ctrl-btns {
+    width: 100% !important;
+    display: flex !important;
+    gap: 6px !important;
+  }
+
+  .pgr-wp-ctrl-btn {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: 7px 8px !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* OTHERS Tab: 4 Split Columns on Mobile */
+  .pgr-others-stage {
+    min-height: 0 !important;
+    gap: 8px !important;
+    border: none !important;
+  }
+
+  .pgr-other-col {
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    border-left: 3px solid #e01a22 !important;
+    padding: 18px 16px !important;
+    min-height: 130px !important;
+  }
+
+  .pgr-oc-content {
+    max-width: 100% !important;
+  }
+
+  .pgr-oc-title {
+    font-size: 1.32rem !important;
+  }
+
+  /* Bottom HUD Bar on Mobile */
+  .pgr-bottom-hud {
+    height: 26px !important;
+    padding: 0 10px !important;
+    font-size: 0.56rem !important;
+  }
+
+  .pgr-bh-arrows,
+  .pgr-bh-line,
+  .pgr-bh-serial,
+  .pgr-bh-slashes {
+    display: none !important;
+  }
+
+  .pgr-bh-center {
+    padding: 0 8px !important;
+  }
+
+  /* Subpages Shared Header (compare / tierlist / summon / relations) */
+  html[data-theme="pgr"] .compare-site-header {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  html[data-theme="pgr"] .compare-site-header .header-inner {
+    flex-wrap: wrap !important;
+    padding: 0.45rem 0.7rem !important;
+    gap: 0.4rem 0.5rem !important;
+    height: auto !important;
+  }
+
+  html[data-theme="pgr"] .compare-site-header .brand {
+    width: auto !important;
+    max-width: 100% !important;
+  }
+
+  html[data-theme="pgr"] .compare-site-header .brand-title span:first-child {
+    font-size: 0.94rem !important;
+  }
+
+  html[data-theme="pgr"] .compare-header-controls {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding-bottom: 2px !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  html[data-theme="pgr"] .compare-header-controls::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  html[data-theme="pgr"] .compare-action-btn {
+    flex-shrink: 0 !important;
+    font-size: 0.74rem !important;
+    padding: 0.32rem 0.65rem !important;
+  }
+
+  /* Summon Simulator Mobile Fixes (2-Column 10-Pull Grid & Compact Controls) */
+  .ten-batch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.55rem !important;
+  }
+
+  .summon-control-panel,
+  .summon-stage-panel {
+    padding: 0.85rem !important;
+  }
+
+  .summon-action-buttons {
+    flex-direction: column !important;
+    gap: 0.55rem !important;
+  }
+}
+
+/* --- 19.4 Small Phones (<= 480px) --- */
+@media (max-width: 480px) {
+  html[data-theme="pgr"] .main-container {
+    padding: 94px 8px 42px 8px !important;
+  }
+
+  .pgr-quick-search input {
+    width: 88px !important;
+  }
+
+  .pgr-rail-item {
+    padding: 4px 9px !important;
+    gap: 4px !important;
+  }
+
+  .pgr-rail-item .pgr-rail-en {
+    display: none !important;
+  }
+
+  .pgr-rail-item.active .pgr-rail-en {
+    display: inline !important;
+    font-size: 0.62rem !important;
+  }
+
+  .pgr-realm-chip .rc-sub {
+    display: none !important;
+  }
+
+  .carousel-lore-chips {
+    display: none !important;
+  }
+
+  html[data-theme="pgr"] .home-carousel-wrap {
+    height: 315px !important;
+  }
+}
+
+

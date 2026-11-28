@@ -3655,6 +3655,25 @@
           }
         });
       }
+      // Auto-collapse sidebar on mobile after selecting a leaf item so user immediately sees results
+      sidebar.addEventListener("click", (e) => {
+        if (window.innerWidth > 1024) return;
+        const leafBtn = e.target.closest(".tree-item, .lore-nav-item, .attr-nav-item, .story-nav-item");
+        if (leafBtn) {
+          sidebar.classList.add("is-mobile-collapsed");
+        }
+      });
+    });
+
+    // Auto-scroll active mobile PGR rail tab into view when switching tabs
+    document.querySelectorAll(".pgr-rail-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (window.innerWidth <= 1180) {
+          try {
+            btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+          } catch (e) {}
+        }
+      });
     });
   }
 
