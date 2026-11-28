@@ -3111,9 +3111,21 @@
 
   // ==================== MODALS & NEW-TAB PORTRAIT VIEWER ====================
   function updateBodyModalState() {
-    const charModalOpen = !document.getElementById("characterModal").classList.contains("hidden");
-    const lbOpen = !document.getElementById("imageLightbox").classList.contains("hidden");
-    document.body.classList.toggle("modal-open", charModalOpen || lbOpen);
+    const charModal = document.getElementById("characterModal");
+    const lbModal = document.getElementById("imageLightbox");
+    const charModalOpen = charModal && !charModal.classList.contains("hidden");
+    const lbOpen = lbModal && !lbModal.classList.contains("hidden");
+    const isOpen = Boolean(charModalOpen || lbOpen);
+    document.body.classList.toggle("modal-open", isOpen);
+
+    // Explicitly hide/restore fixed top HUD bars when modal is open so they never block close button on mobile
+    ["pgrTopBrand", "pgrTopControls", "pgrLeftRail"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.visibility = isOpen ? "hidden" : "";
+        el.style.pointerEvents = isOpen ? "none" : "";
+      }
+    });
   }
 
   function openCharacterModal(charId) {
@@ -3127,9 +3139,16 @@
     }
     const modal = document.getElementById("characterModal");
     const body = document.getElementById("modalBodyContent");
+    const topTitle = document.getElementById("modalTopBarTitle");
+    if (topTitle) {
+      topTitle.textContent = `DOSSIER // ${c.name.replace(/~~/g, "")}`;
+    }
     body.innerHTML = renderCharacterShowcaseCard(c, true);
+    modal.style.zIndex = "99999";
     modal.classList.remove("hidden");
     modal.setAttribute("aria-hidden", "false");
+    const dialog = modal.querySelector(".modal-dialog");
+    if (dialog) dialog.scrollTop = 0;
     updateBodyModalState();
     bindCharacterCardInteractions(body);
   }

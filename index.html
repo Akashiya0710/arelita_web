@@ -16,8 +16,68 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="assets/styles.css?v=20261115_pgr3" />
-  <link rel="stylesheet" href="assets/pgr-theme.css?v=20261128_modal" />
+  <link rel="stylesheet" href="assets/styles.css?v=20261128_fix2" />
+  <link rel="stylesheet" href="assets/pgr-theme.css?v=20261128_fix2" />
+  <style>
+    /* Critical Modal Layer & Mobile Close Header Bar (Bypass cache & prevent header overlap) */
+    #characterModal,
+    #imageLightbox {
+      z-index: 99999 !important;
+    }
+    body.modal-open .pgr-top-brand,
+    body.modal-open .pgr-top-controls,
+    body.modal-open .pgr-left-rail,
+    body.modal-open::before {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    .modal-top-bar {
+      position: sticky !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 500 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 10px !important;
+      padding: 10px 14px !important;
+      background: rgba(12, 14, 20, 0.98) !important;
+      border-bottom: 2px solid #e01a22 !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.85) !important;
+    }
+    html[data-pgr-palette="blue"] .modal-top-bar {
+      border-bottom-color: #00f0ff !important;
+    }
+    .modal-top-bar-title {
+      font-family: "Consolas", "Noto Sans TC", monospace;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .modal-top-bar .modal-close-btn {
+      position: static !important;
+      float: none !important;
+      margin: 0 !important;
+      width: auto !important;
+      min-width: 78px !important;
+      height: 36px !important;
+      padding: 0 14px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      font-size: 0.85rem !important;
+      font-weight: 900 !important;
+      flex-shrink: 0 !important;
+      touch-action: manipulation;
+    }
+  </style>
 </head>
 <body class="is-loading">
   <!-- Next-Gen Cyber-Tactical Holographic Visor & Diagonal Blast-Gate Opening Sequence -->
@@ -1206,7 +1266,13 @@
   <!-- Character Full Detail Modal -->
   <div id="characterModal" class="modal-backdrop hidden" aria-hidden="true">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalCharTitle">
-      <button class="modal-close-btn" id="closeModalBtn" title="關閉 (Esc)">✕</button>
+      <div class="modal-top-bar">
+        <span class="modal-top-bar-title" id="modalTopBarTitle">CONSTRUCT DOSSIER // 角色詳細檔案</span>
+        <button type="button" class="modal-close-btn" id="closeModalBtn" title="關閉 (Esc)" aria-label="關閉角色檔案">
+          <span>✕</span>
+          <span>關閉</span>
+        </button>
+      </div>
       <div id="modalBodyContent" class="modal-body-content">
         <!-- Populated dynamically by app.js -->
       </div>
@@ -1223,6 +1289,6 @@
   </div>
 
   <script src="assets/data.js?v=20261128"></script>
-  <script src="assets/app.js?v=20261128_rwd"></script>
+  <script src="assets/app.js?v=20261128_fix2"></script>
 </body>
 </html>
